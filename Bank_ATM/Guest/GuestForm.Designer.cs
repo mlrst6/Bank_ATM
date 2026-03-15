@@ -1,16 +1,11 @@
-﻿namespace Bank_ATM
+using System.Drawing;
+
+namespace Bank_ATM
 {
     partial class GuestForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,147 +17,117 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GuestForm));
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            this.ExchangeRate = new System.Windows.Forms.Button();
-            this.ExchangeRateInfo = new System.Windows.Forms.Button();
-            this.BankInfo = new System.Windows.Forms.Button();
-            this.Back = new System.Windows.Forms.Button();
-            this.GuestMenu = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            this.txtCardNumber = new System.Windows.Forms.TextBox();
+            this.btnInsertCard = new System.Windows.Forms.Button();
+            this.btnExchange = new System.Windows.Forms.Button();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // txtCardNumber
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(227, 120);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(159, 140);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.txtCardNumber.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.txtCardNumber.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCardNumber.Font = new System.Drawing.Font("Segoe UI", 16F);
+            this.txtCardNumber.ForeColor = System.Drawing.Color.White;
+            this.txtCardNumber.Location = new System.Drawing.Point(50, 100);
+            this.txtCardNumber.MaxLength = 16;
+            this.txtCardNumber.Name = "txtCardNumber";
+            this.txtCardNumber.Size = new System.Drawing.Size(350, 43);
+            this.txtCardNumber.TabIndex = 0;
+            this.txtCardNumber.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // pictureBox2
+            // btnInsertCard
             // 
-            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(227, 266);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(159, 140);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox2.TabIndex = 0;
-            this.pictureBox2.TabStop = false;
+            this.btnInsertCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
+            this.btnInsertCard.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnInsertCard.FlatAppearance.BorderSize = 0;
+            this.btnInsertCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnInsertCard.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.btnInsertCard.ForeColor = System.Drawing.Color.White;
+            this.btnInsertCard.Location = new System.Drawing.Point(50, 160);
+            this.btnInsertCard.Name = "btnInsertCard";
+            this.btnInsertCard.Size = new System.Drawing.Size(350, 60);
+            this.btnInsertCard.TabIndex = 1;
+            this.btnInsertCard.Text = "INSERT CARD";
+            this.btnInsertCard.UseVisualStyleBackColor = false;
+            this.btnInsertCard.Click += new System.EventHandler(this.btnInsertCard_Click);
             // 
-            // pictureBox3
+            // btnExchange
             // 
-            this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pictureBox3.Location = new System.Drawing.Point(227, 412);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(159, 140);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox3.TabIndex = 0;
-            this.pictureBox3.TabStop = false;
+            this.btnExchange.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.btnExchange.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnExchange.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
+            this.btnExchange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExchange.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnExchange.ForeColor = System.Drawing.Color.White;
+            this.btnExchange.Location = new System.Drawing.Point(50, 240);
+            this.btnExchange.Name = "btnExchange";
+            this.btnExchange.Size = new System.Drawing.Size(350, 40);
+            this.btnExchange.TabIndex = 2;
+            this.btnExchange.Text = "EXCHANGE RATES";
+            this.btnExchange.UseVisualStyleBackColor = false;
             // 
-            // pictureBox4
+            // btnBack
             // 
-            this.pictureBox4.Cursor = System.Windows.Forms.Cursors.Default;
-            this.pictureBox4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4.Image")));
-            this.pictureBox4.Location = new System.Drawing.Point(227, 558);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(159, 140);
-            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox4.TabIndex = 0;
-            this.pictureBox4.TabStop = false;
+            this.btnBack.BackColor = System.Drawing.Color.Transparent;
+            this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnBack.FlatAppearance.BorderSize = 0;
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnBack.ForeColor = System.Drawing.Color.IndianRed;
+            this.btnBack.Location = new System.Drawing.Point(50, 300);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(350, 40);
+            this.btnBack.TabIndex = 3;
+            this.btnBack.Text = "GO BACK";
+            this.btnBack.UseVisualStyleBackColor = false;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
-            // ExchangeRate
+            // pnlHeader
             // 
-            this.ExchangeRate.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.ExchangeRate.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.ExchangeRate.Location = new System.Drawing.Point(422, 120);
-            this.ExchangeRate.Name = "ExchangeRate";
-            this.ExchangeRate.Size = new System.Drawing.Size(351, 140);
-            this.ExchangeRate.TabIndex = 1;
-            this.ExchangeRate.Text = "button1";
-            this.ExchangeRate.UseVisualStyleBackColor = true;
-            this.ExchangeRate.Click += new System.EventHandler(this.ExchangeRate_Click);
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.pnlHeader.Controls.Add(this.lblTitle);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(450, 80);
+            this.pnlHeader.TabIndex = 4;
             // 
-            // ExchangeRateInfo
+            // lblTitle
             // 
-            this.ExchangeRateInfo.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.ExchangeRateInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.ExchangeRateInfo.Location = new System.Drawing.Point(422, 266);
-            this.ExchangeRateInfo.Name = "ExchangeRateInfo";
-            this.ExchangeRateInfo.Size = new System.Drawing.Size(351, 140);
-            this.ExchangeRateInfo.TabIndex = 1;
-            this.ExchangeRateInfo.Text = "button1";
-            this.ExchangeRateInfo.UseVisualStyleBackColor = true;
-            // 
-            // BankInfo
-            // 
-            this.BankInfo.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BankInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.BankInfo.Location = new System.Drawing.Point(422, 412);
-            this.BankInfo.Name = "BankInfo";
-            this.BankInfo.Size = new System.Drawing.Size(351, 140);
-            this.BankInfo.TabIndex = 1;
-            this.BankInfo.Text = "button1";
-            this.BankInfo.UseVisualStyleBackColor = true;
-            // 
-            // Back
-            // 
-            this.Back.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Back.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Back.Location = new System.Drawing.Point(422, 558);
-            this.Back.Name = "Back";
-            this.Back.Size = new System.Drawing.Size(351, 140);
-            this.Back.TabIndex = 1;
-            this.Back.Text = "button1";
-            this.Back.UseVisualStyleBackColor = true;
-            this.Back.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // GuestMenu
-            // 
-            this.GuestMenu.AutoSize = true;
-            this.GuestMenu.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.GuestMenu.Location = new System.Drawing.Point(312, 23);
-            this.GuestMenu.Name = "GuestMenu";
-            this.GuestMenu.Size = new System.Drawing.Size(292, 39);
-            this.GuestMenu.TabIndex = 2;
-            this.GuestMenu.Text = "Mehmon menyusi";
+            this.lblTitle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(0, 0);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(450, 80);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Guest Menu";
+            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // GuestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(982, 753);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
+            this.ClientSize = new System.Drawing.Size(450, 400);
             this.ControlBox = false;
-            this.Controls.Add(this.GuestMenu);
-            this.Controls.Add(this.Back);
-            this.Controls.Add(this.BankInfo);
-            this.Controls.Add(this.ExchangeRateInfo);
-            this.Controls.Add(this.ExchangeRate);
-            this.Controls.Add(this.pictureBox4);
-            this.Controls.Add(this.pictureBox3);
-            this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.pnlHeader);
+            this.Controls.Add(this.btnBack);
+            this.Controls.Add(this.btnExchange);
+            this.Controls.Add(this.btnInsertCard);
+            this.Controls.Add(this.txtCardNumber);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "GuestForm";
-            this.Text = "GuestForm";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Guest Menu";
+            this.Load += new System.EventHandler(this.GuestForm_Load);
+            this.pnlHeader.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -170,14 +135,11 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.PictureBox pictureBox4;
-        private System.Windows.Forms.Button ExchangeRate;
-        private System.Windows.Forms.Button ExchangeRateInfo;
-        private System.Windows.Forms.Button BankInfo;
-        private System.Windows.Forms.Button Back;
-        private System.Windows.Forms.Label GuestMenu;
+        private System.Windows.Forms.TextBox txtCardNumber;
+        private System.Windows.Forms.Button btnInsertCard;
+        private System.Windows.Forms.Button btnExchange;
+        private System.Windows.Forms.Button btnBack;
+        private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.Label lblTitle;
     }
 }

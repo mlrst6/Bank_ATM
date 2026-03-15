@@ -1,16 +1,11 @@
-﻿namespace Bank_ATM
+using System.Drawing;
+
+namespace Bank_ATM
 {
     partial class LanguageForm1
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +17,6 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
@@ -34,93 +25,129 @@
             this.ENG = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(347, 143);
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 28F, System.Drawing.FontStyle.Bold);
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(258, 58);
+            this.label1.Size = new System.Drawing.Size(800, 100);
             this.label1.TabIndex = 0;
             this.label1.Text = "Bank ATM";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // UZ
             // 
+            this.UZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
             this.UZ.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.UZ.Location = new System.Drawing.Point(124, 331);
+            this.UZ.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
+            this.UZ.FlatAppearance.BorderSize = 2;
+            this.UZ.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.UZ.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.UZ.ForeColor = System.Drawing.Color.White;
+            this.UZ.Location = new System.Drawing.Point(50, 150);
             this.UZ.Name = "UZ";
-            this.UZ.Size = new System.Drawing.Size(193, 71);
+            this.UZ.Size = new System.Drawing.Size(220, 100);
             this.UZ.TabIndex = 1;
-            this.UZ.Text = "UZ";
-            this.UZ.UseVisualStyleBackColor = true;
+            this.UZ.Text = "O\'zbekcha";
+            this.UZ.UseVisualStyleBackColor = false;
             this.UZ.Click += new System.EventHandler(this.button1_Click);
             // 
             // RU
             // 
+            this.RU.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
             this.RU.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.RU.Location = new System.Drawing.Point(613, 331);
+            this.RU.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
+            this.RU.FlatAppearance.BorderSize = 2;
+            this.RU.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.RU.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.RU.ForeColor = System.Drawing.Color.White;
+            this.RU.Location = new System.Drawing.Point(530, 150);
             this.RU.Name = "RU";
-            this.RU.Size = new System.Drawing.Size(193, 71);
+            this.RU.Size = new System.Drawing.Size(220, 100);
             this.RU.TabIndex = 1;
-            this.RU.Text = "RU";
-            this.RU.UseVisualStyleBackColor = true;
+            this.RU.Text = "Русский";
+            this.RU.UseVisualStyleBackColor = false;
             this.RU.Click += new System.EventHandler(this.button2_Click);
             // 
             // ENG
             // 
+            this.ENG.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
             this.ENG.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.ENG.Location = new System.Drawing.Point(370, 331);
+            this.ENG.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
+            this.ENG.FlatAppearance.BorderSize = 2;
+            this.ENG.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ENG.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.ENG.ForeColor = System.Drawing.Color.White;
+            this.ENG.Location = new System.Drawing.Point(290, 150);
             this.ENG.Name = "ENG";
-            this.ENG.Size = new System.Drawing.Size(193, 71);
+            this.ENG.Size = new System.Drawing.Size(220, 100);
             this.ENG.TabIndex = 1;
-            this.ENG.Text = "ENG";
-            this.ENG.UseVisualStyleBackColor = true;
+            this.ENG.Text = "English";
+            this.ENG.UseVisualStyleBackColor = false;
             this.ENG.Click += new System.EventHandler(this.button3_Click);
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(185, 490);
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 14F);
+            this.label2.ForeColor = System.Drawing.Color.Silver;
+            this.label2.Location = new System.Drawing.Point(0, 300);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(571, 29);
+            this.label2.Size = new System.Drawing.Size(800, 40);
             this.label2.TabIndex = 2;
             this.label2.Text = "Tilni tanlang / Choose language / Выберите язык";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.label3.Dock = System.Windows.Forms.DockStyle.Right;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold);
             this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(960, 0);
+            this.label3.Location = new System.Drawing.Point(760, 10);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(22, 22);
+            this.label3.Size = new System.Drawing.Size(31, 29);
             this.label3.TabIndex = 3;
             this.label3.Text = "X";
             this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
+            // pnlHeader
+            // 
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.pnlHeader.Controls.Add(this.label3);
+            this.pnlHeader.Controls.Add(this.label1);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(800, 100);
+            this.pnlHeader.TabIndex = 4;
             // 
             // LanguageForm1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(982, 753);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
+            this.ClientSize = new System.Drawing.Size(800, 400);
             this.ControlBox = false;
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.ENG);
             this.Controls.Add(this.RU);
             this.Controls.Add(this.UZ);
-            this.Controls.Add(this.label1);
-            this.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "LanguageForm1";
-            this.Text = "LanguageForm1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Language Selection";
             this.Load += new System.EventHandler(this.LanguageForm1_Load);
+            this.pnlHeader.ResumeLayout(false);
+            this.pnlHeader.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -132,5 +159,6 @@
         private System.Windows.Forms.Button ENG;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Panel pnlHeader;
     }
 }

@@ -12,6 +12,9 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <GenerateResourceMSBuildRuntime>CurrentRuntime</GenerateResourceMSBuildRuntime>
+    <DisableTaskHost>true</DisableTaskHost>
+    <RuntimeIdentifier>win</RuntimeIdentifier>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +36,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Dapper">
+      <Version>2.0.123</Version>
+    </PackageReference>
+    <PackageReference Include="BCrypt.Net-Next">
+      <Version>4.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,6 +58,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Guest\ConverterForm.cs">
@@ -70,6 +85,12 @@
     <Compile Include="Guest\GuestForm.Designer.cs">
       <DependentUpon>GuestForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Guest\GuestActionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guest\GuestActionsForm.Designer.cs">
+      <DependentUpon>GuestActionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LanguageForm1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,7 +104,21 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Guest\PinEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guest\PinEntryForm.Designer.cs">
+      <DependentUpon>PinEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\AudioManager.cs" />
+    <Compile Include="Models\AtmModels.cs" />
+    <Compile Include="Core\SessionManager.cs" />
+    <Compile Include="Core\TimeoutManager.cs" />
+    <Compile Include="Repositories\CardRepository.cs" />
+    <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Repositories\TransactionRepository.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Guest\ConverterForm.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
@@ -121,24 +156,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\languages.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Content Include="Images\arrows_16012802.png" />
-    <Content Include="Images\bank_6846272.png" />
-    <Content Include="Images\chauffeur_12271759.png" />
-    <Content Include="Images\credit_11323454.png" />
-    <Content Include="Images\left-arrow_16799021.png" />
-    <Content Include="Images\left-right-arrow_15767611.png" />
-    <Content Include="Images\management_17873545.png" />
-    <Content Include="Images\money-exchange_10063193.png" />
-    <Content Include="Images\money-exchange_9238821.png" />
-    <Content Include="Images\swap_5469483.png" />
-    <Content Include="Images\swipe_6218947.png" />
-    <Content Include="Images\user_12000759.png" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

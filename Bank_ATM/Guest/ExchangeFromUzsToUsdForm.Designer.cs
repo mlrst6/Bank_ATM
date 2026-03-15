@@ -1,16 +1,11 @@
-﻿namespace Bank_ATM
+using System.Drawing;
+
+namespace Bank_ATM
 {
     partial class ExchangeFromUzsToUsdForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +17,6 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.ExchangeUzsPrice = new System.Windows.Forms.Label();
@@ -37,120 +28,152 @@
             this.OtherAmount = new System.Windows.Forms.Button();
             this.Back = new System.Windows.Forms.Button();
             this.converter = new System.Windows.Forms.Button();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // pnlHeader
+            // 
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.pnlHeader.Controls.Add(this.ExchangeUzsPrice);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(800, 80);
+            this.pnlHeader.TabIndex = 2;
             // 
             // ExchangeUzsPrice
             // 
-            this.ExchangeUzsPrice.AutoSize = true;
-            this.ExchangeUzsPrice.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.ExchangeUzsPrice.Location = new System.Drawing.Point(235, 9);
+            this.ExchangeUzsPrice.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ExchangeUzsPrice.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
+            this.ExchangeUzsPrice.ForeColor = System.Drawing.Color.White;
+            this.ExchangeUzsPrice.Location = new System.Drawing.Point(0, 0);
             this.ExchangeUzsPrice.Name = "ExchangeUzsPrice";
-            this.ExchangeUzsPrice.Size = new System.Drawing.Size(430, 39);
+            this.ExchangeUzsPrice.Size = new System.Drawing.Size(800, 80);
             this.ExchangeUzsPrice.TabIndex = 0;
-            this.ExchangeUzsPrice.Text = "Exchage from UZS to USD";
+            this.ExchangeUzsPrice.Text = "Exchange from UZS to USD";
+            this.ExchangeUzsPrice.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button1
             // 
-            this.button1.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button1.Location = new System.Drawing.Point(170, 132);
+            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.button1.ForeColor = System.Drawing.Color.White;
+            this.button1.Location = new System.Drawing.Point(100, 120);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(165, 126);
+            this.button1.Size = new System.Drawing.Size(180, 100);
             this.button1.TabIndex = 1;
             this.button1.Text = "1 USD";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
-            this.button2.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button2.Location = new System.Drawing.Point(393, 132);
+            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.button2.ForeColor = System.Drawing.Color.White;
+            this.button2.Location = new System.Drawing.Point(310, 120);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(165, 126);
+            this.button2.Size = new System.Drawing.Size(180, 100);
             this.button2.TabIndex = 1;
             this.button2.Text = "5 USD";
-            this.button2.UseVisualStyleBackColor = true;
+            this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
-            this.button3.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button3.Location = new System.Drawing.Point(610, 132);
+            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.button3.ForeColor = System.Drawing.Color.White;
+            this.button3.Location = new System.Drawing.Point(520, 120);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(165, 126);
+            this.button3.Size = new System.Drawing.Size(180, 100);
             this.button3.TabIndex = 1;
             this.button3.Text = "10 USD";
-            this.button3.UseVisualStyleBackColor = true;
+            this.button3.UseVisualStyleBackColor = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button5
             // 
-            this.button5.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button5.Location = new System.Drawing.Point(170, 334);
+            this.button5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.button5.ForeColor = System.Drawing.Color.White;
+            this.button5.Location = new System.Drawing.Point(100, 240);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(165, 126);
+            this.button5.Size = new System.Drawing.Size(180, 100);
             this.button5.TabIndex = 1;
             this.button5.Text = "50 USD";
-            this.button5.UseVisualStyleBackColor = true;
+            this.button5.UseVisualStyleBackColor = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button6
             // 
-            this.button6.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button6.Location = new System.Drawing.Point(393, 334);
+            this.button6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.button6.ForeColor = System.Drawing.Color.White;
+            this.button6.Location = new System.Drawing.Point(310, 240);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(165, 126);
+            this.button6.Size = new System.Drawing.Size(180, 100);
             this.button6.TabIndex = 1;
             this.button6.Text = "100 USD";
-            this.button6.UseVisualStyleBackColor = true;
+            this.button6.UseVisualStyleBackColor = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // OtherAmount
             // 
-            this.OtherAmount.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.OtherAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.OtherAmount.Location = new System.Drawing.Point(610, 334);
+            this.OtherAmount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.OtherAmount.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.OtherAmount.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.OtherAmount.ForeColor = System.Drawing.Color.White;
+            this.OtherAmount.Location = new System.Drawing.Point(520, 240);
             this.OtherAmount.Name = "OtherAmount";
-            this.OtherAmount.Size = new System.Drawing.Size(165, 126);
+            this.OtherAmount.Size = new System.Drawing.Size(180, 100);
             this.OtherAmount.TabIndex = 1;
             this.OtherAmount.Text = "Boshqa";
-            this.OtherAmount.UseVisualStyleBackColor = true;
+            this.OtherAmount.UseVisualStyleBackColor = false;
             this.OtherAmount.Click += new System.EventHandler(this.OtherAmount_Click);
             // 
             // Back
             // 
-            this.Back.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Back.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Back.Location = new System.Drawing.Point(262, 532);
+            this.Back.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.Back.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Back.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.Back.ForeColor = System.Drawing.Color.IndianRed;
+            this.Back.Location = new System.Drawing.Point(200, 360);
             this.Back.Name = "Back";
-            this.Back.Size = new System.Drawing.Size(165, 126);
+            this.Back.Size = new System.Drawing.Size(180, 100);
             this.Back.TabIndex = 1;
             this.Back.Text = "Back";
-            this.Back.UseVisualStyleBackColor = true;
+            this.Back.UseVisualStyleBackColor = false;
             this.Back.Click += new System.EventHandler(this.Back_Click);
             // 
             // converter
             // 
-            this.converter.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.converter.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.converter.Location = new System.Drawing.Point(507, 532);
+            this.converter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.converter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.converter.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.converter.ForeColor = System.Drawing.Color.White;
+            this.converter.Location = new System.Drawing.Point(420, 360);
             this.converter.Name = "converter";
-            this.converter.Size = new System.Drawing.Size(165, 126);
+            this.converter.Size = new System.Drawing.Size(180, 100);
             this.converter.TabIndex = 1;
             this.converter.Text = "converter";
-            this.converter.UseVisualStyleBackColor = true;
+            this.converter.UseVisualStyleBackColor = false;
             this.converter.Click += new System.EventHandler(this.converter_Click);
             // 
             // ExchangeFromUzsToUsdForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(982, 753);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
+            this.ClientSize = new System.Drawing.Size(800, 500);
             this.ControlBox = false;
+            this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.Back);
             this.Controls.Add(this.OtherAmount);
             this.Controls.Add(this.button6);
@@ -159,12 +182,13 @@
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.ExchangeUzsPrice);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "ExchangeFromUzsToUsdForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ExchangeFromUzsToUsdForm";
             this.Load += new System.EventHandler(this.ExchangeFromUzsToUsdForm_Load);
+            this.pnlHeader.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -179,5 +203,6 @@
         private System.Windows.Forms.Button OtherAmount;
         private System.Windows.Forms.Button Back;
         private System.Windows.Forms.Button converter;
+        private System.Windows.Forms.Panel pnlHeader;
     }
 }
