@@ -61,6 +61,18 @@
     <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin\AdminActionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\AdminActionsForm.Designer.cs">
+      <DependentUpon>AdminActionsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="User\UserActionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\UserActionsForm.Designer.cs">
+      <DependentUpon>UserActionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Guest\ConverterForm.cs">
       <SubType>Form</SubType>
     </Compile>

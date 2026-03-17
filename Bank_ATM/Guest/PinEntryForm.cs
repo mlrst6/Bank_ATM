@@ -61,10 +61,20 @@ namespace Bank_ATM
 
                 MessageBox.Show(LanguageManager.GetString("Success"), "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 
-                MainForm mainForm = new MainForm();
-                mainForm.StartPosition = FormStartPosition.Manual;
-                mainForm.Location = this.Location;
-                mainForm.Show();
+                if (SessionManager.CurrentRole == UserRole.Admin)
+                {
+                    Admin.AdminActionsForm adminForm = new Admin.AdminActionsForm();
+                    adminForm.StartPosition = FormStartPosition.Manual;
+                    adminForm.Location = this.Location;
+                    adminForm.Show();
+                }
+                else
+                {
+                    User.UserActionsForm userForm = new User.UserActionsForm();
+                    userForm.StartPosition = FormStartPosition.Manual;
+                    userForm.Location = this.Location;
+                    userForm.Show();
+                }
                 this.Close();
             }
             else

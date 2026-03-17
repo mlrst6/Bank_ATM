@@ -21,14 +21,16 @@ namespace Bank_ATM
 
         private void btnInsertCard_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtCardNumber.Text) || txtCardNumber.Text.Length < 16)
+            string cardNumber = txtCardNumber.Text.Replace("-", "").Replace(" ", "");
+            
+            if (string.IsNullOrWhiteSpace(cardNumber) || cardNumber.Length != 16 || !long.TryParse(cardNumber, out _))
             {
-                MessageBox.Show("Please enter a valid 16-digit card number.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(LanguageManager.GetString("Error"), "Invalid Card Number", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             Repositories.CardRepository repo = new Repositories.CardRepository();
-            var card = repo.GetCardByNumber(txtCardNumber.Text);
+            var card = repo.GetCardByNumber(cardNumber);
 
             if (card == null)
             {
@@ -42,7 +44,7 @@ namespace Bank_ATM
                 return;
             }
 
-            PinEntryForm pinForm = new PinEntryForm(txtCardNumber.Text);
+            PinEntryForm pinForm = new PinEntryForm(cardNumber);
             pinForm.StartPosition = FormStartPosition.Manual;
             pinForm.Location = this.Location;
             pinForm.Show();

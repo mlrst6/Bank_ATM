@@ -16,19 +16,19 @@ namespace Bank_ATM.Repositories
             _connectionString = Config.ConnectionString;
         }
 
-        public void AddTransaction(int? sourceAccountId, string type, decimal amount, int? destinationAccountId = null, string reference = null)
+        public void AddTransaction(int? sourceAccountId, string type, decimal amount, int? destinationAccountId = null, string description = null)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                // Note: The database schema needs to be updated to support these columns if they don't exist yet.
-                // For now, we use existing columns or add logic to handle them.
-                string sql = @"INSERT INTO transactions (account_id, type, amount, transaction_date) 
-                               VALUES (@AccountId, @Type, @Amount, @Date)";
+                string sql = @"INSERT INTO transactions (account_id, target_account_id, type, amount, description, transaction_date) 
+                               VALUES (@AccountId, @TargetAccountId, @Type, @Amount, @Description, @Date)";
                 
                 db.Execute(sql, new { 
                     AccountId = sourceAccountId, 
+                    TargetAccountId = destinationAccountId,
                     Type = type, 
                     Amount = amount, 
+                    Description = description,
                     Date = DateTime.Now 
                 });
             }
@@ -38,8 +38,17 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT id, account_id as SourceAccountId, type, amount, transaction_date as TransactionDate FROM transactions ORDER BY transaction_date DESC";
+                string sql = "SELECT id, account_id as AccountId, target_account_id as TargetAccountId, type, amount, description, transaction_date as TransactionDate FROM transactions ORDER BY transaction_date DESC";
                 return db.Query<TransactionDto>(sql);
+            }
+        }
+
+        public IEnumerable<TransactionDto> GetAccountTransactions(int accountId)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                string sql = "SELECT id, account_id as AccountId, target_account_id as TargetAccountId, type, amount, description, transaction_date as TransactionDate FROM transactions WHERE account_id = @AccountId OR target_account_id = @AccountId ORDER BY transaction_date DESC";
+                return db.Query<TransactionDto>(sql, new { AccountId = accountId });
             }
         }
     }

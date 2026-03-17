@@ -33,16 +33,21 @@ namespace Bank_ATM
         private void btnPayServices_Click(object sender, EventArgs e)
         {
             string service = Microsoft.VisualBasic.Interaction.InputBox("Enter Service Name (e.g. Beeline, UzMobile):", LanguageManager.GetString("PayServices"), "");
-            if (string.IsNullOrEmpty(service)) return;
+            if (string.IsNullOrWhiteSpace(service)) return;
 
             string account = Microsoft.VisualBasic.Interaction.InputBox("Enter Phone Number or Account ID:", service, "");
-            if (string.IsNullOrEmpty(account)) return;
+            if (string.IsNullOrWhiteSpace(account)) return;
 
             string amountStr = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount to Pay:", "Payment", "0");
             if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
             {
-                new TransactionRepository().AddTransaction(null, "BillPayment", amount, null, account);
+                // Source is NULL for guest cash payments
+                new TransactionRepository().AddTransaction(null, "BillPayment", amount, null, $"{service}: {account}");
                 MessageBox.Show(LanguageManager.GetString("Success"), "Payment", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (!string.IsNullOrEmpty(amountStr))
+            {
+                MessageBox.Show("Please enter a valid amount.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

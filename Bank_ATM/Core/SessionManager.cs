@@ -28,7 +28,7 @@ namespace Bank_ATM.Core
 
             // Map string role from DB to Enum
             if (user.Role == "Admin") CurrentRole = UserRole.Admin;
-            else CurrentRole = UserRole.CardUser;
+            else CurrentRole = UserRole.User;
 
             TimeoutManager.Start(); // Start the inactivity timer
             OnSessionChanged?.Invoke();
