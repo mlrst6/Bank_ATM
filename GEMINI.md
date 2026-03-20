@@ -46,6 +46,9 @@ Welcome to the Bank_ATM project. This is a .NET Framework 4.7.2 Windows Forms ap
 - **Separation of Concerns:** Keep business and data logic in Repositories or Models; use Forms only for UI and event handling.
 - **Validation:** Always validate card numbers (16 digits) and PINs before proceeding with transactions.
 
+### 5. Build & Test Requirement
+- **Verification First:** Before providing any final code or completing a task, you MUST build the project (using `msbuild`) and verify that your changes are error-free. If errors occur, diagnose and fix them immediately before presenting the final solution.
+
 ## Known Constraints
 - UI layouts are optimized for a fixed size; ensure new elements do not break the layout.
 - The application requires a local SQL Server instance with the `ATM` database (see `setup_sql_server.sql`).

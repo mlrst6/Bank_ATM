@@ -4,16 +4,25 @@ using Bank_ATM.Core;
 
 namespace Bank_ATM
 {
-    public partial class GuestForm : Form
+    public partial class GuestForm : BaseForm
     {
+        private string _customTitleKey = "MainFormUser";
+
         public GuestForm()
         {
             InitializeComponent();
         }
 
+        public GuestForm(string titleKey) : this()
+        {
+            _customTitleKey = titleKey;
+        }
+
         private void GuestForm_Load(object sender, EventArgs e)
         {
             LanguageManager.Apply(this);
+            lblTitle.Text = LanguageManager.GetString(_customTitleKey);
+            
             btnExchange.Visible = false; // Hide Guest-only features here, they are in GuestActionsForm
             btnInsertCard.Text = LanguageManager.GetString("btnInsertCard");
             btnBack.Text = LanguageManager.GetString("btnBack");

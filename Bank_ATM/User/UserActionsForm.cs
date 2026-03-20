@@ -16,7 +16,7 @@ namespace Bank_ATM.User
         private void UserActionsForm_Load(object sender, EventArgs e)
         {
             LanguageManager.Apply(this);
-            lblWelcome.Text = $"{LanguageManager.GetString("label1")} - {SessionManager.CurrentUser.FullName}";
+            lblWelcome.Text = $"{LanguageManager.GetString("label1")} - {SessionManager.Instance.CurrentUser.FullName}";
             
             btnWithdraw.Text = LanguageManager.GetString("Withdraw");
             btnDeposit.Text = LanguageManager.GetString("Deposit");
@@ -25,17 +25,35 @@ namespace Bank_ATM.User
             btnLogout.Text = LanguageManager.GetString("Logout");
         }
 
-        private void btnWithdraw_Click(object sender, EventArgs e)
+        private async void btnWithdraw_Click(object sender, EventArgs e)
         {
             string amountStr = Microsoft.VisualBasic.Interaction.InputBox(LanguageManager.GetString("EnterAmount"), LanguageManager.GetString("Withdraw"), "0");
             if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
             {
-                if (SessionManager.CurrentAccount.Balance >= amount)
+                SetLoading(true);
+                bool success = await new AccountRepository().WithdrawAsync(SessionManager.Instance.CurrentAccount.Id, amount);
+                SetLoading(false);
+
+                if (success)
                 {
-                    SessionManager.CurrentAccount.Balance -= amount;
-                    new AccountRepository().UpdateBalance(SessionManager.CurrentAccount.Id, SessionManager.CurrentAccount.Balance);
-                    new TransactionRepository().AddTransaction(SessionManager.CurrentAccount.Id, "Withdraw", amount);
-                    MessageBox.Show(LanguageManager.GetString("Success"), "Withdrawal", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    SessionManager.Instance.CurrentAccount.Balance -= amount;
+                    AuditLogger.LogTransaction("Withdraw", amount, SessionManager.Instance.CurrentAccount.AccountNumber);
+                    
+                    if (MessageBox.Show("Would you like a digital receipt?", "Receipt", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        var transaction = new TransactionDto 
+                        { 
+                            Type = "Withdraw", 
+                            Amount = amount, 
+                            TransactionDate = DateTime.Now 
+                        };
+                        string path = ReceiptService.GenerateReceipt(transaction, SessionManager.Instance.CurrentUser.FullName, SessionManager.Instance.CurrentAccount.Balance);
+                        if (path != null) MessageBox.Show($"Receipt saved to: {path}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show(LanguageManager.GetString("Success"), "Withdrawal", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
                 else
                 {
@@ -44,19 +62,24 @@ namespace Bank_ATM.User
             }
         }
 
-        private void btnDeposit_Click(object sender, EventArgs e)
+        private async void btnDeposit_Click(object sender, EventArgs e)
         {
             string amountStr = Microsoft.VisualBasic.Interaction.InputBox(LanguageManager.GetString("EnterAmount"), LanguageManager.GetString("Deposit"), "0");
             if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
             {
-                SessionManager.CurrentAccount.Balance += amount;
-                new AccountRepository().UpdateBalance(SessionManager.CurrentAccount.Id, SessionManager.CurrentAccount.Balance);
-                new TransactionRepository().AddTransaction(SessionManager.CurrentAccount.Id, "Deposit", amount);
-                MessageBox.Show(LanguageManager.GetString("Success"), "Deposit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetLoading(true);
+                bool success = await new AccountRepository().DepositAsync(SessionManager.Instance.CurrentAccount.Id, amount);
+                SetLoading(false);
+
+                if (success)
+                {
+                    SessionManager.Instance.CurrentAccount.Balance += amount;
+                    MessageBox.Show(LanguageManager.GetString("Success"), "Deposit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
-        private void btnTransfer_Click(object sender, EventArgs e)
+        private async void btnTransfer_Click(object sender, EventArgs e)
         {
             string targetCardNum = Microsoft.VisualBasic.Interaction.InputBox("Enter Target Card Number:", LanguageManager.GetString("Transfer"), "");
             if (string.IsNullOrEmpty(targetCardNum)) return;
@@ -64,43 +87,68 @@ namespace Bank_ATM.User
             string amountStr = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount:", LanguageManager.GetString("Transfer"), "0");
             if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
             {
-                if (SessionManager.CurrentAccount.Balance < amount)
-                {
-                    MessageBox.Show(LanguageManager.GetString("InsufficientFunds"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
+                SetLoading(true);
                 var cardRepo = new CardRepository();
                 var targetCard = cardRepo.GetCardByNumber(targetCardNum);
+                
                 if (targetCard == null)
                 {
+                    SetLoading(false);
                     MessageBox.Show("Target card not found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                // Atomic transfer
-                SessionManager.CurrentAccount.Balance -= amount;
-                new AccountRepository().UpdateBalance(SessionManager.CurrentAccount.Id, SessionManager.CurrentAccount.Balance);
-                new AccountRepository().UpdateBalance(targetCard.AccountId, amount, true);
-                new TransactionRepository().AddTransaction(SessionManager.CurrentAccount.Id, "Transfer", amount, targetCard.AccountId);
+                bool success = await new AccountRepository().TransferAsync(SessionManager.Instance.CurrentAccount.Id, targetCard.AccountId, amount);
+                SetLoading(false);
 
-                MessageBox.Show(LanguageManager.GetString("Success"), "Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (success)
+                {
+                    SessionManager.Instance.CurrentAccount.Balance -= amount;
+                    AuditLogger.LogTransaction("Transfer", amount, $"{SessionManager.Instance.CurrentAccount.AccountNumber} -> {targetCard.CardNumber}");
+
+                    if (MessageBox.Show("Would you like a digital receipt?", "Receipt", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        var transaction = new TransactionDto 
+                        { 
+                            Type = "Transfer", 
+                            Amount = amount, 
+                            TransactionDate = DateTime.Now,
+                            Description = $"To: {targetCard.CardNumber}"
+                        };
+                        string path = ReceiptService.GenerateReceipt(transaction, SessionManager.Instance.CurrentUser.FullName, SessionManager.Instance.CurrentAccount.Balance);
+                        if (path != null) MessageBox.Show($"Receipt saved to: {path}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show(LanguageManager.GetString("Success"), "Transfer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(LanguageManager.GetString("InsufficientFunds"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
         private void btnBalance_Click(object sender, EventArgs e)
         {
-            MessageBox.Show($"Current Balance: {SessionManager.CurrentAccount.Balance:N2} UZS", "Balance Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show($"Current Balance: {SessionManager.Instance.CurrentAccount.Balance:N2} UZS", "Balance Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnLogout_Click(object sender, EventArgs e)
         {
-            SessionManager.Logout();
+            SessionManager.Instance.Logout();
             MainForm mainForm = new MainForm();
             mainForm.StartPosition = FormStartPosition.Manual;
             mainForm.Location = this.Location;
             mainForm.Show();
             this.Close();
+        }
+
+        private void SetLoading(bool isLoading)
+        {
+            this.UseWaitCursor = isLoading;
+            foreach (Control c in this.Controls) c.Enabled = !isLoading;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Bank_ATM.Repositories;
 using Bank_ATM.Core;
+using Bank_ATM.Models;
 using System.Threading.Tasks;
 
 namespace Bank_ATM
@@ -45,23 +46,25 @@ namespace Bank_ATM
 
             lblStatus.Text = LanguageManager.GetString("Processing");
             btnLogin.Enabled = false;
-            await Task.Delay(1000); 
+            
+            string failMessage = "";
+            bool isValid = await Task.Run(() => {
+                return _cardRepo.ValidatePin(_cardNumber, txtPin.Text, out failMessage);
+            });
 
-            var card = _cardRepo.GetCardByNumber(_cardNumber);
-            bool isValid = _cardRepo.ValidatePin(_cardNumber, txtPin.Text);
-
-            if (isValid && card != null)
+            if (isValid)
             {
+                var card = _cardRepo.GetCardByNumber(_cardNumber);
                 AccountRepository accRepo = new AccountRepository();
-                var account = accRepo.GetAccountById(card.AccountId);
-                var user = accRepo.GetUserById(account.UserId);
+                var account = await accRepo.GetAccountByIdAsync(card.AccountId);
+                var user = await accRepo.GetUserByIdAsync(account.UserId);
 
-                // This triggers SessionManager.OnSessionChanged
-                SessionManager.Login(user, card, account);
+                SessionManager.Instance.Login(user, card, account);
+                AuditLogger.LogInfo($"User {user.FullName} logged in with card {_cardNumber}");
 
                 MessageBox.Show(LanguageManager.GetString("Success"), "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 
-                if (SessionManager.CurrentRole == UserRole.Admin)
+                if (SessionManager.Instance.CurrentRole == UserRole.Admin)
                 {
                     Admin.AdminActionsForm adminForm = new Admin.AdminActionsForm();
                     adminForm.StartPosition = FormStartPosition.Manual;
@@ -79,7 +82,9 @@ namespace Bank_ATM
             }
             else
             {
-                MessageBox.Show(LanguageManager.GetString("Error"), "Invalid PIN", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                AuditLogger.LogWarning($"Failed login attempt for card {_cardNumber}: {failMessage}");
+                MessageBox.Show(failMessage, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                
                 txtPin.Clear();
                 lblStatus.Text = LanguageManager.GetString("lblStatus");
                 btnLogin.Enabled = true;

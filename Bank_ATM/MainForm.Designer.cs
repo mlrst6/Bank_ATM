@@ -60,6 +60,7 @@ namespace Bank_ATM
             this.MainFormUser.TabIndex = 1;
             this.MainFormUser.Text = "Deposit";
             this.MainFormUser.UseVisualStyleBackColor = false;
+            this.MainFormUser.Click += new System.EventHandler(this.MainFormUser_Click);
             // 
             // MainFormAdmin
             // 
@@ -76,6 +77,7 @@ namespace Bank_ATM
             this.MainFormAdmin.TabIndex = 2;
             this.MainFormAdmin.Text = "Balance";
             this.MainFormAdmin.UseVisualStyleBackColor = false;
+            this.MainFormAdmin.Click += new System.EventHandler(this.MainFormAdmin_Click);
             // 
             // Back
             // 

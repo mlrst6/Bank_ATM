@@ -43,6 +43,7 @@ namespace Bank_ATM
             {
                 // Source is NULL for guest cash payments
                 new TransactionRepository().AddTransaction(null, "BillPayment", amount, null, $"{service}: {account}");
+                AuditLogger.LogInfo($"Guest payment: {amount} UZS for {service} ({account})");
                 MessageBox.Show(LanguageManager.GetString("Success"), "Payment", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else if (!string.IsNullOrEmpty(amountStr))

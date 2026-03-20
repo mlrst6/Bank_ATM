@@ -12,6 +12,12 @@ namespace Bank_ATM
         [STAThread]
         static void Main()
         {
+            AuditLogger.Initialize();
+            AuditLogger.LogInfo("Application Starting...");
+
+            // Run database migrations before UI starts
+            DatabaseMigrator.Migrate();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -22,6 +28,9 @@ namespace Bank_ATM
             TimeoutManager.OnTimeout += HandleTimeout;
 
             Application.Run(new LanguageForm1());
+
+            AuditLogger.LogInfo("Application shutting down.");
+            AuditLogger.Shutdown();
         }
 
         private static void HandleTimeout()
@@ -32,11 +41,11 @@ namespace Bank_ATM
                 Application.OpenForms[0].Invoke(new Action(() =>
                 {
                     // If we aren't logged in, we don't care about timeout kicks
-                    if (!SessionManager.IsLoggedIn) return;
+                    if (!SessionManager.Instance.IsLoggedIn) return;
 
                     MessageBox.Show("Session expired due to inactivity. Please remove your card.", "Security Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     
-                    SessionManager.Logout();
+                    SessionManager.Instance.Logout();
 
                     // Close all forms except the first one (LanguageForm)
                     for (int i = Application.OpenForms.Count - 1; i > 0; i--)
@@ -68,7 +77,7 @@ namespace Bank_ATM
             // If the user clicks a mouse button or presses a key, reset the timer
             if (m.Msg == WM_KEYDOWN || m.Msg == WM_LBUTTONDOWN || m.Msg == WM_RBUTTONDOWN)
             {
-                if (SessionManager.IsLoggedIn)
+                if (SessionManager.Instance.IsLoggedIn)
                 {
                     TimeoutManager.ResetTimer();
                 }

@@ -13,6 +13,8 @@ namespace Bank_ATM.Models
     {
         public int Id { get; set; }
         public string FullName { get; set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
         public string PhoneNumber { get; set; }
         public string Role { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -27,6 +29,7 @@ namespace Bank_ATM.Models
         public bool IsBlocked { get; set; }
         public DateTime ExpiryDate { get; set; }
         public int FailedAttempts { get; set; }
+        public DateTime? LockedUntil { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -49,5 +52,13 @@ namespace Bank_ATM.Models
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public DateTime TransactionDate { get; set; }
+    }
+
+    public class AtmDto
+    {
+        public int Id { get; set; }
+        public string AtmName { get; set; }
+        public decimal CurrentBalance { get; set; }
+        public string Location { get; set; }
     }
 }

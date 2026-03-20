@@ -45,3 +45,4 @@ When modifying or adding data logic:
 - [ ] Repository calls use parameterized SQL queries (Dapper).
 - [ ] PINs are verified using BCrypt hashes, never stored in plain text.
 - [ ] No hardcoded UI strings exist in the code.
+- [ ] Project builds successfully (run `msbuild Bank_ATM/Bank_ATM.csproj -p:Configuration=Debug "-t:Restore;Build" -nologo -clp:ErrorsOnly`) before finalizing changes.
