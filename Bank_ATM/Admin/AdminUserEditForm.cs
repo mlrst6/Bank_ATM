@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 using Bank_ATM.Models;
-using Bank_ATM.Repositories;
+using Bank_ATM.Services;
 
 namespace Bank_ATM.Admin
 {
@@ -9,7 +9,7 @@ namespace Bank_ATM.Admin
     {
         private UserDto _user;
         private bool _isEdit;
-        private AccountRepository _repo = new AccountRepository();
+        private readonly AdminService _adminService = new AdminService();
 
         public AdminUserEditForm(UserDto user = null)
         {
@@ -20,32 +20,63 @@ namespace Bank_ATM.Admin
 
         private void AdminUserEditForm_Load(object sender, EventArgs e)
         {
+            ApplyTheme();
+            btnSave.Text = LanguageManager.GetString("Save");
+            btnCancel.Text = LanguageManager.GetString("Cancel");
+            lblDialogTitle.Text = _isEdit
+                ? LanguageManager.GetString("EditUser")
+                : LanguageManager.GetString("CreateUser");
+            lblDialogSubtitle.Text = _isEdit
+                ? LanguageManager.GetString("EditUserSubtitle")
+                : LanguageManager.GetString("CreateUserSubtitle");
             if (_isEdit)
             {
                 txtFullName.Text = _user.FullName;
                 txtUsername.Text = _user.Username;
                 txtPhone.Text = _user.PhoneNumber;
                 cmbRole.SelectedItem = _user.Role;
-                lblPassNote.Text = "(Leave blank to keep current password)";
+                lblPassNote.Text = LanguageManager.GetString("LeaveBlankToKeepPassword");
+                txtInitialPin.Visible = false;
+                lblInitialPin.Visible = false;
+                lblPinNote.Visible = false;
             }
             else
             {
                 cmbRole.SelectedIndex = 0;
             }
+
+            UpdateProvisioningHints();
+            cmbRole.SelectedIndexChanged -= cmbRole_SelectedIndexChanged;
+            cmbRole.SelectedIndexChanged += cmbRole_SelectedIndexChanged;
         }
 
         private async void btnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtFullName.Text) || string.IsNullOrWhiteSpace(txtUsername.Text))
             {
-                MessageBox.Show("Full Name and Username are required.");
+                MessageBox.Show(LanguageManager.GetString("FullNameUsernameRequired"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (!_isEdit && string.IsNullOrWhiteSpace(txtPassword.Text))
             {
-                MessageBox.Show("Password is required for new users.");
+                MessageBox.Show(LanguageManager.GetString("PasswordRequiredForNewUser"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
+            }
+
+            if (!_isEdit && cmbRole.SelectedItem != null && cmbRole.SelectedItem.ToString() == "User")
+            {
+                if (string.IsNullOrWhiteSpace(txtPhone.Text))
+                {
+                    MessageBox.Show(LanguageManager.GetString("PhoneRequiredForCustomer"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtInitialPin.Text) || txtInitialPin.Text.Length != 4 || !int.TryParse(txtInitialPin.Text, out _))
+                {
+                    MessageBox.Show(LanguageManager.GetString("InitialPinRequired"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
 
             _user.FullName = txtFullName.Text;
@@ -55,20 +86,55 @@ namespace Bank_ATM.Admin
 
             try
             {
-                if (_isEdit)
-                    await _repo.UpdateUserAsync(_user, txtPassword.Text);
-                else
-                    await _repo.CreateUserAsync(_user, txtPassword.Text);
+                await _adminService.SaveUserAsync(_user, txtPassword.Text, txtInitialPin.Text, _isEdit);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving user: " + ex.Message);
+                MessageBox.Show(LanguageManager.Format("SaveUserFailed", ex.Message), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e) => this.Close();
+
+        private void cmbRole_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateProvisioningHints();
+        }
+
+        private void UpdateProvisioningHints()
+        {
+            bool isUser = !_isEdit && cmbRole.SelectedItem != null && cmbRole.SelectedItem.ToString() == "User";
+            txtInitialPin.Visible = isUser;
+            lblInitialPin.Visible = isUser;
+            lblPinNote.Visible = isUser;
+            lblPinNote.Text = isUser ? LanguageManager.GetString("CreatesUserAccountCard") : string.Empty;
+        }
+
+        private void ApplyTheme()
+        {
+            AdminTheme.ApplyForm(this);
+            AdminTheme.StylePanel(pnlHeader);
+            AdminTheme.StyleTitle(lblDialogTitle);
+            AdminTheme.StyleLabel(lblDialogSubtitle, true);
+            AdminTheme.StyleLabel(label1, true);
+            AdminTheme.StyleLabel(label2, true);
+            AdminTheme.StyleLabel(label3, true);
+            AdminTheme.StyleLabel(label4, true);
+            AdminTheme.StyleLabel(label5, true);
+            AdminTheme.StyleLabel(lblPassNote, true);
+            AdminTheme.StyleLabel(lblInitialPin, true);
+            AdminTheme.StyleLabel(lblPinNote, true);
+            AdminTheme.StyleTextBox(txtFullName);
+            AdminTheme.StyleTextBox(txtUsername);
+            AdminTheme.StyleTextBox(txtPassword);
+            AdminTheme.StyleTextBox(txtPhone);
+            AdminTheme.StyleTextBox(txtInitialPin);
+            AdminTheme.StyleComboBox(cmbRole);
+            AdminTheme.StyleSuccessButton(btnSave);
+            AdminTheme.StyleSecondaryButton(btnCancel);
+        }
     }
 }

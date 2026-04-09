@@ -47,7 +47,9 @@ namespace Bank_ATM
 
             foreach (Control c in parent.Controls)
             {
-                if (!string.IsNullOrEmpty(c.Name) && words.ContainsKey(c.Name))
+                bool isInputControl = c is TextBox || c is ComboBox || c is ListBox || c is DataGridView;
+
+                if (!isInputControl && !string.IsNullOrEmpty(c.Name) && words.ContainsKey(c.Name))
                 {
                     c.Text = words[c.Name];
                 }
@@ -64,6 +66,11 @@ namespace Bank_ATM
         {
             if (words.ContainsKey(key)) return words[key];
             return key;
+        }
+
+        public static string Format(string key, params object[] args)
+        {
+            return string.Format(GetString(key), args);
         }
     }
 }

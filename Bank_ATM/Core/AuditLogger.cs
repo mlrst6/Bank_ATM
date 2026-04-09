@@ -12,7 +12,8 @@ namespace Bank_ATM.Core
         {
             if (_initialized) return;
 
-            string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs", "audit-.txt");
+            Directory.CreateDirectory(Config.LogDirectory);
+            string logPath = Path.Combine(Config.LogDirectory, "audit-.txt");
             
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()

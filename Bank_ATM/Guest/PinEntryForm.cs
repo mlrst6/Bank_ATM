@@ -1,23 +1,21 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Bank_ATM.Repositories;
 using Bank_ATM.Core;
-using Bank_ATM.Models;
-using System.Threading.Tasks;
+using Bank_ATM.Services;
 
 namespace Bank_ATM
 {
     public partial class PinEntryForm : Form
     {
         private readonly string _cardNumber;
-        private readonly CardRepository _cardRepo;
+        private readonly AuthenticationService _authenticationService;
 
         public PinEntryForm(string cardNumber)
         {
             InitializeComponent();
             _cardNumber = cardNumber;
-            _cardRepo = new CardRepository();
+            _authenticationService = new AuthenticationService();
         }
 
         private void PinEntryForm_Load(object sender, EventArgs e)
@@ -47,43 +45,17 @@ namespace Bank_ATM
             lblStatus.Text = LanguageManager.GetString("Processing");
             btnLogin.Enabled = false;
             
-            string failMessage = "";
-            bool isValid = await Task.Run(() => {
-                return _cardRepo.ValidatePin(_cardNumber, txtPin.Text, out failMessage);
-            });
-
-            if (isValid)
+            var result = await _authenticationService.LoginWithCardAsync(_cardNumber, txtPin.Text);
+            if (result.Success)
             {
-                var card = _cardRepo.GetCardByNumber(_cardNumber);
-                AccountRepository accRepo = new AccountRepository();
-                var account = await accRepo.GetAccountByIdAsync(card.AccountId);
-                var user = await accRepo.GetUserByIdAsync(account.UserId);
+                MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("LoginSuccessful"), MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                SessionManager.Instance.Login(user, card, account);
-                AuditLogger.LogInfo($"User {user.FullName} logged in with card {_cardNumber}");
-
-                MessageBox.Show(LanguageManager.GetString("Success"), "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                
-                if (SessionManager.Instance.CurrentRole == UserRole.Admin)
-                {
-                    Admin.AdminActionsForm adminForm = new Admin.AdminActionsForm();
-                    adminForm.StartPosition = FormStartPosition.Manual;
-                    adminForm.Location = this.Location;
-                    adminForm.Show();
-                }
-                else
-                {
-                    User.UserActionsForm userForm = new User.UserActionsForm();
-                    userForm.StartPosition = FormStartPosition.Manual;
-                    userForm.Location = this.Location;
-                    userForm.Show();
-                }
-                this.Close();
+                FormNavigator.CloseHiddenForm(this.Tag as Form);
+                FormNavigator.ReplaceCurrent(this, new User.UserActionsForm());
             }
             else
             {
-                AuditLogger.LogWarning($"Failed login attempt for card {_cardNumber}: {failMessage}");
-                MessageBox.Show(failMessage, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 
                 txtPin.Clear();
                 lblStatus.Text = LanguageManager.GetString("lblStatus");

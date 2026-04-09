@@ -10,7 +10,7 @@ namespace Bank_ATM.Core
     public static class TimeoutManager
     {
         private static Timer _timeoutTimer;
-        private const int TIMEOUT_MILLISECONDS = 30000; // 30 seconds for ATM realism
+        private static readonly int TimeoutMilliseconds = Config.SessionTimeoutSeconds * 1000;
 
         // Event that forms can subscribe to so they know when to close themselves
         public static event Action OnTimeout;
@@ -18,7 +18,7 @@ namespace Bank_ATM.Core
         static TimeoutManager()
         {
             _timeoutTimer = new Timer();
-            _timeoutTimer.Interval = TIMEOUT_MILLISECONDS;
+            _timeoutTimer.Interval = TimeoutMilliseconds;
             _timeoutTimer.Tick += (s, e) => 
             {
                 Stop();

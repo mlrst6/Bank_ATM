@@ -9,23 +9,15 @@ namespace Bank_ATM.Core
     /// </summary>
     public class SessionManager : IUserSession
     {
-        // Singleton instance for legacy/easy access, but can be injected via Interface
         public static SessionManager Instance { get; } = new SessionManager();
 
         public UserRole CurrentRole { get; private set; } = UserRole.Guest;
         public UserDto CurrentUser { get; private set; }
         public CardDto CurrentCard { get; private set; }
         public AccountDto CurrentAccount { get; private set; }
-        public static AtmDto CurrentAtm { get; private set; } 
 
-        public bool IsLoggedIn => CurrentUser != null && CurrentCard != null;
-
-        // Legacy static access for compatibility during transition
-        public static bool IsLoggedInStatic => Instance.IsLoggedIn;
-        public static UserRole CurrentRoleStatic => Instance.CurrentRole;
-        public static UserDto CurrentUserStatic => Instance.CurrentUser;
-        public static CardDto CurrentCardStatic => Instance.CurrentCard;
-        public static AccountDto CurrentAccountStatic => Instance.CurrentAccount;
+        public bool IsLoggedIn => CurrentUser != null;
+        public bool IsCardSession => CurrentUser != null && CurrentCard != null && CurrentAccount != null;
 
         public static event Action OnSessionChanged;
 
@@ -35,7 +27,8 @@ namespace Bank_ATM.Core
             CurrentCard = card;
             CurrentAccount = account;
 
-            if (user.Role == "Admin") CurrentRole = UserRole.Admin;
+            if (user == null) CurrentRole = UserRole.Guest;
+            else if (user.Role == "Admin") CurrentRole = UserRole.Admin;
             else CurrentRole = UserRole.User;
 
             TimeoutManager.Start(); 
@@ -50,15 +43,6 @@ namespace Bank_ATM.Core
             CurrentRole = UserRole.Guest;
             TimeoutManager.Stop();
             OnSessionChanged?.Invoke();
-        }
-
-        // Static wrappers for legacy code
-        public static void LoginStatic(UserDto user, CardDto card, AccountDto account) => Instance.Login(user, card, account);
-        public static void LogoutStatic() => Instance.Logout();
-
-        public static void SetCurrentAtm(AtmDto atm)
-        {
-            CurrentAtm = atm;
         }
     }
 }

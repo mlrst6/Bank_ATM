@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using Bank_ATM.Core;
 
 namespace Bank_ATM
 {
@@ -15,16 +16,12 @@ namespace Bank_ATM
 
         protected void NavigateTo(Form nextForm)
         {
-            nextForm.Location = this.Location;
-            nextForm.Show();
-            this.Hide();
+            FormNavigator.ShowNext(this, nextForm);
         }
 
-        protected void NavigateBack(Form previousForm)
+        protected void NavigateBack()
         {
-            previousForm.Location = this.Location;
-            previousForm.Show();
-            this.Close();
+            FormNavigator.GoBack(this);
         }
     }
 }

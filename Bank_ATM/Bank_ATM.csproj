@@ -53,6 +53,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -68,6 +69,7 @@
     <Compile Include="Admin\AdminActionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Admin\AdminTheme.cs" />
     <Compile Include="Admin\AdminActionsForm.Designer.cs">
       <DependentUpon>AdminActionsForm.cs</DependentUpon>
     </Compile>
@@ -88,6 +90,12 @@
     </Compile>
     <Compile Include="Admin\AdminCardEditForm.Designer.cs">
       <DependentUpon>AdminCardEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\AdminServiceEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\AdminServiceEditForm.Designer.cs">
+      <DependentUpon>AdminServiceEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Admin\AdminLoginForm.cs">
       <SubType>Form</SubType>
@@ -131,6 +139,12 @@
     <Compile Include="Guest\GuestActionsForm.Designer.cs">
       <DependentUpon>GuestActionsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Payments\ServicePaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\ServicePaymentForm.Designer.cs">
+      <DependentUpon>ServicePaymentForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LanguageForm1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -151,10 +165,15 @@
       <DependentUpon>PinEntryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\AudioManager.cs" />
+    <Compile Include="Core\FormNavigator.cs" />
     <Compile Include="Core\IUserSession.cs" />
     <Compile Include="Core\AuditLogger.cs" />
     <Compile Include="Core\DatabaseMigrator.cs" />
     <Compile Include="Core\ReceiptService.cs" />
+    <Compile Include="Services\ServiceResults.cs" />
+    <Compile Include="Services\AuthenticationService.cs" />
+    <Compile Include="Services\BankingService.cs" />
+    <Compile Include="Services\AdminService.cs" />
     <Compile Include="UI\RoundedButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -169,6 +188,7 @@
     <Compile Include="Core\TimeoutManager.cs" />
     <Compile Include="Repositories\CardRepository.cs" />
     <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Repositories\ServicesRepository.cs" />
     <Compile Include="Repositories\TransactionRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Config.cs" />

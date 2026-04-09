@@ -2,24 +2,23 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Bank_ATM.Core;
-using Bank_ATM.Repositories;
-using Bank_ATM.Models;
-using System.Threading.Tasks;
+using Bank_ATM.Services;
 
 namespace Bank_ATM.Admin
 {
     public partial class AdminLoginForm : BaseForm
     {
-        private readonly AccountRepository _accRepo;
+        private readonly AuthenticationService _authenticationService;
 
         public AdminLoginForm()
         {
             InitializeComponent();
-            _accRepo = new AccountRepository();
+            _authenticationService = new AuthenticationService();
         }
 
         private void AdminLoginForm_Load(object sender, EventArgs e)
         {
+            ApplyTheme();
             LanguageManager.Apply(this);
             lblTitle.Text = LanguageManager.GetString("MainFormAdmin");
             btnLogin.Text = LanguageManager.GetString("btnLogin");
@@ -33,25 +32,17 @@ namespace Bank_ATM.Admin
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Please enter both username and password.", "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(LanguageManager.GetString("AdminCredentialsRequired"), LanguageManager.GetString("LoginError"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             SetLoading(true);
-            var admin = await _accRepo.GetAdminByUsernameAsync(username);
-
-            if (admin != null && BCrypt.Net.BCrypt.Verify(password, admin.PasswordHash))
-            {
-                // Admin login without a card
-                SessionManager.Instance.Login(admin, null, null); 
-                AuditLogger.LogInfo($"Admin {admin.FullName} logged in via credentials.");
-
-                NavigateTo(new AdminActionsForm());
-            }
+            var result = await _authenticationService.LoginAdminAsync(username, password);
+            if (result.Success)
+                FormNavigator.ReplaceCurrent(this, new AdminActionsForm());
             else
             {
-                AuditLogger.LogWarning($"Failed Admin login attempt for username: {username}");
-                MessageBox.Show("Invalid username or password.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.Message, LanguageManager.GetString("LoginFailed"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtPassword.Clear();
             }
             SetLoading(false);
@@ -59,7 +50,7 @@ namespace Bank_ATM.Admin
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            NavigateBack(new MainForm());
+            NavigateBack();
         }
 
         private void SetLoading(bool isLoading)
@@ -67,6 +58,18 @@ namespace Bank_ATM.Admin
             this.UseWaitCursor = isLoading;
             btnLogin.Enabled = !isLoading;
             btnBack.Enabled = !isLoading;
+        }
+
+        private void ApplyTheme()
+        {
+            AdminTheme.ApplyForm(this);
+            AdminTheme.StyleTitle(lblTitle);
+            AdminTheme.StyleLabel(lblUser, true);
+            AdminTheme.StyleLabel(lblPass, true);
+            AdminTheme.StyleTextBox(txtUsername);
+            AdminTheme.StyleTextBox(txtPassword);
+            AdminTheme.StyleSuccessButton(btnLogin);
+            AdminTheme.StyleSecondaryButton(btnBack);
         }
     }
 }

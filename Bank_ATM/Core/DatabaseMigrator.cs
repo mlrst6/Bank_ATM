@@ -13,22 +13,26 @@ namespace Bank_ATM.Core
 
         public static void Migrate()
         {
+            Migrate(Config.SeedDefaultAdminOnStartup);
+        }
+
+        public static void Migrate(bool seedDefaultAdmin)
+        {
             try
             {
                 CreateDatabaseIfNotExists();
                 EnsureMigrationTableExists();
-                
-                // Ensure default admin is present
-                EnsureDefaultAdmin();
 
                 var migrationsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Migrations");
                 if (!Directory.Exists(migrationsDir))
                 {
-                    // Fallback for development/relative paths
                     migrationsDir = Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName, "Bank_ATM", "Migrations");
                 }
 
-                if (!Directory.Exists(migrationsDir)) return;
+                if (!Directory.Exists(migrationsDir))
+                {
+                    throw new DirectoryNotFoundException($"Migrations directory was not found. Expected path: {migrationsDir}");
+                }
 
                 var migrationFiles = Directory.GetFiles(migrationsDir, "*.sql").OrderBy(f => f).ToList();
                 var appliedMigrations = GetAppliedMigrations();
@@ -63,10 +67,55 @@ namespace Bank_ATM.Core
                         }
                     }
                 }
+
+                if (seedDefaultAdmin)
+                {
+                    EnsureDefaultAdmin();
+                }
             }
             catch (Exception ex)
             {
                 AuditLogger.LogError("Fatal error during database migration", ex);
+                throw;
+            }
+        }
+
+        public static void VerifySchemaReady()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+
+                    int requiredTables = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.tables
+                        WHERE name IN ('users', 'accounts', 'cards', 'transactions', 'services')");
+
+                    if (requiredTables < 5)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is incomplete. Run the migration bootstrap once or deploy the SQL scripts first.");
+                    }
+
+                    int requiredColumns = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.columns
+                        WHERE object_id = OBJECT_ID('dbo.users')
+                          AND name IN ('is_active')");
+
+                    if (requiredColumns < 1)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the latest migrations before starting the application.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AuditLogger.LogError("Database schema verification failed", ex);
+                throw;
             }
         }
 
@@ -118,34 +167,21 @@ namespace Bank_ATM.Core
                 {
                     connection.Open();
                     
-                    // Check if 'admin' user exists
                     var adminExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM users WHERE username = 'admin'");
-                    
-                    string hashedPassword = BCrypt.Net.BCrypt.HashPassword("admin123", 11);
 
                     if (adminExists == 0)
                     {
-                        // Create admin
+                        string hashedPassword = BCrypt.Net.BCrypt.HashPassword("admin123", 11);
                         connection.Execute(@"
                             INSERT INTO users (full_name, username, password_hash, role) 
                             VALUES ('System Admin', 'admin', @Password, 'Admin')", 
                             new { Password = hashedPassword });
-                        AuditLogger.LogInfo("Default admin 'admin' created with password 'admin123'.");
-                    }
-                    else
-                    {
-                        // Update existing admin password to 'admin123' to ensure it works
-                        connection.Execute(@"
-                            UPDATE users SET password_hash = @Password WHERE username = 'admin'", 
-                            new { Password = hashedPassword });
-                        AuditLogger.LogInfo("Default admin password updated to 'admin123'.");
+                        AuditLogger.LogWarning("Default admin account 'admin' was created because seed bootstrap is enabled. Change its password immediately.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Table might not exist yet if it's the very first run before V1 script
-                // We'll ignore this as V1 script will create it with a default hash anyway
                 AuditLogger.LogWarning($"EnsureDefaultAdmin skipped: {ex.Message}");
             }
         }

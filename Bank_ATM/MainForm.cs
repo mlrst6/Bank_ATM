@@ -48,7 +48,7 @@ namespace Bank_ATM
 
         private void Back_Click(object sender, EventArgs e)
         {
-            NavigateBack(new LanguageForm1());
+            NavigateBack();
         }
     }
 }

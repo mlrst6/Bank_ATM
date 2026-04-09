@@ -1,15 +1,26 @@
 using System;
 using System.Windows.Forms;
+using Bank_ATM.Core;
 
 namespace Bank_ATM
 {
     public partial class ConverterForm : Form
     {
-        private const long UzsToUsdRate = 12000;
+        private readonly decimal _initialAmount;
+        private readonly string _initialFromCurrency;
+        private readonly string _initialToCurrency;
 
         public ConverterForm()
+            : this(0m, "USD", "UZS")
+        {
+        }
+
+        public ConverterForm(decimal initialAmount, string fromCurrency, string toCurrency)
         {
             InitializeComponent();
+            _initialAmount = initialAmount;
+            _initialFromCurrency = fromCurrency;
+            _initialToCurrency = toCurrency;
         }
 
         private void ConverterForm_Load(object sender, EventArgs e)
@@ -19,11 +30,21 @@ namespace Bank_ATM
 
             listBox1.Items.Clear();
             listBox1.Items.AddRange(new string[] { "USD", "UZS" });
-            listBox1.SelectedIndex = 0;
 
             listBox2.Items.Clear();
             listBox2.Items.AddRange(new string[] { "UZS", "USD" });
-            listBox2.SelectedIndex = 0;
+
+            listBox1.SelectedItem = _initialFromCurrency;
+            if (listBox1.SelectedIndex < 0) listBox1.SelectedIndex = 0;
+
+            listBox2.SelectedItem = _initialToCurrency;
+            if (listBox2.SelectedIndex < 0) listBox2.SelectedIndex = 0;
+
+            if (_initialAmount > 0)
+            {
+                textBox1.Text = _initialAmount.ToString("0.##");
+                PerformConversion();
+            }
         }
 
         private void SetupNumericKeypad()
@@ -51,20 +72,22 @@ namespace Bank_ATM
 
         private void PerformConversion()
         {
-            if (long.TryParse(textBox1.Text, out long input))
+            if (decimal.TryParse(textBox1.Text, out decimal input))
             {
-                int fromIndex = listBox1.SelectedIndex;
-                int toIndex = listBox2.SelectedIndex;
-                long result = 0;
+                string fromCurrency = listBox1.SelectedItem as string;
+                string toCurrency = listBox2.SelectedItem as string;
+                decimal result;
 
-                if (fromIndex == 0 && toIndex == 0) // USD to UZS
-                    result = input * UzsToUsdRate;
-                else if (fromIndex == 1 && toIndex == 1) // UZS to USD
-                    result = input / UzsToUsdRate;
-                else
+                if (fromCurrency == toCurrency)
                     result = input;
+                else if (fromCurrency == "USD" && toCurrency == "UZS")
+                    result = input * Config.UzsToUsdRate;
+                else if (fromCurrency == "UZS" && toCurrency == "USD")
+                    result = input / Config.UzsToUsdRate;
+                else
+                    result = 0m;
 
-                textBox2.Text = result.ToString("N0");
+                textBox2.Text = result.ToString("N2");
             }
             else
             {
@@ -74,11 +97,7 @@ namespace Bank_ATM
 
         private void Back_Click(object sender, EventArgs e)
         {
-            ExchangeFromUzsToUsdForm nextForm = new ExchangeFromUzsToUsdForm();
-            nextForm.StartPosition = FormStartPosition.Manual;
-            nextForm.Location = this.Location;
-            nextForm.Show();
-            this.Close();
+            FormNavigator.GoBack(this, () => new GuestActionsForm());
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -103,6 +122,9 @@ namespace Bank_ATM
         }
 
         private void button12_Click(object sender, EventArgs e) { }
-        private void textBox1_TextChanged(object sender, EventArgs e) { }
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            PerformConversion();
+        }
     }
 }

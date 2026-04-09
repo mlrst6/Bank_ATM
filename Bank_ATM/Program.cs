@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 
@@ -12,25 +9,44 @@ namespace Bank_ATM
         [STAThread]
         static void Main()
         {
-            AuditLogger.Initialize();
-            AuditLogger.LogInfo("Application Starting...");
+            try
+            {
+                AuditLogger.Initialize();
+                AuditLogger.LogInfo("Application Starting...");
 
-            // Run database migrations before UI starts
-            DatabaseMigrator.Migrate();
+                if (Config.BootstrapDatabaseOnStartup)
+                {
+                    AuditLogger.LogInfo("Database bootstrap on startup is enabled.");
+                    DatabaseMigrator.Migrate();
+                }
+                else
+                {
+                    AuditLogger.LogInfo("Database bootstrap on startup is disabled. Verifying existing schema.");
+                    DatabaseMigrator.VerifySchemaReady();
+                }
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            // Add global activity listener for ATM security timeout
-            Application.AddMessageFilter(new UserActivityFilter());
-            
-            // When a timeout happens, restart the application state
-            TimeoutManager.OnTimeout += HandleTimeout;
+                Application.AddMessageFilter(new UserActivityFilter());
+                TimeoutManager.OnTimeout += HandleTimeout;
 
-            Application.Run(new LanguageForm1());
-
-            AuditLogger.LogInfo("Application shutting down.");
-            AuditLogger.Shutdown();
+                Application.Run(new LanguageForm1());
+            }
+            catch (Exception ex)
+            {
+                AuditLogger.LogError("Application failed to start", ex);
+                MessageBox.Show(
+                    "Application startup failed. Please check the logs and database configuration.",
+                    "Startup Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                AuditLogger.LogInfo("Application shutting down.");
+                AuditLogger.Shutdown();
+            }
         }
 
         private static void HandleTimeout()
@@ -40,20 +56,21 @@ namespace Bank_ATM
             {
                 Application.OpenForms[0].Invoke(new Action(() =>
                 {
-                    // If we aren't logged in, we don't care about timeout kicks
                     if (!SessionManager.Instance.IsLoggedIn) return;
 
-                    MessageBox.Show("Session expired due to inactivity. Please remove your card.", "Security Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    string message = SessionManager.Instance.IsCardSession
+                        ? "Session expired due to inactivity. Please remove your card."
+                        : "Admin session expired due to inactivity. Please log in again.";
+
+                    MessageBox.Show(message, "Security Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     
                     SessionManager.Instance.Logout();
 
-                    // Close all forms except the first one (LanguageForm)
                     for (int i = Application.OpenForms.Count - 1; i > 0; i--)
                     {
                         Application.OpenForms[i].Close();
                     }
                     
-                    // Show the language form again
                     if (Application.OpenForms.Count > 0)
                     {
                         Application.OpenForms[0].Show();
@@ -74,7 +91,6 @@ namespace Bank_ATM
 
         public bool PreFilterMessage(ref Message m)
         {
-            // If the user clicks a mouse button or presses a key, reset the timer
             if (m.Msg == WM_KEYDOWN || m.Msg == WM_LBUTTONDOWN || m.Msg == WM_RBUTTONDOWN)
             {
                 if (SessionManager.Instance.IsLoggedIn)

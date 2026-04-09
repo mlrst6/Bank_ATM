@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using Bank_ATM.Core;
 
 namespace Bank_ATM
 {
@@ -20,10 +21,7 @@ namespace Bank_ATM
             LanguageManager.CurrentLang = lang;
             LanguageManager.Load();
 
-            MainForm mainForm = new MainForm();
-            mainForm.Location = this.Location;
-            mainForm.Show();
-            this.Hide();
+            FormNavigator.ShowNext(this, new MainForm());
         }
 
         private void button1_Click(object sender, EventArgs e)

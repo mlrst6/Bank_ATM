@@ -17,7 +17,10 @@ namespace Bank_ATM.Models
         public string PasswordHash { get; set; }
         public string PhoneNumber { get; set; }
         public string Role { get; set; }
+        public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int? PrimaryAccountId { get; set; }
+        public string PrimaryAccountNumber { get; set; }
     }
 
     public class CardDto
@@ -54,6 +57,16 @@ namespace Bank_ATM.Models
         public DateTime TransactionDate { get; set; }
     }
 
+    public class ServiceDto
+    {
+        public int Id { get; set; }
+        public string ServiceName { get; set; }
+        public string Category { get; set; }
+        public string AccountHint { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
     public class AtmDto
     {
         public int Id { get; set; }
@@ -62,3 +75,4 @@ namespace Bank_ATM.Models
         public string Location { get; set; }
     }
 }
+

@@ -76,6 +76,14 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
+                var accountExists = db.ExecuteScalar<int>(
+                    "SELECT COUNT(*) FROM accounts WHERE id = @Id AND is_active = 1",
+                    new { Id = card.AccountId }) > 0;
+                if (!accountExists)
+                {
+                    throw new InvalidOperationException("The selected account does not exist or is inactive.");
+                }
+
                 string hashedPin = BCrypt.Net.BCrypt.HashPassword(pin, 11);
                 string sql = @"INSERT INTO cards (account_id, card_number, pin_hash, expiry_date) 
                                VALUES (@AccountId, @CardNumber, @PinHash, @ExpiryDate)";
@@ -122,6 +130,12 @@ namespace Bank_ATM.Repositories
             if (card.IsBlocked)
             {
                 message = "This card is permanently blocked.";
+                return false;
+            }
+
+            if (card.ExpiryDate.Date < DateTime.Today)
+            {
+                message = "This card is expired.";
                 return false;
             }
 

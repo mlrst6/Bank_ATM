@@ -21,12 +21,36 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                return await db.QueryFirstOrDefaultAsync<AccountDto>("SELECT id, user_id as UserId, account_number as AccountNumber, balance FROM accounts WHERE id = @Id", new { Id = id });
+                return await db.QueryFirstOrDefaultAsync<AccountDto>(
+                    "SELECT id, user_id as UserId, account_number as AccountNumber, balance, is_active as IsActive, created_at as CreatedAt FROM accounts WHERE id = @Id",
+                    new { Id = id });
+            }
+        }
+
+        public async Task<AccountDto> GetAccountByUserIdAsync(int userId)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                return await db.QueryFirstOrDefaultAsync<AccountDto>(
+                    "SELECT TOP 1 id, user_id as UserId, account_number as AccountNumber, balance, is_active as IsActive, created_at as CreatedAt FROM accounts WHERE user_id = @UserId ORDER BY id",
+                    new { UserId = userId });
+            }
+        }
+
+        public async Task<bool> AccountExistsAsync(int accountId)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                return await db.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM accounts WHERE id = @Id AND is_active = 1",
+                    new { Id = accountId }) > 0;
             }
         }
 
         public async Task<bool> WithdrawAsync(int accountId, decimal amount)
         {
+            if (amount <= 0) return false;
+
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 db.Open();
@@ -34,10 +58,22 @@ namespace Bank_ATM.Repositories
                 {
                     try
                     {
-                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>("SELECT balance FROM accounts WHERE id = @Id", new { Id = accountId }, trans);
-                        if (account == null || account.Balance < amount) return false;
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive || account.Balance < amount) return false;
 
-                        await db.ExecuteAsync("UPDATE accounts SET balance = balance - @Amount WHERE id = @Id", new { Amount = amount, Id = accountId }, trans);
+                        int updatedRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = amount, Id = accountId },
+                            trans);
+                        if (updatedRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
                         await db.ExecuteAsync(@"INSERT INTO transactions (account_id, type, amount, transaction_date) 
                                                VALUES (@AccountId, 'Withdraw', @Amount, GETDATE())", 
                                                new { AccountId = accountId, Amount = amount }, trans);
@@ -56,6 +92,8 @@ namespace Bank_ATM.Repositories
 
         public async Task<bool> DepositAsync(int accountId, decimal amount)
         {
+            if (amount <= 0) return false;
+
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 db.Open();
@@ -63,7 +101,16 @@ namespace Bank_ATM.Repositories
                 {
                     try
                     {
-                        await db.ExecuteAsync("UPDATE accounts SET balance = balance + @Amount WHERE id = @Id", new { Amount = amount, Id = accountId }, trans);
+                        int updatedRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance + @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = amount, Id = accountId },
+                            trans);
+                        if (updatedRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
                         await db.ExecuteAsync(@"INSERT INTO transactions (account_id, type, amount, transaction_date) 
                                                VALUES (@AccountId, 'Deposit', @Amount, GETDATE())", 
                                                new { AccountId = accountId, Amount = amount }, trans);
@@ -82,6 +129,8 @@ namespace Bank_ATM.Repositories
 
         public async Task<bool> TransferAsync(int sourceAccountId, int targetAccountId, decimal amount)
         {
+            if (amount <= 0 || sourceAccountId == targetAccountId) return false;
+
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 db.Open();
@@ -89,11 +138,37 @@ namespace Bank_ATM.Repositories
                 {
                     try
                     {
-                        var source = await db.QueryFirstOrDefaultAsync<AccountDto>("SELECT balance FROM accounts WHERE id = @Id", new { Id = sourceAccountId }, trans);
-                        if (source == null || source.Balance < amount) return false;
+                        var source = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = sourceAccountId },
+                            trans);
+                        if (source == null || !source.IsActive || source.Balance < amount) return false;
 
-                        await db.ExecuteAsync("UPDATE accounts SET balance = balance - @Amount WHERE id = @Id", new { Amount = amount, Id = sourceAccountId }, trans);
-                        await db.ExecuteAsync("UPDATE accounts SET balance = balance + @Amount WHERE id = @Id", new { Amount = amount, Id = targetAccountId }, trans);
+                        var target = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT id, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = targetAccountId },
+                            trans);
+                        if (target == null || !target.IsActive) return false;
+
+                        int debitRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = amount, Id = sourceAccountId },
+                            trans);
+                        if (debitRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int creditRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance + @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = amount, Id = targetAccountId },
+                            trans);
+                        if (creditRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
                         
                         await db.ExecuteAsync(@"INSERT INTO transactions (account_id, target_account_id, type, amount, transaction_date) 
                                                VALUES (@SourceId, @TargetId, 'Transfer', @Amount, GETDATE())", 
@@ -115,7 +190,16 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                return await db.QueryFirstOrDefaultAsync<UserDto>("SELECT id, full_name as FullName, role, username, password_hash as PasswordHash FROM users WHERE id = @UserId", new { UserId = userId });
+                return await db.QueryFirstOrDefaultAsync<UserDto>(@"
+                    SELECT
+                        id,
+                        full_name as FullName,
+                        role,
+                        username,
+                        password_hash as PasswordHash,
+                        is_active as IsActive
+                    FROM users
+                    WHERE id = @UserId AND is_active = 1", new { UserId = userId });
             }
         }
 
@@ -123,7 +207,16 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                return await db.QueryFirstOrDefaultAsync<UserDto>("SELECT id, full_name as FullName, role, username, password_hash as PasswordHash FROM users WHERE username = @Username AND role = 'Admin'", new { Username = username });
+                return await db.QueryFirstOrDefaultAsync<UserDto>(@"
+                    SELECT
+                        id,
+                        full_name as FullName,
+                        role,
+                        username,
+                        password_hash as PasswordHash,
+                        is_active as IsActive
+                    FROM users
+                    WHERE username = @Username AND role = 'Admin' AND is_active = 1", new { Username = username });
             }
         }
 
@@ -131,7 +224,70 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                return await db.QueryAsync<UserDto>("SELECT id, full_name as FullName, username, phone_number as PhoneNumber, role, created_at as CreatedAt FROM users");
+                return await db.QueryAsync<UserDto>(@"
+                    SELECT
+                        u.id,
+                        u.full_name as FullName,
+                        u.username,
+                        u.phone_number as PhoneNumber,
+                        u.role,
+                        u.is_active as IsActive,
+                        u.created_at as CreatedAt,
+                        a.id as PrimaryAccountId,
+                        a.account_number as PrimaryAccountNumber
+                    FROM users u
+                    OUTER APPLY (
+                        SELECT TOP 1 id, account_number
+                        FROM accounts
+                        WHERE user_id = u.id
+                        ORDER BY id
+                    ) a
+                    ORDER BY u.id");
+            }
+        }
+
+        public async Task<bool> PayServiceAsync(int accountId, decimal amount, string description)
+        {
+            if (amount <= 0) return false;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive || account.Balance < amount) return false;
+
+                        int updatedRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = amount, Id = accountId },
+                            trans);
+                        if (updatedRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, 'BillPayment', @Amount, @Description, GETDATE())",
+                            new { AccountId = accountId, Amount = amount, Description = description },
+                            trans);
+
+                        trans.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
             }
         }
 
@@ -154,12 +310,76 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<int> CreateUserWithProvisioningAsync(UserDto user, string password, string initialPin)
+        {
+            using (var db = new SqlConnection(_connectionString))
+            {
+                await db.OpenAsync();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, 11);
+                        int userId = await db.QuerySingleAsync<int>(@"
+                            INSERT INTO users (full_name, username, password_hash, phone_number, role)
+                            VALUES (@FullName, @Username, @PasswordHash, @PhoneNumber, @Role);
+                            SELECT CAST(SCOPE_IDENTITY() as int)",
+                            new
+                            {
+                                user.FullName,
+                                user.Username,
+                                PasswordHash = hashedPassword,
+                                user.PhoneNumber,
+                                user.Role
+                            },
+                            trans);
+
+                        if (user.Role == "User")
+                        {
+                            string accountNumber = await GenerateUniqueAccountNumberAsync(db, trans);
+                            int accountId = await db.QuerySingleAsync<int>(@"
+                                INSERT INTO accounts (user_id, account_number, balance, is_active)
+                                VALUES (@UserId, @AccountNumber, 0, 1);
+                                SELECT CAST(SCOPE_IDENTITY() as int)",
+                                new { UserId = userId, AccountNumber = accountNumber },
+                                trans);
+
+                            if (!string.IsNullOrWhiteSpace(initialPin))
+                            {
+                                string cardNumber = await GenerateUniqueCardNumberAsync(db, trans);
+                                string pinHash = BCrypt.Net.BCrypt.HashPassword(initialPin, 11);
+                                await db.ExecuteAsync(@"
+                                    INSERT INTO cards (account_id, card_number, pin_hash, expiry_date, is_blocked, failed_attempts)
+                                    VALUES (@AccountId, @CardNumber, @PinHash, @ExpiryDate, 0, 0)",
+                                    new
+                                    {
+                                        AccountId = accountId,
+                                        CardNumber = cardNumber,
+                                        PinHash = pinHash,
+                                        ExpiryDate = DateTime.Today.AddYears(5)
+                                    },
+                                    trans);
+                            }
+                        }
+
+                        trans.Commit();
+                        return userId;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task UpdateUserAsync(UserDto user, string newPassword = null)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 string sql = @"UPDATE users SET full_name = @FullName, username = @Username, 
-                               phone_number = @PhoneNumber, role = @Role";
+                               phone_number = @PhoneNumber, role = @Role, is_active = @IsActive";
                 
                 var parameters = new DynamicParameters(user);
                 
@@ -176,23 +396,103 @@ namespace Bank_ATM.Repositories
 
         public async Task DeleteUserAsync(int userId)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (var db = new SqlConnection(_connectionString))
             {
-                await db.ExecuteAsync("DELETE FROM users WHERE id = @Id", new { Id = userId });
+                await db.OpenAsync();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var user = await db.QueryFirstOrDefaultAsync<UserDto>(@"
+                            SELECT
+                                id,
+                                role,
+                                is_active as IsActive
+                            FROM users
+                            WHERE id = @Id",
+                            new { Id = userId },
+                            trans);
+
+                        if (user == null)
+                        {
+                            return;
+                        }
+
+                        if (!user.IsActive)
+                        {
+                            throw new InvalidOperationException("This user is already inactive.");
+                        }
+
+                        if (string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int activeAdmins = await db.ExecuteScalarAsync<int>(
+                                "SELECT COUNT(*) FROM users WHERE role = 'Admin' AND is_active = 1",
+                                transaction: trans);
+
+                            if (activeAdmins <= 1)
+                            {
+                                throw new InvalidOperationException("You cannot deactivate the last active administrator.");
+                            }
+                        }
+
+                        await db.ExecuteAsync(
+                            "UPDATE users SET is_active = 0 WHERE id = @Id",
+                            new { Id = userId },
+                            trans);
+
+                        await db.ExecuteAsync(
+                            "UPDATE accounts SET is_active = 0 WHERE user_id = @Id",
+                            new { Id = userId },
+                            trans);
+
+                        await db.ExecuteAsync(@"
+                            UPDATE cards
+                            SET is_blocked = 1
+                            WHERE account_id IN (
+                                SELECT id FROM accounts WHERE user_id = @Id
+                            )",
+                            new { Id = userId },
+                            trans);
+
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
             }
         }
 
-        // Legacy support for non-async calls if needed, but async is preferred
-        public void UpdateBalance(int accountId, decimal amount, bool isIncrement = false)
+        private async Task<string> GenerateUniqueAccountNumberAsync(SqlConnection db, IDbTransaction trans)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            for (int attempt = 0; attempt < 10; attempt++)
             {
-                string sql = isIncrement 
-                    ? "UPDATE accounts SET balance = balance + @Amount WHERE id = @Id"
-                    : "UPDATE accounts SET balance = @Amount WHERE id = @Id";
-                    
-                db.Execute(sql, new { Amount = amount, Id = accountId });
+                string candidate = $"ACC{DateTime.UtcNow:yyMMddHHmmss}{attempt}";
+                int exists = await db.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM accounts WHERE account_number = @AccountNumber",
+                    new { AccountNumber = candidate },
+                    trans);
+                if (exists == 0) return candidate;
             }
+
+            throw new InvalidOperationException("Could not generate a unique account number.");
+        }
+
+        private async Task<string> GenerateUniqueCardNumberAsync(SqlConnection db, IDbTransaction trans)
+        {
+            for (int attempt = 0; attempt < 10; attempt++)
+            {
+                string candidate = $"{DateTime.UtcNow:yyyyMMddHHmmss}{attempt % 10}{(attempt + 7) % 10}";
+                int exists = await db.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM cards WHERE card_number = @CardNumber",
+                    new { CardNumber = candidate },
+                    trans);
+                if (exists == 0) return candidate;
+            }
+
+            throw new InvalidOperationException("Could not generate a unique card number.");
         }
     }
 }

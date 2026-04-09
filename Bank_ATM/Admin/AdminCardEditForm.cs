@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 using Bank_ATM.Models;
-using Bank_ATM.Repositories;
+using Bank_ATM.Services;
 
 namespace Bank_ATM.Admin
 {
@@ -9,7 +9,7 @@ namespace Bank_ATM.Admin
     {
         private CardDto _card;
         private bool _isEdit;
-        private CardRepository _repo = new CardRepository();
+        private readonly AdminService _adminService = new AdminService();
 
         public AdminCardEditForm(CardDto card = null)
         {
@@ -20,54 +20,91 @@ namespace Bank_ATM.Admin
 
         private void AdminCardEditForm_Load(object sender, EventArgs e)
         {
+            ApplyTheme();
+            btnSave.Text = LanguageManager.GetString("Save");
+            btnCancel.Text = LanguageManager.GetString("Cancel");
+            lblDialogTitle.Text = _isEdit
+                ? LanguageManager.GetString("EditCard")
+                : LanguageManager.GetString("CreateCard");
+            lblDialogSubtitle.Text = _isEdit
+                ? LanguageManager.GetString("EditCardSubtitle")
+                : LanguageManager.GetString("CreateCardSubtitle");
             if (_isEdit)
             {
                 txtAccountId.Text = _card.AccountId.ToString();
                 txtCardNumber.Text = _card.CardNumber;
                 chkBlocked.Checked = _card.IsBlocked;
                 dtpExpiry.Value = _card.ExpiryDate;
-                lblPinNote.Text = "(Leave blank to keep current PIN)";
+                lblPinNote.Text = LanguageManager.GetString("LeaveBlankToKeepPin");
                 txtAccountId.ReadOnly = true; // Usually don't change linked account
             }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtCardNumber.Text) || txtCardNumber.Text.Length != 16)
+            string sanitizedCardNumber = txtCardNumber.Text.Replace(" ", "").Replace("-", "");
+
+            if (string.IsNullOrWhiteSpace(sanitizedCardNumber) || sanitizedCardNumber.Length != 16 || !long.TryParse(sanitizedCardNumber, out _))
             {
-                MessageBox.Show("Valid 16-digit Card Number is required.");
+                MessageBox.Show(LanguageManager.GetString("ValidCardNumberRequired"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (!_isEdit && string.IsNullOrWhiteSpace(txtPin.Text))
+            if (!_isEdit && (string.IsNullOrWhiteSpace(txtPin.Text) || txtPin.Text.Length != 4 || !int.TryParse(txtPin.Text, out _)))
             {
-                MessageBox.Show("PIN is required for new cards.");
+                MessageBox.Show(LanguageManager.GetString("ValidPinRequiredForNewCard"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            _card.CardNumber = txtCardNumber.Text;
+            if (!string.IsNullOrWhiteSpace(txtPin.Text) && (txtPin.Text.Length != 4 || !int.TryParse(txtPin.Text, out _)))
+            {
+                MessageBox.Show(LanguageManager.GetString("PinMustBeFourDigits"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!int.TryParse(txtAccountId.Text, out int accId) || accId <= 0)
+            {
+                MessageBox.Show(LanguageManager.GetString("ValidAccountIdRequired"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _card.CardNumber = sanitizedCardNumber;
             _card.IsBlocked = chkBlocked.Checked;
-            _card.ExpiryDate = dtpExpiry.Value;
-            
-            if (int.TryParse(txtAccountId.Text, out int accId))
-                _card.AccountId = accId;
+            _card.ExpiryDate = dtpExpiry.Value.Date;
+            _card.AccountId = accId;
 
             try
             {
-                if (_isEdit)
-                    _repo.UpdateCard(_card, txtPin.Text);
-                else
-                    _repo.CreateCard(_card, txtPin.Text);
+                _adminService.SaveCard(_card, txtPin.Text, _isEdit);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving card: " + ex.Message);
+                MessageBox.Show(LanguageManager.Format("SaveCardFailed", ex.Message), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e) => this.Close();
+
+        private void ApplyTheme()
+        {
+            AdminTheme.ApplyForm(this);
+            AdminTheme.StylePanel(pnlHeader);
+            AdminTheme.StyleTitle(lblDialogTitle);
+            AdminTheme.StyleLabel(lblDialogSubtitle, true);
+            AdminTheme.StyleLabel(label1, true);
+            AdminTheme.StyleLabel(label2, true);
+            AdminTheme.StyleLabel(label3, true);
+            AdminTheme.StyleLabel(label4, true);
+            AdminTheme.StyleLabel(lblPinNote, true);
+            AdminTheme.StyleTextBox(txtAccountId);
+            AdminTheme.StyleTextBox(txtCardNumber);
+            AdminTheme.StyleTextBox(txtPin);
+            AdminTheme.StyleCheckBox(chkBlocked);
+            AdminTheme.StyleSuccessButton(btnSave);
+            AdminTheme.StyleSecondaryButton(btnCancel);
+        }
     }
 }

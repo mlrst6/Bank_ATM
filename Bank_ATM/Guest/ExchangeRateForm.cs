@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using Bank_ATM.Core;
 
 namespace Bank_ATM
 {
@@ -17,20 +18,12 @@ namespace Bank_ATM
 
         private void btnUzsToUsd_Click(object sender, EventArgs e)
         {
-            ExchangeFromUzsToUsdForm nextForm = new ExchangeFromUzsToUsdForm();
-            nextForm.StartPosition = FormStartPosition.Manual;
-            nextForm.Location = this.Location;
-            nextForm.Show();
-            this.Close();
+            FormNavigator.ShowNext(this, new ConverterForm(0m, "UZS", "USD"));
         }
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            GuestForm guestForm = new GuestForm();
-            guestForm.StartPosition = FormStartPosition.Manual;
-            guestForm.Location = this.Location;
-            guestForm.Show();
-            this.Close();
+            FormNavigator.GoBack(this, () => new GuestActionsForm());
         }
 
         private void label2_Click(object sender, EventArgs e) { }
