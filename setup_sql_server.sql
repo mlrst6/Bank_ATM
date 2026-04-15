@@ -164,6 +164,22 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID(N'dbo.atm_cash_denominations', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.atm_cash_denominations (
+        atm_id INT NOT NULL,
+        currency_id INT NOT NULL,
+        denomination_value DECIMAL(18, 2) NOT NULL,
+        note_count INT NOT NULL CONSTRAINT CK_atm_cash_denominations_note_count CHECK (note_count >= 0),
+        updated_at DATETIME NOT NULL CONSTRAINT DF_atm_cash_denominations_updated_at DEFAULT GETDATE(),
+        CONSTRAINT PK_atm_cash_denominations PRIMARY KEY (atm_id, currency_id, denomination_value),
+        CONSTRAINT CK_atm_cash_denominations_value CHECK (denomination_value > 0),
+        CONSTRAINT FK_atm_cash_denominations_atms FOREIGN KEY (atm_id) REFERENCES dbo.atms(id) ON DELETE CASCADE,
+        CONSTRAINT FK_atm_cash_denominations_currencies FOREIGN KEY (currency_id) REFERENCES dbo.currencies(id)
+    );
+END
+GO
+
 IF NOT EXISTS (SELECT 1 FROM dbo.currencies WHERE code = N'UZS')
     INSERT INTO dbo.currencies (code, currency_name, rate_to_uzs, is_active)
     VALUES (N'UZS', N'Uzbekistani Som', 1.0000, 1);
@@ -183,6 +199,36 @@ IF @DefaultAtmId IS NOT NULL AND @DefaultUsdId IS NOT NULL AND NOT EXISTS (
     SELECT 1 FROM dbo.atm_currency_cash WHERE atm_id = @DefaultAtmId AND currency_id = @DefaultUsdId)
     INSERT INTO dbo.atm_currency_cash (atm_id, currency_id, cash_balance)
     VALUES (@DefaultAtmId, @DefaultUsdId, 1000.00);
+GO
+
+DECLARE @DenomAtmId INT = (SELECT TOP 1 id FROM dbo.atms ORDER BY id);
+DECLARE @DenomUzsId INT = (SELECT id FROM dbo.currencies WHERE code = N'UZS');
+DECLARE @DenomUsdId INT = (SELECT id FROM dbo.currencies WHERE code = N'USD');
+IF @DenomAtmId IS NOT NULL AND @DenomUzsId IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM dbo.atm_cash_denominations WHERE atm_id = @DenomAtmId AND currency_id = @DenomUzsId)
+BEGIN
+    INSERT INTO dbo.atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+    VALUES
+        (@DenomAtmId, @DenomUzsId, 1000.00, 100),
+        (@DenomAtmId, @DenomUzsId, 2000.00, 100),
+        (@DenomAtmId, @DenomUzsId, 5000.00, 100),
+        (@DenomAtmId, @DenomUzsId, 10000.00, 100),
+        (@DenomAtmId, @DenomUzsId, 20000.00, 50),
+        (@DenomAtmId, @DenomUzsId, 50000.00, 24),
+        (@DenomAtmId, @DenomUzsId, 100000.00, 10);
+END
+IF @DenomAtmId IS NOT NULL AND @DenomUsdId IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM dbo.atm_cash_denominations WHERE atm_id = @DenomAtmId AND currency_id = @DenomUsdId)
+BEGIN
+    INSERT INTO dbo.atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+    VALUES
+        (@DenomAtmId, @DenomUsdId, 1.00, 100),
+        (@DenomAtmId, @DenomUsdId, 5.00, 80),
+        (@DenomAtmId, @DenomUsdId, 10.00, 50),
+        (@DenomAtmId, @DenomUsdId, 20.00, 25),
+        (@DenomAtmId, @DenomUsdId, 50.00, 6),
+        (@DenomAtmId, @DenomUsdId, 100.00, 2);
+END
 GO
 
 IF OBJECT_ID(N'dbo.service_accounts', N'U') IS NULL
@@ -318,6 +364,8 @@ IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE version = N'V6__AtmCash
     INSERT INTO dbo.schema_migrations (version) VALUES (N'V6__AtmCashBalance.sql');
 IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE version = N'V7__CurrenciesAndAtmCurrencyCash.sql')
     INSERT INTO dbo.schema_migrations (version) VALUES (N'V7__CurrenciesAndAtmCurrencyCash.sql');
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE version = N'V8__AtmCashDenominations.sql')
+    INSERT INTO dbo.schema_migrations (version) VALUES (N'V8__AtmCashDenominations.sql');
 GO
 
 PRINT N'ATM database bootstrap completed.';

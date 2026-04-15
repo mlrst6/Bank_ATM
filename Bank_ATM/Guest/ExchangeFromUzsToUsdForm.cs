@@ -15,6 +15,7 @@ namespace Bank_ATM
 
         private void ExchangeFromUzsToUsdForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
             var usd = new CurrencyRepository().GetCurrencyByCode("USD");
             ExchangeUzsPrice.Text = usd == null

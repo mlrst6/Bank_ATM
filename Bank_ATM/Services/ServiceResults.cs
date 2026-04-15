@@ -22,6 +22,7 @@ namespace Bank_ATM.Services
         public decimal DebitedAmountUzs { get; set; }
         public string CashCurrencyCode { get; set; }
         public decimal CashAmount { get; set; }
+        public CashNoteDto[] CashBreakdown { get; set; }
     }
 
     public class CardAccessResult : ServiceResult

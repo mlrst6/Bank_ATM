@@ -118,6 +118,9 @@
     <Compile Include="User\UserActionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="User\UserOperationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="User\UserActionsForm.Designer.cs">
       <DependentUpon>UserActionsForm.cs</DependentUpon>
     </Compile>
@@ -176,6 +179,7 @@
     <Compile Include="Guest\PinEntryForm.Designer.cs">
       <DependentUpon>PinEntryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\AppWindow.cs" />
     <Compile Include="Core\AudioManager.cs" />
     <Compile Include="Core\FormNavigator.cs" />
     <Compile Include="Core\IUserSession.cs" />
@@ -192,6 +196,9 @@
     <Compile Include="UI\ModernKeypad.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="UI\CashNoteInputDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="BaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,6 +209,7 @@
     <Compile Include="Repositories\AccountRepository.cs" />
     <Compile Include="Repositories\AtmRepository.cs" />
     <Compile Include="Repositories\CurrencyRepository.cs" />
+    <Compile Include="Repositories\CashRepository.cs" />
     <Compile Include="Repositories\ServicesRepository.cs" />
     <Compile Include="Repositories\TransactionRepository.cs" />
     <Compile Include="Program.cs" />

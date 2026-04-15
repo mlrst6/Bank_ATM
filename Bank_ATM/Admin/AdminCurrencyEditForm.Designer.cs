@@ -24,6 +24,8 @@ namespace Bank_ATM.Admin
             this.txtRateToUzs = new System.Windows.Forms.TextBox();
             this.lblCashAvailable = new System.Windows.Forms.Label();
             this.txtCashAvailable = new System.Windows.Forms.TextBox();
+            this.lblDenominations = new System.Windows.Forms.Label();
+            this.txtDenominations = new System.Windows.Forms.TextBox();
             this.chkIsActive = new System.Windows.Forms.CheckBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -102,42 +104,61 @@ namespace Bank_ATM.Admin
             this.txtCashAvailable.Size = new System.Drawing.Size(422, 22);
             this.txtCashAvailable.TabIndex = 8;
             // 
+            // lblDenominations
+            // 
+            this.lblDenominations.AutoSize = true;
+            this.lblDenominations.Location = new System.Drawing.Point(30, 332);
+            this.lblDenominations.Name = "lblDenominations";
+            this.lblDenominations.Size = new System.Drawing.Size(151, 17);
+            this.lblDenominations.TabIndex = 9;
+            this.lblDenominations.Text = "Denominations";
+            // 
+            // txtDenominations
+            // 
+            this.txtDenominations.Location = new System.Drawing.Point(33, 352);
+            this.txtDenominations.Multiline = true;
+            this.txtDenominations.Name = "txtDenominations";
+            this.txtDenominations.Size = new System.Drawing.Size(422, 62);
+            this.txtDenominations.TabIndex = 10;
+            // 
             // chkIsActive
             // 
             this.chkIsActive.AutoSize = true;
-            this.chkIsActive.Location = new System.Drawing.Point(33, 334);
+            this.chkIsActive.Location = new System.Drawing.Point(33, 432);
             this.chkIsActive.Name = "chkIsActive";
             this.chkIsActive.Size = new System.Drawing.Size(67, 21);
-            this.chkIsActive.TabIndex = 9;
+            this.chkIsActive.TabIndex = 11;
             this.chkIsActive.Text = "Active";
             this.chkIsActive.UseVisualStyleBackColor = true;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(189, 388);
+            this.btnSave.Location = new System.Drawing.Point(189, 490);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(128, 42);
-            this.btnSave.TabIndex = 10;
+            this.btnSave.TabIndex = 12;
             this.btnSave.Text = "SAVE";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(327, 388);
+            this.btnCancel.Location = new System.Drawing.Point(327, 490);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(128, 42);
-            this.btnCancel.TabIndex = 11;
+            this.btnCancel.TabIndex = 13;
             this.btnCancel.Text = "CANCEL";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // AdminCurrencyEditForm
             // 
-            this.ClientSize = new System.Drawing.Size(492, 462);
+            this.ClientSize = new System.Drawing.Size(492, 566);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkIsActive);
+            this.Controls.Add(this.txtDenominations);
+            this.Controls.Add(this.lblDenominations);
             this.Controls.Add(this.txtCashAvailable);
             this.Controls.Add(this.lblCashAvailable);
             this.Controls.Add(this.txtRateToUzs);
@@ -167,6 +188,8 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.TextBox txtRateToUzs;
         private System.Windows.Forms.Label lblCashAvailable;
         private System.Windows.Forms.TextBox txtCashAvailable;
+        private System.Windows.Forms.Label lblDenominations;
+        private System.Windows.Forms.TextBox txtDenominations;
         private System.Windows.Forms.CheckBox chkIsActive;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;

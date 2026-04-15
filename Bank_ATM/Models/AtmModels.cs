@@ -106,5 +106,24 @@ namespace Bank_ATM.Models
         public decimal CashAvailable { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
-}
 
+    public class CashDenominationDto
+    {
+        public int AtmId { get; set; }
+        public int CurrencyId { get; set; }
+        public string CurrencyCode { get; set; }
+        public decimal DenominationValue { get; set; }
+        public int NoteCount { get; set; }
+        public decimal TotalValue => DenominationValue * NoteCount;
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    public class CashNoteDto
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyCode { get; set; }
+        public decimal DenominationValue { get; set; }
+        public int NoteCount { get; set; }
+        public decimal TotalValue => DenominationValue * NoteCount;
+    }
+}

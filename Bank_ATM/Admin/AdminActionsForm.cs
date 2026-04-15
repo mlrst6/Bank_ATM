@@ -1,10 +1,10 @@
 using System;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Services;
+using Bank_ATM.UI;
 
 namespace Bank_ATM.Admin
 {
@@ -21,6 +21,7 @@ namespace Bank_ATM.Admin
 
         private async void AdminActionsForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             ApplyTheme();
             LanguageManager.Apply(this);
             lblAdminTitle.Text = LanguageManager.Format("AdminWelcomeTitle", SessionManager.Instance.CurrentUser.FullName);
@@ -73,79 +74,50 @@ namespace Bank_ATM.Admin
             await RefreshStatsAsync();
         }
 
-        private async void pnlTransactions_Click(object sender, EventArgs e)
+        private void pnlTransactions_Click(object sender, EventArgs e)
+        {
+            var cash = _adminService.GetAllCashDenominations();
+            AdminDataViewForm viewForm = new AdminDataViewForm("ATM CASH DENOMINATIONS", cash, "CASH");
+            viewForm.ShowDialog();
+        }
+
+        private async void btnRefillAtm_Click(object sender, EventArgs e)
         {
             var currencies = _adminService.GetAllCurrencies()
                 .Where(currency => currency.IsActive)
                 .OrderBy(currency => currency.Code)
-                .ToList();
-
+                .ToArray();
             if (!currencies.Any())
             {
                 MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string availableCodes = string.Join(", ", currencies.Select(currency => currency.Code));
-            string input = Microsoft.VisualBasic.Interaction.InputBox(
-                LanguageManager.Format("SelectDashboardCurrency", availableCodes),
-                LanguageManager.GetString("AtmCashAvailable"),
-                _selectedAtmCashCurrencyCode);
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return;
-            }
-
-            string currencyCode = input.Trim().ToUpperInvariant();
-            if (!currencies.Any(currency => currency.Code == currencyCode))
-            {
-                MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            _selectedAtmCashCurrencyCode = currencyCode;
-            await RefreshStatsAsync();
-        }
-
-        private async void btnRefillAtm_Click(object sender, EventArgs e)
-        {
-            var atm = _adminService.GetDefaultAtm();
-            string prompt = atm == null
-                ? LanguageManager.GetString("EnterAtmRefillAmount")
-                : LanguageManager.Format("AtmCashPrompt", atm.CurrentBalance);
-            string input = Microsoft.VisualBasic.Interaction.InputBox(
-                prompt,
+            using (var dialog = new CashNoteInputDialog(
                 LanguageManager.GetString("RefillAtmCash"),
-                "1000000");
+                LanguageManager.GetString("RefillCashNotesSubtitle"),
+                currencies,
+                code => _adminService.GetCashDenominations(code).ToArray()))
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
 
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return;
-            }
-
-            decimal amount;
-            if (!decimal.TryParse(input, NumberStyles.Number, CultureInfo.CurrentCulture, out amount) &&
-                !decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out amount))
-            {
-                MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                _adminService.AddAtmCash(amount);
-                await RefreshStatsAsync();
-                var updatedAtm = _adminService.GetDefaultAtm();
-                MessageBox.Show(
-                    LanguageManager.Format("AtmCashUpdated", updatedAtm.CurrentBalance),
-                    LanguageManager.GetString("Success"),
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                try
+                {
+                    _adminService.AddAtmCashNotes(dialog.CurrencyId, dialog.Notes);
+                    await RefreshStatsAsync();
+                    MessageBox.Show(
+                        LanguageManager.Format("AtmCashNotesUpdated", dialog.TotalAmount, dialog.CurrencyCode),
+                        LanguageManager.GetString("Success"),
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 

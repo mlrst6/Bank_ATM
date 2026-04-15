@@ -14,6 +14,7 @@ namespace Bank_ATM
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             SetupUI();
         }
 

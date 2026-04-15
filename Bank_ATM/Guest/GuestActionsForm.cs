@@ -14,6 +14,7 @@ namespace Bank_ATM
 
         private void GuestActionsForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
             lblTitle.Text = LanguageManager.GetString("MainFormGuest");
             btnExchange.Text = LanguageManager.GetString("btnExchange");

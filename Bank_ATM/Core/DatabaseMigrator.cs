@@ -93,9 +93,9 @@ namespace Bank_ATM.Core
                     int requiredTables = connection.ExecuteScalar<int>(@"
                         SELECT COUNT(*)
                         FROM sys.tables
-                        WHERE name IN ('users', 'accounts', 'cards', 'transactions', 'services', 'service_accounts', 'atms', 'currencies', 'atm_currency_cash')");
+                        WHERE name IN ('users', 'accounts', 'cards', 'transactions', 'services', 'service_accounts', 'atms', 'currencies', 'atm_currency_cash', 'atm_cash_denominations')");
 
-                    if (requiredTables < 9)
+                    if (requiredTables < 10)
                     {
                         throw new InvalidOperationException(
                             "Database schema is incomplete. Run the migration bootstrap once or deploy the SQL scripts first.");
@@ -153,6 +153,18 @@ namespace Bank_ATM.Core
                     {
                         throw new InvalidOperationException(
                             "Database schema is outdated. Apply the currencies migration before starting the application.");
+                    }
+
+                    int denominationColumns = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.columns
+                        WHERE object_id = OBJECT_ID('dbo.atm_cash_denominations')
+                          AND name IN ('atm_id', 'currency_id', 'denomination_value', 'note_count')");
+
+                    if (denominationColumns < 4)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the ATM cash denominations migration before starting the application.");
                     }
                 }
             }

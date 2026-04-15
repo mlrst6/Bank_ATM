@@ -64,6 +64,11 @@ namespace Bank_ATM.Repositories
 
         public int SaveCurrency(CurrencyDto currency)
         {
+            return SaveCurrency(currency, null);
+        }
+
+        public int SaveCurrency(CurrencyDto currency, IEnumerable<decimal> denominationValues)
+        {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 db.Open();
@@ -132,6 +137,47 @@ namespace Bank_ATM.Repositories
                             new { CurrencyId = id, currency.CashAvailable },
                             trans);
 
+                        db.Execute(@"
+                            IF NOT EXISTS (
+                                SELECT 1 FROM atm_cash_denominations
+                                WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                  AND currency_id = @CurrencyId
+                            )
+                            BEGIN
+                                IF @Code = 'UZS'
+                                BEGIN
+                                    INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                                    VALUES
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 1000.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 2000.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 5000.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 10000.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 20000.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 50000.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 100000.00, 0)
+                                END
+                                ELSE
+                                BEGIN
+                                    INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                                    VALUES
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 1.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 5.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 10.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 20.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 50.00, 0),
+                                        ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, 100.00, 0)
+                                END
+                            END",
+                            new { CurrencyId = id, Code = code },
+                            trans);
+
+                        if (denominationValues != null)
+                        {
+                            SaveDenominations(db, trans, id, denominationValues);
+                        }
+
+                        CashRepository.SyncCashTotals(db, trans, id);
+
                         if (code == "UZS")
                         {
                             db.Execute(@"
@@ -160,6 +206,73 @@ namespace Bank_ATM.Repositories
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 db.Execute("UPDATE currencies SET is_active = 0, updated_at = GETDATE() WHERE id = @Id", new { Id = currencyId });
+            }
+        }
+
+        private static void SaveDenominations(IDbConnection db, IDbTransaction trans, int currencyId, IEnumerable<decimal> denominationValues)
+        {
+            var values = denominationValues
+                .Where(value => value > 0m)
+                .Select(value => decimal.Round(value, 2))
+                .Distinct()
+                .OrderBy(value => value)
+                .ToList();
+
+            if (!values.Any())
+            {
+                throw new System.InvalidOperationException("At least one denomination is required.");
+            }
+
+            var existing = db.Query<CashDenominationDto>(@"
+                SELECT
+                    atm_id as AtmId,
+                    currency_id as CurrencyId,
+                    denomination_value as DenominationValue,
+                    note_count as NoteCount,
+                    updated_at as UpdatedAt
+                FROM atm_cash_denominations
+                WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                  AND currency_id = @CurrencyId",
+                new { CurrencyId = currencyId },
+                trans).ToList();
+
+            foreach (decimal value in values)
+            {
+                db.Execute(@"
+                    IF NOT EXISTS (
+                        SELECT 1 FROM atm_cash_denominations
+                        WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                          AND currency_id = @CurrencyId
+                          AND denomination_value = @DenominationValue
+                    )
+                    BEGIN
+                        INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                        VALUES ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, @DenominationValue, 0)
+                    END",
+                    new { CurrencyId = currencyId, DenominationValue = value },
+                    trans);
+            }
+
+            foreach (var removed in existing.Where(item => !values.Contains(decimal.Round(item.DenominationValue, 2))))
+            {
+                if (removed.NoteCount > 0)
+                {
+                    throw new System.InvalidOperationException(
+                        $"Cannot remove denomination {removed.DenominationValue:N2} because it still has {removed.NoteCount} note(s) in the ATM.");
+                }
+
+                db.Execute(@"
+                    DELETE FROM atm_cash_denominations
+                    WHERE atm_id = @AtmId
+                      AND currency_id = @CurrencyId
+                      AND denomination_value = @DenominationValue",
+                    new
+                    {
+                        removed.AtmId,
+                        removed.CurrencyId,
+                        removed.DenominationValue
+                    },
+                    trans);
             }
         }
     }

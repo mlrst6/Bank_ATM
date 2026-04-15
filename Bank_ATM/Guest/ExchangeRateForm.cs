@@ -13,6 +13,7 @@ namespace Bank_ATM
 
         private void ExchangeRateForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
         }
 

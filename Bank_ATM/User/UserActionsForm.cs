@@ -1,12 +1,12 @@
 using System;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Models;
 using Bank_ATM.Payments;
 using Bank_ATM.Services;
+using Bank_ATM.UI;
 
 namespace Bank_ATM.User
 {
@@ -22,6 +22,7 @@ namespace Bank_ATM.User
 
         private void UserActionsForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
             ApplyTheme();
             RefreshAccountSummary();
@@ -37,33 +38,29 @@ namespace Bank_ATM.User
         private async void btnWithdraw_Click(object sender, EventArgs e)
         {
             var currencies = _bankingService.GetActiveCurrencies();
-            string currencyCode = Microsoft.VisualBasic.Interaction.InputBox(
-                LanguageManager.Format("SelectWithdrawCurrency", string.Join(", ", currencies.Select(c => c.Code))),
-                LanguageManager.GetString("Withdraw"),
-                "UZS");
-            if (string.IsNullOrWhiteSpace(currencyCode))
-            {
-                return;
-            }
-
-            currencyCode = currencyCode.Trim().ToUpperInvariant();
-            if (!currencies.Any(c => c.Code == currencyCode))
+            if (currencies.Length == 0)
             {
                 MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (TryPromptAmount(LanguageManager.Format("WithdrawCurrencyAmount", currencyCode), out decimal amount))
+            using (var dialog = new UserOperationDialog(UserOperationType.Withdraw, currencies))
             {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
                 SetLoading(true);
-                var result = await _bankingService.WithdrawAsync(amount, currencyCode);
+                var result = await _bankingService.WithdrawAsync(dialog.Amount, dialog.CurrencyCode);
                 SetLoading(false);
 
                 if (result.Success)
                 {
                     AuditLogger.LogTransaction("Withdraw", result.DebitedAmountUzs, SessionManager.Instance.CurrentAccount.AccountNumber);
                     RefreshAccountSummary();
-                    bool showedReceiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{amount:N2} {currencyCode}");
+                    ShowCashBreakdown(LanguageManager.GetString("CashDispensedBreakdown"), result.CashBreakdown);
+                    bool showedReceiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{dialog.Amount:N2} {dialog.CurrencyCode}");
                     if (!showedReceiptMessage)
                     {
                         MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Withdraw"), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -79,31 +76,31 @@ namespace Bank_ATM.User
         private async void btnDeposit_Click(object sender, EventArgs e)
         {
             var currencies = _bankingService.GetActiveCurrencies();
-            string currencyCode = Microsoft.VisualBasic.Interaction.InputBox(
-                LanguageManager.Format("SelectDepositCurrency", string.Join(", ", currencies.Select(c => c.Code))),
-                LanguageManager.GetString("Deposit"),
-                "UZS");
-            if (string.IsNullOrWhiteSpace(currencyCode))
-            {
-                return;
-            }
-
-            currencyCode = currencyCode.Trim().ToUpperInvariant();
-            if (!currencies.Any(c => c.Code == currencyCode))
+            if (currencies.Length == 0)
             {
                 MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (TryPromptAmount(LanguageManager.Format("DepositCurrencyAmount", currencyCode), out decimal amount))
+            using (var dialog = new CashNoteInputDialog(
+                LanguageManager.GetString("Deposit"),
+                LanguageManager.GetString("DepositCashNotesSubtitle"),
+                currencies,
+                code => _bankingService.GetCashDenominations(code)))
             {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
                 SetLoading(true);
-                var result = await _bankingService.DepositAsync(amount, currencyCode);
+                var result = await _bankingService.DepositCashNotesAsync(dialog.CurrencyCode, dialog.Notes);
                 SetLoading(false);
 
                 if (result.Success)
                 {
                     RefreshAccountSummary();
+                    ShowCashBreakdown(LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown);
                     MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Deposit"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -115,27 +112,22 @@ namespace Bank_ATM.User
 
         private async void btnTransfer_Click(object sender, EventArgs e)
         {
-            string targetCardNum = Microsoft.VisualBasic.Interaction.InputBox(
-                LanguageManager.GetString("EnterTargetCardNumber"),
-                LanguageManager.GetString("Transfer"),
-                string.Empty);
-            if (string.IsNullOrEmpty(targetCardNum)) return;
-
-            string amountStr = Microsoft.VisualBasic.Interaction.InputBox(
-                LanguageManager.GetString("EnterAmount"),
-                LanguageManager.GetString("Transfer"),
-                "0");
-            if (TryParseAmount(amountStr, out decimal amount))
+            using (var dialog = new UserOperationDialog(UserOperationType.Transfer, new CurrencyDto[0]))
             {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
                 SetLoading(true);
-                var result = await _bankingService.TransferByCardAsync(targetCardNum, amount);
+                var result = await _bankingService.TransferByCardAsync(dialog.TargetCardNumber, dialog.Amount);
                 SetLoading(false);
 
                 if (result.Success)
                 {
-                    AuditLogger.LogTransaction("Transfer", amount, $"{SessionManager.Instance.CurrentAccount.AccountNumber} -> {result.TargetCard.CardNumber}");
+                    AuditLogger.LogTransaction("Transfer", dialog.Amount, $"{SessionManager.Instance.CurrentAccount.AccountNumber} -> {result.TargetCard.CardNumber}");
                     RefreshAccountSummary();
-                    bool showedReceiptMessage = OfferDigitalReceipt("Transfer", amount, LanguageManager.Format("TransferReceiptDescription", result.TargetCard.CardNumber));
+                    bool showedReceiptMessage = OfferDigitalReceipt("Transfer", dialog.Amount, LanguageManager.Format("TransferReceiptDescription", result.TargetCard.CardNumber));
                     if (!showedReceiptMessage)
                     {
                         MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Transfer"), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -145,10 +137,6 @@ namespace Bank_ATM.User
                 {
                     MessageBox.Show(result.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-            }
-            else if (!string.IsNullOrWhiteSpace(amountStr))
-            {
-                MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -241,38 +229,16 @@ namespace Bank_ATM.User
             return false;
         }
 
-        private bool TryPromptAmount(string title, out decimal amount)
+        private void ShowCashBreakdown(string title, CashNoteDto[] notes)
         {
-            string amountStr = Microsoft.VisualBasic.Interaction.InputBox(
-                LanguageManager.GetString("EnterAmount"),
-                title,
-                "0");
-
-            if (string.IsNullOrWhiteSpace(amountStr))
+            if (notes == null || notes.Length == 0)
             {
-                amount = 0m;
-                return false;
+                return;
             }
 
-            if (!TryParseAmount(amountStr, out amount))
-            {
-                MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
-        private static bool TryParseAmount(string input, out decimal amount)
-        {
-            if (decimal.TryParse(input, NumberStyles.Number, CultureInfo.CurrentCulture, out amount) ||
-                decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out amount))
-            {
-                return amount > 0m && decimal.Round(amount, 2) == amount;
-            }
-
-            amount = 0m;
-            return false;
+            string message = string.Join(Environment.NewLine, notes.Select(note =>
+                $"{note.DenominationValue:N0} {note.CurrencyCode} x {note.NoteCount} = {note.TotalValue:N0} {note.CurrencyCode}"));
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ApplyTheme()

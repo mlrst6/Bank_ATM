@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
 using Bank_ATM.Core;
+using Bank_ATM.UI;
 
 namespace Bank_ATM.Payments
 {
@@ -33,6 +34,11 @@ namespace Bank_ATM.Payments
                 : LanguageManager.GetString("GuestServicePaymentSubtitle");
             btnPay.Text = LanguageManager.GetString("Pay");
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            if (!_chargeCurrentAccount)
+            {
+                txtAmount.ReadOnly = true;
+                txtAmount.Text = LanguageManager.GetString("CashAmountCalculatedFromNotes");
+            }
 
             _services = _bankingService.GetAvailableServices();
             cmbServices.DataSource = _services;
@@ -56,7 +62,8 @@ namespace Bank_ATM.Payments
                 return;
             }
 
-            if (!TryParseAmount(txtAmount.Text, out decimal amount))
+            decimal amount = 0m;
+            if (_chargeCurrentAccount && !TryParseAmount(txtAmount.Text, out amount))
             {
                 MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -64,7 +71,38 @@ namespace Bank_ATM.Payments
 
             SetLoading(true);
             var service = (ServiceDto)cmbServices.SelectedItem;
-            var result = await _bankingService.PayServiceAsync(service.Id, txtReference.Text.Trim(), amount, _chargeCurrentAccount);
+            ServiceResult result;
+            if (_chargeCurrentAccount)
+            {
+                result = await _bankingService.PayServiceAsync(service.Id, txtReference.Text.Trim(), amount, true);
+            }
+            else
+            {
+                SetLoading(false);
+                var uzsCurrency = _bankingService.GetActiveCurrencies()
+                    .Where(currency => currency.Code == "UZS")
+                    .ToArray();
+                if (!uzsCurrency.Any())
+                {
+                    MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                using (var notesDialog = new CashNoteInputDialog(
+                    LanguageManager.GetString("GuestServicePayment"),
+                    LanguageManager.GetString("GuestCashPaymentSubtitle"),
+                    uzsCurrency,
+                    code => _bankingService.GetCashDenominations(code)))
+                {
+                    if (notesDialog.ShowDialog(this) != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    SetLoading(true);
+                    result = await _bankingService.PayServiceWithCashNotesAsync(service.Id, txtReference.Text.Trim(), notesDialog.Notes);
+                }
+            }
             SetLoading(false);
 
             if (!result.Success)

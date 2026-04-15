@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Bank_ATM.Models;
@@ -198,6 +199,114 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<IList<CashNoteDto>> WithdrawCurrencyWithDenominationsAsync(
+            int accountId,
+            decimal cashAmount,
+            decimal debitAmountUzs,
+            int currencyId,
+            string currencyCode)
+        {
+            if (!IsValidMoneyAmount(cashAmount) || !IsValidMoneyAmount(debitAmountUzs)) return null;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive || account.Balance < debitAmountUzs)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        var denominations = (await db.QueryAsync<CashDenominationDto>(@"
+                            SELECT
+                                d.atm_id as AtmId,
+                                d.currency_id as CurrencyId,
+                                c.code as CurrencyCode,
+                                d.denomination_value as DenominationValue,
+                                d.note_count as NoteCount,
+                                d.updated_at as UpdatedAt
+                            FROM atm_cash_denominations d WITH (UPDLOCK, ROWLOCK)
+                            INNER JOIN currencies c ON c.id = d.currency_id
+                            WHERE d.atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND d.currency_id = @CurrencyId
+                            ORDER BY d.denomination_value DESC",
+                            new { CurrencyId = currencyId },
+                            trans)).ToList();
+
+                        var breakdown = BuildWithdrawalBreakdown(cashAmount, denominations);
+                        if (breakdown == null || breakdown.Count == 0)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        foreach (var note in breakdown)
+                        {
+                            int rows = await db.ExecuteAsync(@"
+                                UPDATE atm_cash_denominations
+                                SET note_count = note_count - @NoteCount,
+                                    updated_at = GETDATE()
+                                WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                  AND currency_id = @CurrencyId
+                                  AND denomination_value = @DenominationValue
+                                  AND note_count >= @NoteCount",
+                                new
+                                {
+                                    CurrencyId = currencyId,
+                                    note.DenominationValue,
+                                    note.NoteCount
+                                },
+                                trans);
+
+                            if (rows != 1)
+                            {
+                                trans.Rollback();
+                                return null;
+                            }
+                        }
+
+                        int accountRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = debitAmountUzs, Id = accountId },
+                            trans);
+                        if (accountRows != 1)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, 'Withdraw', @Amount, @Description, GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                Amount = debitAmountUzs,
+                                Description = $"Cash withdrawal: {cashAmount:N2} {currencyCode}; Notes: {FormatNotes(breakdown)}"
+                            },
+                            trans);
+
+                        await CashRepository.SyncCashTotalsAsync(db, trans, currencyId);
+                        trans.Commit();
+                        return breakdown;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task<bool> DepositAsync(int accountId, decimal amount)
         {
             if (!IsValidMoneyAmount(amount)) return false;
@@ -350,6 +459,100 @@ namespace Bank_ATM.Repositories
 
                         trans.Commit();
                         return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task<IList<CashNoteDto>> DepositCurrencyWithDenominationsAsync(
+            int accountId,
+            IEnumerable<CashNoteDto> notes,
+            decimal creditAmountUzs,
+            int currencyId,
+            string currencyCode)
+        {
+            var noteList = CashRepository.NormalizeNotes(notes).ToList();
+            decimal cashAmount = noteList.Sum(note => note.TotalValue);
+            if (!noteList.Any() || !IsValidMoneyAmount(cashAmount) || !IsValidMoneyAmount(creditAmountUzs)) return null;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT id, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        int accountRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance + @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = creditAmountUzs, Id = accountId },
+                            trans);
+
+                        if (accountRows != 1)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        foreach (var note in noteList)
+                        {
+                            await db.ExecuteAsync(@"
+                                IF EXISTS (
+                                    SELECT 1 FROM atm_cash_denominations
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId
+                                      AND denomination_value = @DenominationValue
+                                )
+                                BEGIN
+                                    UPDATE atm_cash_denominations
+                                    SET note_count = note_count + @NoteCount,
+                                        updated_at = GETDATE()
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId
+                                      AND denomination_value = @DenominationValue
+                                END
+                                ELSE
+                                BEGIN
+                                    INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                                    VALUES ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, @DenominationValue, @NoteCount)
+                                END",
+                                new
+                                {
+                                    CurrencyId = currencyId,
+                                    note.DenominationValue,
+                                    note.NoteCount
+                                },
+                                trans);
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, 'Deposit', @Amount, @Description, GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                Amount = creditAmountUzs,
+                                Description = $"Cash deposit: {cashAmount:N2} {currencyCode}; Notes: {FormatNotes(noteList)}"
+                            },
+                            trans);
+
+                        await CashRepository.SyncCashTotalsAsync(db, trans, currencyId);
+                        trans.Commit();
+                        return noteList;
                     }
                     catch
                     {
@@ -768,6 +971,44 @@ namespace Bank_ATM.Repositories
             }
 
             throw new InvalidOperationException("Could not generate a unique card number.");
+        }
+
+        private static IList<CashNoteDto> BuildWithdrawalBreakdown(decimal amount, IEnumerable<CashDenominationDto> denominations)
+        {
+            decimal remaining = amount;
+            var result = new List<CashNoteDto>();
+
+            foreach (var denomination in denominations.OrderByDescending(d => d.DenominationValue))
+            {
+                if (denomination.NoteCount <= 0 || denomination.DenominationValue <= 0m)
+                {
+                    continue;
+                }
+
+                int needed = (int)Math.Floor(remaining / denomination.DenominationValue);
+                int selected = Math.Min(needed, denomination.NoteCount);
+                if (selected <= 0)
+                {
+                    continue;
+                }
+
+                result.Add(new CashNoteDto
+                {
+                    CurrencyId = denomination.CurrencyId,
+                    CurrencyCode = denomination.CurrencyCode,
+                    DenominationValue = denomination.DenominationValue,
+                    NoteCount = selected
+                });
+                remaining -= denomination.DenominationValue * selected;
+            }
+
+            return remaining == 0m ? result : null;
+        }
+
+        private static string FormatNotes(IEnumerable<CashNoteDto> notes)
+        {
+            return string.Join(", ", CashRepository.NormalizeNotes(notes)
+                .Select(note => $"{note.DenominationValue:N2} x {note.NoteCount}"));
         }
 
         private static bool IsValidMoneyAmount(decimal amount)

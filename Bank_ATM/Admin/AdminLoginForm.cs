@@ -18,6 +18,7 @@ namespace Bank_ATM.Admin
 
         private void AdminLoginForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             ApplyTheme();
             LanguageManager.Apply(this);
             lblTitle.Text = LanguageManager.GetString("MainFormAdmin");

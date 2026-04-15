@@ -14,6 +14,7 @@ namespace Bank_ATM.Services
         private readonly ServicesRepository _servicesRepository = new ServicesRepository();
         private readonly AtmRepository _atmRepository = new AtmRepository();
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
+        private readonly CashRepository _cashRepository = new CashRepository();
 
         public Task<IEnumerable<UserDto>> GetAllUsersAsync() => _accountRepository.GetAllUsersAsync();
         public IEnumerable<CardDto> GetAllCards() => _cardRepository.GetAllCards();
@@ -21,11 +22,15 @@ namespace Bank_ATM.Services
         public IEnumerable<TransactionDto> GetAllTransactions() => _transactionRepository.GetAllTransactions();
         public IEnumerable<ServiceDto> GetAllServices() => _servicesRepository.GetAllServices();
         public IEnumerable<CurrencyDto> GetAllCurrencies() => _currencyRepository.GetAllCurrencies();
+        public IEnumerable<CashDenominationDto> GetAllCashDenominations() => _cashRepository.GetAllDenominations();
+        public IEnumerable<CashDenominationDto> GetCashDenominations(string currencyCode) => _cashRepository.GetDenominations(currencyCode);
         public int SaveCurrency(CurrencyDto currency) => _currencyRepository.SaveCurrency(currency);
+        public int SaveCurrency(CurrencyDto currency, IEnumerable<decimal> denominationValues) => _currencyRepository.SaveCurrency(currency, denominationValues);
         public void DeactivateCurrency(int currencyId) => _currencyRepository.DeactivateCurrency(currencyId);
         public IEnumerable<ServiceAccountDto> GetServiceAccounts(int serviceId) => _servicesRepository.GetServiceAccounts(serviceId);
         public AtmDto GetDefaultAtm() => _atmRepository.GetDefaultAtm();
         public void AddAtmCash(decimal amount) => _atmRepository.AddCash(amount);
+        public void AddAtmCashNotes(int currencyId, IEnumerable<CashNoteDto> notes) => _cashRepository.AddCashNotes(currencyId, notes);
 
         public async Task<ServiceResult> SaveUserAsync(UserDto user, string password, string initialPin, bool isEdit)
         {

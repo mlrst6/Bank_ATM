@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Bank_ATM.Core;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
 
@@ -28,6 +29,7 @@ namespace Bank_ATM.Admin
 
         private void AdminDataViewForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             ApplyTheme();
             lblTitle.Text = _title;
             btnAdd.Text = LanguageManager.GetString("Add");
@@ -38,8 +40,8 @@ namespace Bank_ATM.Admin
                 : LanguageManager.GetString("Delete");
             RefreshGrid();
 
-            // Disable CRUD for Transactions
-            bool isReadOnly = _mode == "TRANSACTIONS";
+            // Disable CRUD for read-only operational data.
+            bool isReadOnly = _mode == "TRANSACTIONS" || _mode == "CASH";
             btnAdd.Visible = !isReadOnly;
             btnEdit.Visible = !isReadOnly;
             btnDelete.Visible = !isReadOnly;
@@ -55,6 +57,8 @@ namespace Bank_ATM.Admin
                 _allItems = _adminService.GetAllServices().Cast<object>().ToList();
             else if (_mode == "CURRENCIES")
                 _allItems = _adminService.GetAllCurrencies().Cast<object>().ToList();
+            else if (_mode == "CASH")
+                _allItems = _adminService.GetAllCashDenominations().Cast<object>().ToList();
             else
                 _allItems = ((System.Collections.IEnumerable)_dataSource).Cast<object>().ToList();
 
@@ -260,6 +264,11 @@ namespace Bank_ATM.Admin
             {
                 HideColumn("Id");
             }
+            else if (_mode == "CASH")
+            {
+                HideColumn("AtmId");
+                HideColumn("CurrencyId");
+            }
         }
 
         private void HideColumn(string name)
@@ -290,6 +299,10 @@ namespace Bank_ATM.Admin
                 case "CurrencyName": return "Currency Name";
                 case "RateToUzs": return "Rate to UZS";
                 case "CashAvailable": return "ATM Cash";
+                case "CurrencyCode": return "Currency";
+                case "DenominationValue": return "Denomination";
+                case "NoteCount": return "Notes";
+                case "TotalValue": return "Total";
                 case "UpdatedAt": return "Updated";
                 case "ExpiryDate": return "Expires";
                 case "FailedAttempts": return "Failed PIN Attempts";

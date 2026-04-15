@@ -15,6 +15,7 @@ namespace Bank_ATM.Services
         private readonly ServicesRepository _servicesRepository = new ServicesRepository();
         private readonly AtmRepository _atmRepository = new AtmRepository();
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
+        private readonly CashRepository _cashRepository = new CashRepository();
 
         public async Task<BankingResult> WithdrawAsync(decimal amount)
         {
@@ -45,17 +46,25 @@ namespace Bank_ATM.Services
             }
 
             decimal debitAmountUzs = decimal.Round(amount * currency.RateToUzs, 2);
+            if (currentAccount.Balance < debitAmountUzs)
+            {
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("InsufficientFunds") };
+            }
+
             if (currency.CashAvailable < amount)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("AtmInsufficientCash") };
             }
 
-            bool success = normalizedCurrency == "UZS"
-                ? await _accountRepository.WithdrawAsync(currentAccount.Id, amount)
-                : await _accountRepository.WithdrawCurrencyAsync(currentAccount.Id, amount, debitAmountUzs, currency.Id, normalizedCurrency);
-            if (!success)
+            var breakdown = await _accountRepository.WithdrawCurrencyWithDenominationsAsync(
+                currentAccount.Id,
+                amount,
+                debitAmountUzs,
+                currency.Id,
+                normalizedCurrency);
+            if (breakdown == null || !breakdown.Any())
             {
-                return new BankingResult { Success = false, Message = LanguageManager.GetString("InsufficientFunds") };
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("AtmCannotDispenseRequestedAmount") };
             }
 
             var account = await RefreshCurrentSessionAccountAsync();
@@ -65,13 +74,19 @@ namespace Bank_ATM.Services
                 Account = account,
                 DebitedAmountUzs = debitAmountUzs,
                 CashCurrencyCode = normalizedCurrency,
-                CashAmount = amount
+                CashAmount = amount,
+                CashBreakdown = breakdown.ToArray()
             };
         }
 
         public CurrencyDto[] GetActiveCurrencies()
         {
             return _currencyRepository.GetActiveCurrencies().ToArray();
+        }
+
+        public CashDenominationDto[] GetCashDenominations(string currencyCode)
+        {
+            return _cashRepository.GetDenominations(currencyCode).ToArray();
         }
 
         public async Task<BankingResult> DepositAsync(decimal amount)
@@ -120,6 +135,55 @@ namespace Bank_ATM.Services
                 DebitedAmountUzs = creditAmountUzs,
                 CashCurrencyCode = normalizedCurrency,
                 CashAmount = amount
+            };
+        }
+
+        public async Task<BankingResult> DepositCashNotesAsync(string currencyCode, CashNoteDto[] notes)
+        {
+            var currentAccount = SessionManager.Instance.CurrentAccount;
+            if (currentAccount == null || !currentAccount.IsActive)
+            {
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("NoActiveAccountSession") };
+            }
+
+            string normalizedCurrency = string.IsNullOrWhiteSpace(currencyCode)
+                ? "UZS"
+                : currencyCode.Trim().ToUpperInvariant();
+
+            var currency = _currencyRepository.GetCurrencyByCode(normalizedCurrency);
+            if (currency == null || !currency.IsActive)
+            {
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
+            }
+
+            var noteList = CashRepository.NormalizeNotes(notes).ToArray();
+            decimal cashAmount = noteList.Sum(note => note.TotalValue);
+            if (!IsValidMoneyAmount(cashAmount))
+            {
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("InvalidCashNotes") };
+            }
+
+            decimal creditAmountUzs = decimal.Round(cashAmount * currency.RateToUzs, 2);
+            var savedNotes = await _accountRepository.DepositCurrencyWithDenominationsAsync(
+                currentAccount.Id,
+                noteList,
+                creditAmountUzs,
+                currency.Id,
+                normalizedCurrency);
+            if (savedNotes == null)
+            {
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("DepositFailed") };
+            }
+
+            var account = await RefreshCurrentSessionAccountAsync();
+            return new BankingResult
+            {
+                Success = true,
+                Account = account,
+                DebitedAmountUzs = creditAmountUzs,
+                CashCurrencyCode = normalizedCurrency,
+                CashAmount = cashAmount,
+                CashBreakdown = savedNotes.ToArray()
             };
         }
 
@@ -239,6 +303,60 @@ namespace Bank_ATM.Services
             return new ServiceResult { Success = true, Message = LanguageManager.GetString("ServicePaymentCompleted") };
         }
 
+        public async Task<ServiceResult> PayServiceWithCashNotesAsync(int serviceId, string accountReference, CashNoteDto[] notes)
+        {
+            string sanitizedReference = (accountReference ?? string.Empty).Trim();
+            var noteList = CashRepository.NormalizeNotes(notes).ToArray();
+            decimal amount = noteList.Sum(note => note.TotalValue);
+            if (string.IsNullOrWhiteSpace(sanitizedReference) || !IsValidMoneyAmount(amount))
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("InvalidServicePaymentInput") };
+            }
+
+            var uzs = _currencyRepository.GetCurrencyByCode("UZS");
+            if (uzs == null || !uzs.IsActive)
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
+            }
+
+            var service = _servicesRepository.GetServiceById(serviceId);
+            if (service == null || !service.IsActive)
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("SelectedServiceUnavailable") };
+            }
+
+            var serviceAccount = _servicesRepository.GetActiveServiceAccount(service.Id, sanitizedReference);
+            if (serviceAccount == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = LanguageManager.Format("ServiceReferenceNotFound", sanitizedReference, service.ServiceName)
+                };
+            }
+
+            string description = string.IsNullOrWhiteSpace(serviceAccount.CustomerName)
+                ? $"{service.ServiceName}: {sanitizedReference}; Cash notes: {FormatNotes(noteList)}"
+                : $"{service.ServiceName}: {sanitizedReference} ({serviceAccount.CustomerName}); Cash notes: {FormatNotes(noteList)}";
+
+            bool success = await _cashRepository.AddGuestCashPaymentAsync(
+                service.Id,
+                serviceAccount.Id,
+                sanitizedReference,
+                amount,
+                description,
+                uzs.Id,
+                noteList);
+
+            if (!success)
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("InvalidCashNotes") };
+            }
+
+            AuditLogger.LogInfo($"Guest cash service payment: {amount} UZS for {description}");
+            return new ServiceResult { Success = true, Message = LanguageManager.GetString("ServicePaymentCompleted") };
+        }
+
         public string GenerateReceiptForCurrentSession(TransactionDto transaction)
         {
             if (transaction == null ||
@@ -262,6 +380,11 @@ namespace Bank_ATM.Services
         private static bool IsValidMoneyAmount(decimal amount)
         {
             return amount > 0m && decimal.Round(amount, 2) == amount;
+        }
+
+        private static string FormatNotes(CashNoteDto[] notes)
+        {
+            return string.Join(", ", notes.Select(note => $"{note.DenominationValue:N2} x {note.NoteCount}"));
         }
 
         private async Task<AccountDto> RefreshCurrentSessionAccountAsync()

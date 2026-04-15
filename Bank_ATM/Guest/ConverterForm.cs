@@ -29,6 +29,7 @@ namespace Bank_ATM
 
         private void ConverterForm_Load(object sender, EventArgs e)
         {
+            AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
             SetupNumericKeypad();
             _currencies = new CurrencyRepository().GetActiveCurrencies().ToArray();
