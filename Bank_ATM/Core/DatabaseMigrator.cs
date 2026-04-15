@@ -11,6 +11,11 @@ namespace Bank_ATM.Core
     {
         private static string _connectionString = Config.ConnectionString;
 
+        public static string DescribeConnectionTarget()
+        {
+            return Config.DescribeConnectionTarget();
+        }
+
         public static void Migrate()
         {
             Migrate(Config.SeedDefaultAdminOnStartup);
@@ -37,9 +42,8 @@ namespace Bank_ATM.Core
                 var migrationFiles = Directory.GetFiles(migrationsDir, "*.sql").OrderBy(f => f).ToList();
                 var appliedMigrations = GetAppliedMigrations();
 
-                using (var connection = new SqlConnection(_connectionString))
+                using (var connection = OpenConnection(_connectionString))
                 {
-                    connection.Open();
                     foreach (var file in migrationFiles)
                     {
                         var fileName = Path.GetFileName(file);
@@ -84,31 +88,71 @@ namespace Bank_ATM.Core
         {
             try
             {
-                using (var connection = new SqlConnection(_connectionString))
+                using (var connection = OpenConnection(_connectionString))
                 {
-                    connection.Open();
-
                     int requiredTables = connection.ExecuteScalar<int>(@"
                         SELECT COUNT(*)
                         FROM sys.tables
-                        WHERE name IN ('users', 'accounts', 'cards', 'transactions', 'services')");
+                        WHERE name IN ('users', 'accounts', 'cards', 'transactions', 'services', 'service_accounts', 'atms', 'currencies', 'atm_currency_cash')");
 
-                    if (requiredTables < 5)
+                    if (requiredTables < 9)
                     {
                         throw new InvalidOperationException(
                             "Database schema is incomplete. Run the migration bootstrap once or deploy the SQL scripts first.");
                     }
 
                     int requiredColumns = connection.ExecuteScalar<int>(@"
-                        SELECT COUNT(*)
-                        FROM sys.columns
-                        WHERE object_id = OBJECT_ID('dbo.users')
-                          AND name IN ('is_active')");
+                        SELECT
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.users')
+                               AND name IN ('is_active'))
+                            +
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.transactions')
+                               AND name IN ('service_id', 'service_account_id', 'payment_reference'))");
 
-                    if (requiredColumns < 1)
+                    if (requiredColumns < 4)
                     {
                         throw new InvalidOperationException(
                             "Database schema is outdated. Apply the latest migrations before starting the application.");
+                    }
+
+                    int serviceAccountUserColumns = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.columns
+                        WHERE object_id = OBJECT_ID('dbo.service_accounts')
+                          AND name IN ('user_id')");
+
+                    if (serviceAccountUserColumns < 1)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the latest service account migrations before starting the application.");
+                    }
+
+                    int atmCashColumns = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.columns
+                        WHERE object_id = OBJECT_ID('dbo.atms')
+                          AND name IN ('current_balance')");
+
+                    if (atmCashColumns < 1)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the ATM cash balance migration before starting the application.");
+                    }
+
+                    int currencyColumns = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.columns
+                        WHERE object_id = OBJECT_ID('dbo.currencies')
+                          AND name IN ('code', 'rate_to_uzs', 'is_active')");
+
+                    if (currencyColumns < 3)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the currencies migration before starting the application.");
                     }
                 }
             }
@@ -125,9 +169,8 @@ namespace Bank_ATM.Core
             var targetDb = builder.InitialCatalog;
             builder.InitialCatalog = "master";
 
-            using (var connection = new SqlConnection(builder.ConnectionString))
+            using (var connection = OpenConnection(builder.ConnectionString))
             {
-                connection.Open();
                 var dbExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM sys.databases WHERE name = @Name", new { Name = targetDb });
                 if (dbExists == 0)
                 {
@@ -139,7 +182,7 @@ namespace Bank_ATM.Core
 
         private static void EnsureMigrationTableExists()
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = OpenConnection(_connectionString))
             {
                 connection.Execute(@"
                     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'schema_migrations')
@@ -153,7 +196,7 @@ namespace Bank_ATM.Core
 
         private static List<string> GetAppliedMigrations()
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = OpenConnection(_connectionString))
             {
                 return connection.Query<string>("SELECT version FROM schema_migrations").ToList();
             }
@@ -163,10 +206,8 @@ namespace Bank_ATM.Core
         {
             try
             {
-                using (var connection = new SqlConnection(_connectionString))
+                using (var connection = OpenConnection(_connectionString))
                 {
-                    connection.Open();
-                    
                     var adminExists = connection.ExecuteScalar<int>("SELECT COUNT(*) FROM users WHERE username = 'admin'");
 
                     if (adminExists == 0)
@@ -183,6 +224,67 @@ namespace Bank_ATM.Core
             catch (Exception ex)
             {
                 AuditLogger.LogWarning($"EnsureDefaultAdmin skipped: {ex.Message}");
+            }
+        }
+
+        private static SqlConnection OpenConnection(string connectionString)
+        {
+            try
+            {
+                var connection = new SqlConnection(connectionString);
+                connection.Open();
+                return connection;
+            }
+            catch (SqlException ex) when (IsServerUnavailable(ex))
+            {
+                throw new InvalidOperationException(
+                    $"Could not connect to SQL Server instance '{GetDataSource(connectionString)}'.{Environment.NewLine}" +
+                    $"Check that the SQL Server service or LocalDB instance exists and is running.{Environment.NewLine}" +
+                    $"Update App.config or BANK_ATM_CONNECTION_STRING if this is the wrong server.",
+                    ex);
+            }
+            catch (SqlException ex) when (ex.Number == 18456)
+            {
+                throw new InvalidOperationException(
+                    $"SQL Server rejected the login for instance '{GetDataSource(connectionString)}'.{Environment.NewLine}" +
+                    "Check the username/password or switch to Windows Authentication.",
+                    ex);
+            }
+            catch (SqlException ex) when (ex.Number == 4060)
+            {
+                throw new InvalidOperationException(
+                    $"Connected to SQL Server instance '{GetDataSource(connectionString)}', but database '{GetInitialCatalog(connectionString)}' is not accessible.{Environment.NewLine}" +
+                    "Check that the database exists and that the login has permission to use it.",
+                    ex);
+            }
+        }
+
+        private static bool IsServerUnavailable(SqlException ex)
+        {
+            return ex.Number == 2 || ex.Number == 53 || ex.Number == -1;
+        }
+
+        private static string GetDataSource(string connectionString)
+        {
+            try
+            {
+                return new SqlConnectionStringBuilder(connectionString).DataSource;
+            }
+            catch
+            {
+                return "(unknown)";
+            }
+        }
+
+        private static string GetInitialCatalog(string connectionString)
+        {
+            try
+            {
+                return new SqlConnectionStringBuilder(connectionString).InitialCatalog;
+            }
+            catch
+            {
+                return "(unknown)";
             }
         }
     }

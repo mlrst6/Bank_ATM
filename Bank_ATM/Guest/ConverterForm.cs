@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
+using Bank_ATM.Models;
+using Bank_ATM.Repositories;
 
 namespace Bank_ATM
 {
@@ -9,6 +12,7 @@ namespace Bank_ATM
         private readonly decimal _initialAmount;
         private readonly string _initialFromCurrency;
         private readonly string _initialToCurrency;
+        private CurrencyDto[] _currencies = new CurrencyDto[0];
 
         public ConverterForm()
             : this(0m, "USD", "UZS")
@@ -27,12 +31,13 @@ namespace Bank_ATM
         {
             LanguageManager.Apply(this);
             SetupNumericKeypad();
+            _currencies = new CurrencyRepository().GetActiveCurrencies().ToArray();
 
             listBox1.Items.Clear();
-            listBox1.Items.AddRange(new string[] { "USD", "UZS" });
+            listBox1.Items.AddRange(_currencies.Select(c => c.Code).Cast<object>().ToArray());
 
             listBox2.Items.Clear();
-            listBox2.Items.AddRange(new string[] { "UZS", "USD" });
+            listBox2.Items.AddRange(_currencies.Select(c => c.Code).Cast<object>().ToArray());
 
             listBox1.SelectedItem = _initialFromCurrency;
             if (listBox1.SelectedIndex < 0) listBox1.SelectedIndex = 0;
@@ -78,14 +83,15 @@ namespace Bank_ATM
                 string toCurrency = listBox2.SelectedItem as string;
                 decimal result;
 
-                if (fromCurrency == toCurrency)
-                    result = input;
-                else if (fromCurrency == "USD" && toCurrency == "UZS")
-                    result = input * Config.UzsToUsdRate;
-                else if (fromCurrency == "UZS" && toCurrency == "USD")
-                    result = input / Config.UzsToUsdRate;
-                else
+                var from = _currencies.FirstOrDefault(c => c.Code == fromCurrency);
+                var to = _currencies.FirstOrDefault(c => c.Code == toCurrency);
+
+                if (from == null || to == null)
                     result = 0m;
+                else if (fromCurrency == toCurrency)
+                    result = input;
+                else
+                    result = (input * from.RateToUzs) / to.RateToUzs;
 
                 textBox2.Text = result.ToString("N2");
             }

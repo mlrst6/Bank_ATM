@@ -1,5 +1,7 @@
 using System;
 using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Models;
@@ -34,18 +36,34 @@ namespace Bank_ATM.User
 
         private async void btnWithdraw_Click(object sender, EventArgs e)
         {
-            string amountStr = Microsoft.VisualBasic.Interaction.InputBox(LanguageManager.GetString("EnterAmount"), LanguageManager.GetString("Withdraw"), "0");
-            if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
+            var currencies = _bankingService.GetActiveCurrencies();
+            string currencyCode = Microsoft.VisualBasic.Interaction.InputBox(
+                LanguageManager.Format("SelectWithdrawCurrency", string.Join(", ", currencies.Select(c => c.Code))),
+                LanguageManager.GetString("Withdraw"),
+                "UZS");
+            if (string.IsNullOrWhiteSpace(currencyCode))
+            {
+                return;
+            }
+
+            currencyCode = currencyCode.Trim().ToUpperInvariant();
+            if (!currencies.Any(c => c.Code == currencyCode))
+            {
+                MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (TryPromptAmount(LanguageManager.Format("WithdrawCurrencyAmount", currencyCode), out decimal amount))
             {
                 SetLoading(true);
-                var result = await _bankingService.WithdrawAsync(amount);
+                var result = await _bankingService.WithdrawAsync(amount, currencyCode);
                 SetLoading(false);
 
                 if (result.Success)
                 {
-                    AuditLogger.LogTransaction("Withdraw", amount, SessionManager.Instance.CurrentAccount.AccountNumber);
+                    AuditLogger.LogTransaction("Withdraw", result.DebitedAmountUzs, SessionManager.Instance.CurrentAccount.AccountNumber);
                     RefreshAccountSummary();
-                    bool showedReceiptMessage = OfferDigitalReceipt("Withdraw", amount, null);
+                    bool showedReceiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{amount:N2} {currencyCode}");
                     if (!showedReceiptMessage)
                     {
                         MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Withdraw"), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -60,11 +78,27 @@ namespace Bank_ATM.User
 
         private async void btnDeposit_Click(object sender, EventArgs e)
         {
-            string amountStr = Microsoft.VisualBasic.Interaction.InputBox(LanguageManager.GetString("EnterAmount"), LanguageManager.GetString("Deposit"), "0");
-            if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
+            var currencies = _bankingService.GetActiveCurrencies();
+            string currencyCode = Microsoft.VisualBasic.Interaction.InputBox(
+                LanguageManager.Format("SelectDepositCurrency", string.Join(", ", currencies.Select(c => c.Code))),
+                LanguageManager.GetString("Deposit"),
+                "UZS");
+            if (string.IsNullOrWhiteSpace(currencyCode))
+            {
+                return;
+            }
+
+            currencyCode = currencyCode.Trim().ToUpperInvariant();
+            if (!currencies.Any(c => c.Code == currencyCode))
+            {
+                MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (TryPromptAmount(LanguageManager.Format("DepositCurrencyAmount", currencyCode), out decimal amount))
             {
                 SetLoading(true);
-                var result = await _bankingService.DepositAsync(amount);
+                var result = await _bankingService.DepositAsync(amount, currencyCode);
                 SetLoading(false);
 
                 if (result.Success)
@@ -91,7 +125,7 @@ namespace Bank_ATM.User
                 LanguageManager.GetString("EnterAmount"),
                 LanguageManager.GetString("Transfer"),
                 "0");
-            if (decimal.TryParse(amountStr, out decimal amount) && amount > 0)
+            if (TryParseAmount(amountStr, out decimal amount))
             {
                 SetLoading(true);
                 var result = await _bankingService.TransferByCardAsync(targetCardNum, amount);
@@ -111,6 +145,10 @@ namespace Bank_ATM.User
                 {
                     MessageBox.Show(result.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+            }
+            else if (!string.IsNullOrWhiteSpace(amountStr))
+            {
+                MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -200,6 +238,40 @@ namespace Bank_ATM.User
                 return true;
             }
 
+            return false;
+        }
+
+        private bool TryPromptAmount(string title, out decimal amount)
+        {
+            string amountStr = Microsoft.VisualBasic.Interaction.InputBox(
+                LanguageManager.GetString("EnterAmount"),
+                title,
+                "0");
+
+            if (string.IsNullOrWhiteSpace(amountStr))
+            {
+                amount = 0m;
+                return false;
+            }
+
+            if (!TryParseAmount(amountStr, out amount))
+            {
+                MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool TryParseAmount(string input, out decimal amount)
+        {
+            if (decimal.TryParse(input, NumberStyles.Number, CultureInfo.CurrentCulture, out amount) ||
+                decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out amount))
+            {
+                return amount > 0m && decimal.Round(amount, 2) == amount;
+            }
+
+            amount = 0m;
             return false;
         }
 

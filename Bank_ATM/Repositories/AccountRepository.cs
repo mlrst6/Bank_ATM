@@ -49,7 +49,7 @@ namespace Bank_ATM.Repositories
 
         public async Task<bool> WithdrawAsync(int accountId, decimal amount)
         {
-            if (amount <= 0) return false;
+            if (!IsValidMoneyAmount(amount)) return false;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -62,7 +62,39 @@ namespace Bank_ATM.Repositories
                             "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
                             new { Id = accountId },
                             trans);
-                        if (account == null || !account.IsActive || account.Balance < amount) return false;
+                        if (account == null || !account.IsActive || account.Balance < amount)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int atmRows = await db.ExecuteAsync(@"
+                            UPDATE atm_currency_cash
+                            SET cash_balance = cash_balance - @Amount,
+                                updated_at = GETDATE()
+                            WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND currency_id = (SELECT id FROM currencies WHERE code = 'UZS')
+                              AND cash_balance >= @Amount",
+                            new { Amount = amount },
+                            trans);
+
+                        if (atmRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        await db.ExecuteAsync(@"
+                            UPDATE atms
+                            SET current_balance = (
+                                    SELECT cash_balance
+                                    FROM atm_currency_cash
+                                    WHERE atm_id = atms.id
+                                      AND currency_id = (SELECT id FROM currencies WHERE code = 'UZS')
+                                ),
+                                updated_at = GETDATE()
+                            WHERE id = (SELECT TOP 1 id FROM atms ORDER BY id)",
+                            transaction: trans);
 
                         int updatedRows = await db.ExecuteAsync(
                             "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
@@ -90,9 +122,14 @@ namespace Bank_ATM.Repositories
             }
         }
 
-        public async Task<bool> DepositAsync(int accountId, decimal amount)
+        public async Task<bool> WithdrawCurrencyAsync(
+            int accountId,
+            decimal cashAmount,
+            decimal debitAmountUzs,
+            int currencyId,
+            string currencyCode)
         {
-            if (amount <= 0) return false;
+            if (!IsValidMoneyAmount(cashAmount) || !IsValidMoneyAmount(debitAmountUzs)) return false;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -101,6 +138,87 @@ namespace Bank_ATM.Repositories
                 {
                     try
                     {
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive || account.Balance < debitAmountUzs)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int cashRows = await db.ExecuteAsync(@"
+                            UPDATE atm_currency_cash
+                            SET cash_balance = cash_balance - @CashAmount,
+                                updated_at = GETDATE()
+                            WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND currency_id = @CurrencyId
+                              AND cash_balance >= @CashAmount",
+                            new { CashAmount = cashAmount, CurrencyId = currencyId },
+                            trans);
+
+                        if (cashRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int accountRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = debitAmountUzs, Id = accountId },
+                            trans);
+
+                        if (accountRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, 'Withdraw', @Amount, @Description, GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                Amount = debitAmountUzs,
+                                Description = $"Cash withdrawal: {cashAmount:N2} {currencyCode}"
+                            },
+                            trans);
+
+                        trans.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task<bool> DepositAsync(int accountId, decimal amount)
+        {
+            if (!IsValidMoneyAmount(amount)) return false;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT id, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
                         int updatedRows = await db.ExecuteAsync(
                             "UPDATE accounts SET balance = balance + @Amount WHERE id = @Id AND is_active = 1",
                             new { Amount = amount, Id = accountId },
@@ -110,6 +228,27 @@ namespace Bank_ATM.Repositories
                             trans.Rollback();
                             return false;
                         }
+
+                        await db.ExecuteAsync(@"
+                            UPDATE atm_currency_cash
+                            SET cash_balance = cash_balance + @Amount,
+                                updated_at = GETDATE()
+                            WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND currency_id = (SELECT id FROM currencies WHERE code = 'UZS')",
+                            new { Amount = amount },
+                            trans);
+
+                        await db.ExecuteAsync(@"
+                            UPDATE atms
+                            SET current_balance = (
+                                    SELECT cash_balance
+                                    FROM atm_currency_cash
+                                    WHERE atm_id = atms.id
+                                      AND currency_id = (SELECT id FROM currencies WHERE code = 'UZS')
+                                ),
+                                updated_at = GETDATE()
+                            WHERE id = (SELECT TOP 1 id FROM atms ORDER BY id)",
+                            transaction: trans);
 
                         await db.ExecuteAsync(@"INSERT INTO transactions (account_id, type, amount, transaction_date) 
                                                VALUES (@AccountId, 'Deposit', @Amount, GETDATE())", 
@@ -127,9 +266,103 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<bool> DepositCurrencyAsync(
+            int accountId,
+            decimal cashAmount,
+            decimal creditAmountUzs,
+            int currencyId,
+            string currencyCode)
+        {
+            if (!IsValidMoneyAmount(cashAmount) || !IsValidMoneyAmount(creditAmountUzs)) return false;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var account = await db.QueryFirstOrDefaultAsync<AccountDto>(
+                            "SELECT id, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
+                            new { Id = accountId },
+                            trans);
+                        if (account == null || !account.IsActive)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int accountRows = await db.ExecuteAsync(
+                            "UPDATE accounts SET balance = balance + @Amount WHERE id = @Id AND is_active = 1",
+                            new { Amount = creditAmountUzs, Id = accountId },
+                            trans);
+
+                        if (accountRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int cashRows = await db.ExecuteAsync(@"
+                            UPDATE atm_currency_cash
+                            SET cash_balance = cash_balance + @CashAmount,
+                                updated_at = GETDATE()
+                            WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND currency_id = @CurrencyId",
+                            new { CashAmount = cashAmount, CurrencyId = currencyId },
+                            trans);
+
+                        if (cashRows != 1)
+                        {
+                            await db.ExecuteAsync(@"
+                                INSERT INTO atm_currency_cash (atm_id, currency_id, cash_balance)
+                                VALUES ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, @CashAmount)",
+                                new { CashAmount = cashAmount, CurrencyId = currencyId },
+                                trans);
+                        }
+
+                        if (currencyCode == "UZS")
+                        {
+                            await db.ExecuteAsync(@"
+                                UPDATE atms
+                                SET current_balance = (
+                                        SELECT cash_balance
+                                        FROM atm_currency_cash
+                                        WHERE atm_id = atms.id
+                                          AND currency_id = @CurrencyId
+                                    ),
+                                    updated_at = GETDATE()
+                                WHERE id = (SELECT TOP 1 id FROM atms ORDER BY id)",
+                                new { CurrencyId = currencyId },
+                                trans);
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, 'Deposit', @Amount, @Description, GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                Amount = creditAmountUzs,
+                                Description = $"Cash deposit: {cashAmount:N2} {currencyCode}"
+                            },
+                            trans);
+
+                        trans.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task<bool> TransferAsync(int sourceAccountId, int targetAccountId, decimal amount)
         {
-            if (amount <= 0 || sourceAccountId == targetAccountId) return false;
+            if (!IsValidMoneyAmount(amount) || sourceAccountId == targetAccountId) return false;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -142,13 +375,21 @@ namespace Bank_ATM.Repositories
                             "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
                             new { Id = sourceAccountId },
                             trans);
-                        if (source == null || !source.IsActive || source.Balance < amount) return false;
+                        if (source == null || !source.IsActive || source.Balance < amount)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
 
                         var target = await db.QueryFirstOrDefaultAsync<AccountDto>(
                             "SELECT id, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
                             new { Id = targetAccountId },
                             trans);
-                        if (target == null || !target.IsActive) return false;
+                        if (target == null || !target.IsActive)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
 
                         int debitRows = await db.ExecuteAsync(
                             "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
@@ -239,16 +480,22 @@ namespace Bank_ATM.Repositories
                     OUTER APPLY (
                         SELECT TOP 1 id, account_number
                         FROM accounts
-                        WHERE user_id = u.id
+                        WHERE user_id = u.id AND is_active = 1
                         ORDER BY id
                     ) a
                     ORDER BY u.id");
             }
         }
 
-        public async Task<bool> PayServiceAsync(int accountId, decimal amount, string description)
+        public async Task<bool> PayServiceAsync(
+            int accountId,
+            decimal amount,
+            string description,
+            int serviceId,
+            int serviceAccountId,
+            string paymentReference)
         {
-            if (amount <= 0) return false;
+            if (!IsValidMoneyAmount(amount)) return false;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -261,7 +508,11 @@ namespace Bank_ATM.Repositories
                             "SELECT balance, is_active as IsActive FROM accounts WITH (UPDLOCK, ROWLOCK) WHERE id = @Id",
                             new { Id = accountId },
                             trans);
-                        if (account == null || !account.IsActive || account.Balance < amount) return false;
+                        if (account == null || !account.IsActive || account.Balance < amount)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
 
                         int updatedRows = await db.ExecuteAsync(
                             "UPDATE accounts SET balance = balance - @Amount WHERE id = @Id AND is_active = 1",
@@ -274,9 +525,33 @@ namespace Bank_ATM.Repositories
                         }
 
                         await db.ExecuteAsync(@"
-                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
-                            VALUES (@AccountId, 'BillPayment', @Amount, @Description, GETDATE())",
-                            new { AccountId = accountId, Amount = amount, Description = description },
+                            INSERT INTO transactions (
+                                account_id,
+                                type,
+                                amount,
+                                description,
+                                service_id,
+                                service_account_id,
+                                payment_reference,
+                                transaction_date)
+                            VALUES (
+                                @AccountId,
+                                'BillPayment',
+                                @Amount,
+                                @Description,
+                                @ServiceId,
+                                @ServiceAccountId,
+                                @PaymentReference,
+                                GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                Amount = amount,
+                                Description = description,
+                                ServiceId = serviceId,
+                                ServiceAccountId = serviceAccountId,
+                                PaymentReference = paymentReference
+                            },
                             trans);
 
                         trans.Commit();
@@ -493,6 +768,11 @@ namespace Bank_ATM.Repositories
             }
 
             throw new InvalidOperationException("Could not generate a unique card number.");
+        }
+
+        private static bool IsValidMoneyAmount(decimal amount)
+        {
+            return amount > 0m && decimal.Round(amount, 2) == amount;
         }
     }
 }

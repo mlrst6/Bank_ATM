@@ -24,9 +24,16 @@ namespace Bank_ATM.Admin
             this.lblAccountHint = new System.Windows.Forms.Label();
             this.txtAccountHint = new System.Windows.Forms.TextBox();
             this.lblHint = new System.Windows.Forms.Label();
+            this.lblValidReferences = new System.Windows.Forms.Label();
+            this.pnlServiceAccounts = new System.Windows.Forms.Panel();
+            this.dgvServiceAccounts = new System.Windows.Forms.DataGridView();
+            this.btnAddServiceAccount = new System.Windows.Forms.Button();
+            this.btnDeactivateServiceAccount = new System.Windows.Forms.Button();
             this.chkIsActive = new System.Windows.Forms.CheckBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.pnlServiceAccounts.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvServiceAccounts)).BeginInit();
             this.SuspendLayout();
             // 
             // lblTitle
@@ -105,42 +112,97 @@ namespace Bank_ATM.Admin
             this.lblHint.TabIndex = 8;
             this.lblHint.Text = "Example: phone number, subscriber ID, meter.";
             // 
+            // lblValidReferences
+            // 
+            this.lblValidReferences.AutoSize = true;
+            this.lblValidReferences.Location = new System.Drawing.Point(30, 322);
+            this.lblValidReferences.Name = "lblValidReferences";
+            this.lblValidReferences.Size = new System.Drawing.Size(138, 17);
+            this.lblValidReferences.TabIndex = 9;
+            this.lblValidReferences.Text = "User service accounts";
+            // 
+            // pnlServiceAccounts
+            // 
+            this.pnlServiceAccounts.Controls.Add(this.dgvServiceAccounts);
+            this.pnlServiceAccounts.Location = new System.Drawing.Point(33, 342);
+            this.pnlServiceAccounts.Name = "pnlServiceAccounts";
+            this.pnlServiceAccounts.Size = new System.Drawing.Size(422, 126);
+            this.pnlServiceAccounts.TabIndex = 10;
+            // 
+            // dgvServiceAccounts
+            // 
+            this.dgvServiceAccounts.AllowUserToAddRows = false;
+            this.dgvServiceAccounts.AllowUserToDeleteRows = false;
+            this.dgvServiceAccounts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvServiceAccounts.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvServiceAccounts.Location = new System.Drawing.Point(0, 0);
+            this.dgvServiceAccounts.MultiSelect = false;
+            this.dgvServiceAccounts.Name = "dgvServiceAccounts";
+            this.dgvServiceAccounts.RowHeadersWidth = 51;
+            this.dgvServiceAccounts.RowTemplate.Height = 24;
+            this.dgvServiceAccounts.Size = new System.Drawing.Size(422, 126);
+            this.dgvServiceAccounts.TabIndex = 0;
+            // 
+            // btnAddServiceAccount
+            // 
+            this.btnAddServiceAccount.Location = new System.Drawing.Point(33, 478);
+            this.btnAddServiceAccount.Name = "btnAddServiceAccount";
+            this.btnAddServiceAccount.Size = new System.Drawing.Size(206, 36);
+            this.btnAddServiceAccount.TabIndex = 11;
+            this.btnAddServiceAccount.Text = "Add User Account";
+            this.btnAddServiceAccount.UseVisualStyleBackColor = true;
+            this.btnAddServiceAccount.Click += new System.EventHandler(this.btnAddServiceAccount_Click);
+            // 
+            // btnDeactivateServiceAccount
+            // 
+            this.btnDeactivateServiceAccount.Location = new System.Drawing.Point(249, 478);
+            this.btnDeactivateServiceAccount.Name = "btnDeactivateServiceAccount";
+            this.btnDeactivateServiceAccount.Size = new System.Drawing.Size(206, 36);
+            this.btnDeactivateServiceAccount.TabIndex = 12;
+            this.btnDeactivateServiceAccount.Text = "Deactivate Account";
+            this.btnDeactivateServiceAccount.UseVisualStyleBackColor = true;
+            this.btnDeactivateServiceAccount.Click += new System.EventHandler(this.btnDeactivateServiceAccount_Click);
+            // 
             // chkIsActive
             // 
             this.chkIsActive.AutoSize = true;
-            this.chkIsActive.Location = new System.Drawing.Point(33, 327);
+            this.chkIsActive.Location = new System.Drawing.Point(33, 534);
             this.chkIsActive.Name = "chkIsActive";
             this.chkIsActive.Size = new System.Drawing.Size(100, 21);
-            this.chkIsActive.TabIndex = 9;
+            this.chkIsActive.TabIndex = 13;
             this.chkIsActive.Text = "Active service";
             this.chkIsActive.UseVisualStyleBackColor = true;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(189, 376);
+            this.btnSave.Location = new System.Drawing.Point(189, 582);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(128, 42);
-            this.btnSave.TabIndex = 10;
+            this.btnSave.TabIndex = 14;
             this.btnSave.Text = "SAVE";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(327, 376);
+            this.btnCancel.Location = new System.Drawing.Point(327, 582);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(128, 42);
-            this.btnCancel.TabIndex = 11;
+            this.btnCancel.TabIndex = 15;
             this.btnCancel.Text = "CANCEL";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // AdminServiceEditForm
             // 
-            this.ClientSize = new System.Drawing.Size(492, 445);
+            this.ClientSize = new System.Drawing.Size(492, 650);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkIsActive);
+            this.Controls.Add(this.btnDeactivateServiceAccount);
+            this.Controls.Add(this.btnAddServiceAccount);
+            this.Controls.Add(this.pnlServiceAccounts);
+            this.Controls.Add(this.lblValidReferences);
             this.Controls.Add(this.lblHint);
             this.Controls.Add(this.txtAccountHint);
             this.Controls.Add(this.lblAccountHint);
@@ -157,6 +219,8 @@ namespace Bank_ATM.Admin
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Service";
             this.Load += new System.EventHandler(this.AdminServiceEditForm_Load);
+            this.pnlServiceAccounts.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvServiceAccounts)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -171,6 +235,11 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.Label lblAccountHint;
         private System.Windows.Forms.TextBox txtAccountHint;
         private System.Windows.Forms.Label lblHint;
+        private System.Windows.Forms.Label lblValidReferences;
+        private System.Windows.Forms.Panel pnlServiceAccounts;
+        private System.Windows.Forms.DataGridView dgvServiceAccounts;
+        private System.Windows.Forms.Button btnAddServiceAccount;
+        private System.Windows.Forms.Button btnDeactivateServiceAccount;
         private System.Windows.Forms.CheckBox chkIsActive;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;

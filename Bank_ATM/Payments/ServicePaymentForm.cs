@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Globalization;
 using System.Windows.Forms;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
@@ -55,8 +56,7 @@ namespace Bank_ATM.Payments
                 return;
             }
 
-            decimal amount;
-            if (!decimal.TryParse(txtAmount.Text, out amount) || amount <= 0)
+            if (!TryParseAmount(txtAmount.Text, out decimal amount))
             {
                 MessageBox.Show(LanguageManager.GetString("InvalidPaymentAmount"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -142,6 +142,18 @@ namespace Bank_ATM.Payments
             lblReference.ForeColor = Color.FromArgb(148, 163, 184);
             lblAmount.ForeColor = Color.FromArgb(148, 163, 184);
             lblReferenceHint.ForeColor = Color.FromArgb(148, 163, 184);
+        }
+
+        private static bool TryParseAmount(string input, out decimal amount)
+        {
+            if (decimal.TryParse(input, NumberStyles.Number, CultureInfo.CurrentCulture, out amount) ||
+                decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out amount))
+            {
+                return amount > 0m && decimal.Round(amount, 2) == amount;
+            }
+
+            amount = 0m;
+            return false;
         }
     }
 }

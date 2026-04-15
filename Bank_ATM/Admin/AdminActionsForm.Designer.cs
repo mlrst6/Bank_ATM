@@ -33,6 +33,8 @@ namespace Bank_ATM.Admin
             this.btnManageCards = new System.Windows.Forms.Button();
             this.btnManageServices = new System.Windows.Forms.Button();
             this.btnAuditLogs = new System.Windows.Forms.Button();
+            this.btnManageCurrencies = new System.Windows.Forms.Button();
+            this.btnRefillAtm = new System.Windows.Forms.Button();
             this.btnLogout = new System.Windows.Forms.Button();
             this.pnlUsers.SuspendLayout();
             this.pnlCards.SuspendLayout();
@@ -207,9 +209,29 @@ namespace Bank_ATM.Admin
             this.btnAuditLogs.UseVisualStyleBackColor = true;
             this.btnAuditLogs.Click += new System.EventHandler(this.btnAuditLogs_Click);
             // 
+            // btnManageCurrencies
+            // 
+            this.btnManageCurrencies.Location = new System.Drawing.Point(40, 411);
+            this.btnManageCurrencies.Name = "btnManageCurrencies";
+            this.btnManageCurrencies.Size = new System.Drawing.Size(377, 48);
+            this.btnManageCurrencies.TabIndex = 11;
+            this.btnManageCurrencies.Text = "Manage Currencies";
+            this.btnManageCurrencies.UseVisualStyleBackColor = true;
+            this.btnManageCurrencies.Click += new System.EventHandler(this.btnManageCurrencies_Click);
+            // 
+            // btnRefillAtm
+            // 
+            this.btnRefillAtm.Location = new System.Drawing.Point(437, 411);
+            this.btnRefillAtm.Name = "btnRefillAtm";
+            this.btnRefillAtm.Size = new System.Drawing.Size(377, 48);
+            this.btnRefillAtm.TabIndex = 10;
+            this.btnRefillAtm.Text = "Refill ATM Cash";
+            this.btnRefillAtm.UseVisualStyleBackColor = true;
+            this.btnRefillAtm.Click += new System.EventHandler(this.btnRefillAtm_Click);
+            // 
             // btnLogout
             // 
-            this.btnLogout.Location = new System.Drawing.Point(664, 423);
+            this.btnLogout.Location = new System.Drawing.Point(664, 465);
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.Size = new System.Drawing.Size(150, 48);
             this.btnLogout.TabIndex = 9;
@@ -221,6 +243,8 @@ namespace Bank_ATM.Admin
             // 
             this.ClientSize = new System.Drawing.Size(860, 500);
             this.Controls.Add(this.btnLogout);
+            this.Controls.Add(this.btnRefillAtm);
+            this.Controls.Add(this.btnManageCurrencies);
             this.Controls.Add(this.btnAuditLogs);
             this.Controls.Add(this.btnManageServices);
             this.Controls.Add(this.btnManageCards);
@@ -265,6 +289,8 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.Button btnManageCards;
         private System.Windows.Forms.Button btnManageServices;
         private System.Windows.Forms.Button btnAuditLogs;
+        private System.Windows.Forms.Button btnManageCurrencies;
+        private System.Windows.Forms.Button btnRefillAtm;
         private System.Windows.Forms.Button btnLogout;
     }
 }

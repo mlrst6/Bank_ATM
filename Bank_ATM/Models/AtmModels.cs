@@ -21,6 +21,10 @@ namespace Bank_ATM.Models
         public DateTime CreatedAt { get; set; }
         public int? PrimaryAccountId { get; set; }
         public string PrimaryAccountNumber { get; set; }
+        public string DisplayName => $"{FullName} ({Username})";
+        public string AccountDisplayName => string.IsNullOrWhiteSpace(PrimaryAccountNumber)
+            ? DisplayName
+            : $"{FullName} ({Username}) - {PrimaryAccountNumber}";
     }
 
     public class CardDto
@@ -54,6 +58,9 @@ namespace Bank_ATM.Models
         public string Type { get; set; } // Withdraw, Deposit, Transfer, BillPayment, Exchange
         public decimal Amount { get; set; }
         public string Description { get; set; }
+        public int? ServiceId { get; set; }
+        public int? ServiceAccountId { get; set; }
+        public string PaymentReference { get; set; }
         public DateTime TransactionDate { get; set; }
     }
 
@@ -64,6 +71,20 @@ namespace Bank_ATM.Models
         public string Category { get; set; }
         public string AccountHint { get; set; }
         public bool IsActive { get; set; }
+        public int ValidReferenceCount { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class ServiceAccountDto
+    {
+        public int Id { get; set; }
+        public int ServiceId { get; set; }
+        public int? UserId { get; set; }
+        public string ReferenceNumber { get; set; }
+        public string CustomerName { get; set; }
+        public string UserFullName { get; set; }
+        public string Username { get; set; }
+        public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -73,6 +94,17 @@ namespace Bank_ATM.Models
         public string AtmName { get; set; }
         public decimal CurrentBalance { get; set; }
         public string Location { get; set; }
+    }
+
+    public class CurrencyDto
+    {
+        public int Id { get; set; }
+        public string Code { get; set; }
+        public string CurrencyName { get; set; }
+        public decimal RateToUzs { get; set; }
+        public bool IsActive { get; set; }
+        public decimal CashAvailable { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }
 

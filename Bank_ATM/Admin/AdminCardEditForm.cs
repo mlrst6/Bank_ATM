@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
@@ -18,11 +19,12 @@ namespace Bank_ATM.Admin
             _isEdit = card != null;
         }
 
-        private void AdminCardEditForm_Load(object sender, EventArgs e)
+        private async void AdminCardEditForm_Load(object sender, EventArgs e)
         {
             ApplyTheme();
             btnSave.Text = LanguageManager.GetString("Save");
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            label1.Text = "User:";
             lblDialogTitle.Text = _isEdit
                 ? LanguageManager.GetString("EditCard")
                 : LanguageManager.GetString("CreateCard");
@@ -31,12 +33,31 @@ namespace Bank_ATM.Admin
                 : LanguageManager.GetString("CreateCardSubtitle");
             if (_isEdit)
             {
-                txtAccountId.Text = _card.AccountId.ToString();
                 txtCardNumber.Text = _card.CardNumber;
                 chkBlocked.Checked = _card.IsBlocked;
                 dtpExpiry.Value = _card.ExpiryDate;
                 lblPinNote.Text = LanguageManager.GetString("LeaveBlankToKeepPin");
-                txtAccountId.ReadOnly = true; // Usually don't change linked account
+            }
+            else
+            {
+                txtCardNumber.Text = _adminService.GenerateCardNumber();
+            }
+
+            txtCardNumber.ReadOnly = true;
+
+            var users = (await _adminService.GetAllUsersAsync())
+                .Where(user => user.IsActive && user.Role == "User" && user.PrimaryAccountId.HasValue)
+                .OrderBy(user => user.FullName)
+                .ToList();
+
+            cmbUsers.DataSource = users;
+            cmbUsers.DisplayMember = "AccountDisplayName";
+            cmbUsers.ValueMember = "PrimaryAccountId";
+
+            if (_isEdit)
+            {
+                cmbUsers.SelectedItem = users.FirstOrDefault(user => user.PrimaryAccountId == _card.AccountId);
+                cmbUsers.Enabled = false;
             }
         }
 
@@ -62,16 +83,17 @@ namespace Bank_ATM.Admin
                 return;
             }
 
-            if (!int.TryParse(txtAccountId.Text, out int accId) || accId <= 0)
+            var selectedUser = cmbUsers.SelectedItem as UserDto;
+            if (!_isEdit && (selectedUser == null || !selectedUser.PrimaryAccountId.HasValue))
             {
-                MessageBox.Show(LanguageManager.GetString("ValidAccountIdRequired"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(LanguageManager.GetString("SelectUserWithAccountRequired"), LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             _card.CardNumber = sanitizedCardNumber;
             _card.IsBlocked = chkBlocked.Checked;
             _card.ExpiryDate = dtpExpiry.Value.Date;
-            _card.AccountId = accId;
+            _card.AccountId = _isEdit ? _card.AccountId : selectedUser.PrimaryAccountId.Value;
 
             try
             {
@@ -99,8 +121,12 @@ namespace Bank_ATM.Admin
             AdminTheme.StyleLabel(label3, true);
             AdminTheme.StyleLabel(label4, true);
             AdminTheme.StyleLabel(lblPinNote, true);
-            AdminTheme.StyleTextBox(txtAccountId);
+            cmbUsers.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            cmbUsers.ForeColor = System.Drawing.Color.White;
+            cmbUsers.FlatStyle = FlatStyle.Flat;
+            cmbUsers.DropDownStyle = ComboBoxStyle.DropDownList;
             AdminTheme.StyleTextBox(txtCardNumber);
+            txtCardNumber.BackColor = System.Drawing.Color.FromArgb(40, 52, 70);
             AdminTheme.StyleTextBox(txtPin);
             AdminTheme.StyleCheckBox(chkBlocked);
             AdminTheme.StyleSuccessButton(btnSave);

@@ -12,11 +12,20 @@ namespace Bank_ATM.Services
         private readonly CardRepository _cardRepository = new CardRepository();
         private readonly TransactionRepository _transactionRepository = new TransactionRepository();
         private readonly ServicesRepository _servicesRepository = new ServicesRepository();
+        private readonly AtmRepository _atmRepository = new AtmRepository();
+        private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
 
         public Task<IEnumerable<UserDto>> GetAllUsersAsync() => _accountRepository.GetAllUsersAsync();
         public IEnumerable<CardDto> GetAllCards() => _cardRepository.GetAllCards();
+        public string GenerateCardNumber() => _cardRepository.GenerateUniqueCardNumber();
         public IEnumerable<TransactionDto> GetAllTransactions() => _transactionRepository.GetAllTransactions();
         public IEnumerable<ServiceDto> GetAllServices() => _servicesRepository.GetAllServices();
+        public IEnumerable<CurrencyDto> GetAllCurrencies() => _currencyRepository.GetAllCurrencies();
+        public int SaveCurrency(CurrencyDto currency) => _currencyRepository.SaveCurrency(currency);
+        public void DeactivateCurrency(int currencyId) => _currencyRepository.DeactivateCurrency(currencyId);
+        public IEnumerable<ServiceAccountDto> GetServiceAccounts(int serviceId) => _servicesRepository.GetServiceAccounts(serviceId);
+        public AtmDto GetDefaultAtm() => _atmRepository.GetDefaultAtm();
+        public void AddAtmCash(decimal amount) => _atmRepository.AddCash(amount);
 
         public async Task<ServiceResult> SaveUserAsync(UserDto user, string password, string initialPin, bool isEdit)
         {
@@ -59,6 +68,14 @@ namespace Bank_ATM.Services
 
             return new ServiceResult { Success = true };
         }
+
+        public void ReplaceServiceAccounts(int serviceId, IEnumerable<ServiceAccountDto> accounts)
+        {
+            _servicesRepository.ReplaceServiceAccounts(serviceId, accounts);
+        }
+
+        public int CreateServiceAccount(ServiceAccountDto account) => _servicesRepository.CreateServiceAccount(account);
+        public void DeactivateServiceAccount(int serviceAccountId) => _servicesRepository.DeactivateServiceAccount(serviceAccountId);
 
         public async Task DeleteUserAsync(int userId)
         {

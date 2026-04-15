@@ -53,6 +53,8 @@ namespace Bank_ATM.Admin
                 _allItems = _adminService.GetAllCards().Cast<object>().ToList();
             else if (_mode == "SERVICES")
                 _allItems = _adminService.GetAllServices().Cast<object>().ToList();
+            else if (_mode == "CURRENCIES")
+                _allItems = _adminService.GetAllCurrencies().Cast<object>().ToList();
             else
                 _allItems = ((System.Collections.IEnumerable)_dataSource).Cast<object>().ToList();
 
@@ -78,6 +80,13 @@ namespace Bank_ATM.Admin
             else if (_mode == "SERVICES")
             {
                 using (var form = new AdminServiceEditForm())
+                {
+                    if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
+                }
+            }
+            else if (_mode == "CURRENCIES")
+            {
+                using (var form = new AdminCurrencyEditForm())
                 {
                     if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
                 }
@@ -108,6 +117,14 @@ namespace Bank_ATM.Admin
             {
                 var service = (ServiceDto)dataGridView.SelectedRows[0].DataBoundItem;
                 using (var form = new AdminServiceEditForm(service))
+                {
+                    if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
+                }
+            }
+            else if (_mode == "CURRENCIES")
+            {
+                var currency = (CurrencyDto)dataGridView.SelectedRows[0].DataBoundItem;
+                using (var form = new AdminCurrencyEditForm(currency))
                 {
                     if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
                 }
@@ -144,6 +161,11 @@ namespace Bank_ATM.Admin
                 {
                     var service = (ServiceDto)dataGridView.SelectedRows[0].DataBoundItem;
                     _adminService.DeleteService(service.Id);
+                }
+                else if (_mode == "CURRENCIES")
+                {
+                    var currency = (CurrencyDto)dataGridView.SelectedRows[0].DataBoundItem;
+                    _adminService.DeactivateCurrency(currency.Id);
                 }
                 RefreshGrid();
             }
@@ -234,6 +256,10 @@ namespace Bank_ATM.Admin
             {
                 HideColumn("Id");
             }
+            else if (_mode == "CURRENCIES")
+            {
+                HideColumn("Id");
+            }
         }
 
         private void HideColumn(string name)
@@ -256,7 +282,15 @@ namespace Bank_ATM.Admin
                 case "CreatedAt": return "Created";
                 case "ServiceName": return "Service Name";
                 case "AccountHint": return "Payment Reference";
+                case "ValidReferenceCount": return "Valid IDs";
                 case "IsActive": return "Active";
+                case "ServiceId": return "Service";
+                case "ServiceAccountId": return "Service Account";
+                case "PaymentReference": return "Payment Reference";
+                case "CurrencyName": return "Currency Name";
+                case "RateToUzs": return "Rate to UZS";
+                case "CashAvailable": return "ATM Cash";
+                case "UpdatedAt": return "Updated";
                 case "ExpiryDate": return "Expires";
                 case "FailedAttempts": return "Failed PIN Attempts";
                 case "LockedUntil": return "Locked Until";

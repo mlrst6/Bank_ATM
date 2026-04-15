@@ -16,19 +16,49 @@ namespace Bank_ATM.Repositories
             _connectionString = Config.ConnectionString;
         }
 
-        public void AddTransaction(int? sourceAccountId, string type, decimal amount, int? destinationAccountId = null, string description = null)
+        public void AddTransaction(
+            int? sourceAccountId,
+            string type,
+            decimal amount,
+            int? destinationAccountId = null,
+            string description = null,
+            int? serviceId = null,
+            int? serviceAccountId = null,
+            string paymentReference = null)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = @"INSERT INTO transactions (account_id, target_account_id, type, amount, description, transaction_date) 
-                               VALUES (@AccountId, @TargetAccountId, @Type, @Amount, @Description, @Date)";
-                
+                string sql = @"
+                    INSERT INTO transactions (
+                        account_id,
+                        target_account_id,
+                        type,
+                        amount,
+                        description,
+                        service_id,
+                        service_account_id,
+                        payment_reference,
+                        transaction_date)
+                    VALUES (
+                        @AccountId,
+                        @TargetAccountId,
+                        @Type,
+                        @Amount,
+                        @Description,
+                        @ServiceId,
+                        @ServiceAccountId,
+                        @PaymentReference,
+                        @Date)";
+                 
                 db.Execute(sql, new { 
                     AccountId = sourceAccountId, 
                     TargetAccountId = destinationAccountId,
                     Type = type, 
                     Amount = amount, 
                     Description = description,
+                    ServiceId = serviceId,
+                    ServiceAccountId = serviceAccountId,
+                    PaymentReference = paymentReference,
                     Date = DateTime.Now 
                 });
             }
@@ -38,7 +68,20 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT id, account_id as AccountId, target_account_id as TargetAccountId, type, amount, description, transaction_date as TransactionDate FROM transactions ORDER BY transaction_date DESC";
+                string sql = @"
+                    SELECT
+                        id,
+                        account_id as AccountId,
+                        target_account_id as TargetAccountId,
+                        type,
+                        amount,
+                        description,
+                        service_id as ServiceId,
+                        service_account_id as ServiceAccountId,
+                        payment_reference as PaymentReference,
+                        transaction_date as TransactionDate
+                    FROM transactions
+                    ORDER BY transaction_date DESC";
                 return db.Query<TransactionDto>(sql);
             }
         }
@@ -47,7 +90,21 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT id, account_id as AccountId, target_account_id as TargetAccountId, type, amount, description, transaction_date as TransactionDate FROM transactions WHERE account_id = @AccountId OR target_account_id = @AccountId ORDER BY transaction_date DESC";
+                string sql = @"
+                    SELECT
+                        id,
+                        account_id as AccountId,
+                        target_account_id as TargetAccountId,
+                        type,
+                        amount,
+                        description,
+                        service_id as ServiceId,
+                        service_account_id as ServiceAccountId,
+                        payment_reference as PaymentReference,
+                        transaction_date as TransactionDate
+                    FROM transactions
+                    WHERE account_id = @AccountId OR target_account_id = @AccountId
+                    ORDER BY transaction_date DESC";
                 return db.Query<TransactionDto>(sql, new { AccountId = accountId });
             }
         }

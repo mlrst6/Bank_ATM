@@ -19,6 +19,9 @@ namespace Bank_ATM.Services
     {
         public AccountDto Account { get; set; }
         public CardDto TargetCard { get; set; }
+        public decimal DebitedAmountUzs { get; set; }
+        public string CashCurrencyCode { get; set; }
+        public decimal CashAmount { get; set; }
     }
 
     public class CardAccessResult : ServiceResult

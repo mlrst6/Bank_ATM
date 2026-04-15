@@ -37,15 +37,23 @@ namespace Bank_ATM.Admin
             }
 
             SetLoading(true);
-            var result = await _authenticationService.LoginAdminAsync(username, password);
-            if (result.Success)
-                FormNavigator.ReplaceCurrent(this, new AdminActionsForm());
-            else
+            try
             {
+                var result = await _authenticationService.LoginAdminAsync(username, password);
+                if (result.Success)
+                {
+                    FormNavigator.ReplaceCurrent(this, new AdminActionsForm());
+                    return;
+                }
+
                 MessageBox.Show(result.Message, LanguageManager.GetString("LoginFailed"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtPassword.Clear();
+                txtPassword.Focus();
             }
-            SetLoading(false);
+            finally
+            {
+                SetLoading(false);
+            }
         }
 
         private void btnBack_Click(object sender, EventArgs e)

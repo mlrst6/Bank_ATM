@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
 using Dapper;
 using Bank_ATM.Models;
 
@@ -72,6 +73,26 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public string GenerateUniqueCardNumber()
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                for (int attempt = 0; attempt < 20; attempt++)
+                {
+                    string candidate = GenerateCardNumberCandidate();
+                    int exists = db.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM cards WHERE card_number = @CardNumber",
+                        new { CardNumber = candidate });
+                    if (exists == 0)
+                    {
+                        return candidate;
+                    }
+                }
+            }
+
+            throw new InvalidOperationException("Could not generate a unique card number.");
+        }
+
         public void CreateCard(CardDto card, string pin)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
@@ -82,6 +103,11 @@ namespace Bank_ATM.Repositories
                 if (!accountExists)
                 {
                     throw new InvalidOperationException("The selected account does not exist or is inactive.");
+                }
+
+                if (string.IsNullOrWhiteSpace(card.CardNumber))
+                {
+                    card.CardNumber = GenerateUniqueCardNumber();
                 }
 
                 string hashedPin = BCrypt.Net.BCrypt.HashPassword(pin, 11);
@@ -120,42 +146,58 @@ namespace Bank_ATM.Repositories
         public bool ValidatePin(string cardNumber, string inputPin, out string message)
         {
             message = "";
-            var card = GetCardByNumber(cardNumber);
+            string sanitizedCardNumber = (cardNumber ?? string.Empty).Replace("-", "").Replace(" ", "").Trim();
+            string sanitizedPin = (inputPin ?? string.Empty).Trim();
+
+            if (sanitizedCardNumber.Length != 16 || !long.TryParse(sanitizedCardNumber, out _))
+            {
+                message = LanguageManager.GetString("InvalidCardNumberMessage");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(sanitizedPin))
+            {
+                message = "PIN is required.";
+                return false;
+            }
+
+            var card = GetCardByNumber(sanitizedCardNumber);
             if (card == null)
             {
-                message = "Card not found.";
+                message = LanguageManager.GetString("CardNotRecognized");
                 return false;
             }
 
             if (card.IsBlocked)
             {
-                message = "This card is permanently blocked.";
+                message = LanguageManager.GetString("CardBlocked");
                 return false;
             }
 
             if (card.ExpiryDate.Date < DateTime.Today)
             {
-                message = "This card is expired.";
+                message = LanguageManager.GetString("CardExpired");
                 return false;
             }
 
             if (card.LockedUntil.HasValue && card.LockedUntil.Value > DateTime.Now)
             {
                 var remaining = card.LockedUntil.Value - DateTime.Now;
-                message = $"Card is locked. Try again in {remaining.Minutes}m {remaining.Seconds}s.";
+                int remainingMinutes = (int)Math.Ceiling(remaining.TotalMinutes);
+                message = $"Card is temporarily locked. Try again in {Math.Max(1, remainingMinutes)} minute(s).";
                 return false;
             }
 
-            bool isValid = BCrypt.Net.BCrypt.Verify(inputPin, card.PinHash);
-            
+            bool isValid = BCrypt.Net.BCrypt.Verify(sanitizedPin, card.PinHash);
+             
             if (isValid)
             {
-                ResetFailedAttempts(cardNumber);
+                ResetFailedAttempts(sanitizedCardNumber);
             }
             else
             {
-                IncrementFailedAttempts(cardNumber);
-                var updatedCard = GetCardByNumber(cardNumber);
+                IncrementFailedAttempts(sanitizedCardNumber);
+                var updatedCard = GetCardByNumber(sanitizedCardNumber);
                 int attemptsLeft = 3 - updatedCard.FailedAttempts;
                 if (attemptsLeft > 0)
                     message = $"Invalid PIN. {attemptsLeft} attempts remaining.";
@@ -164,6 +206,18 @@ namespace Bank_ATM.Repositories
             }
 
             return isValid;
+        }
+
+        private static string GenerateCardNumberCandidate()
+        {
+            byte[] bytes = new byte[8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(bytes);
+            }
+
+            ulong number = BitConverter.ToUInt64(bytes, 0) % 1000000000000UL;
+            return "8600" + number.ToString("D12");
         }
     }
 }

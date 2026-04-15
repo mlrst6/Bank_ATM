@@ -2,16 +2,13 @@ using System;
 using System.Configuration;
 using System.Globalization;
 using System.IO;
+using System.Data.SqlClient;
 
 namespace Bank_ATM
 {
     public static class Config
     {
-#if DEBUG
-        private const bool DefaultBootstrapDatabaseOnStartup = true;
-#else
         private const bool DefaultBootstrapDatabaseOnStartup = false;
-#endif
 
         public static string ConnectionString
         {
@@ -37,6 +34,52 @@ namespace Bank_ATM
 
                 throw new ConfigurationErrorsException(
                     "No SQL Server connection string is configured. Use connectionStrings/ATM or BANK_ATM_CONNECTION_STRING.");
+            }
+        }
+
+        public static string ConnectionStringSource
+        {
+            get
+            {
+                string fromEnvironment = Environment.GetEnvironmentVariable("BANK_ATM_CONNECTION_STRING");
+                if (!string.IsNullOrWhiteSpace(fromEnvironment))
+                {
+                    return "BANK_ATM_CONNECTION_STRING environment variable";
+                }
+
+                var namedConnection = ConfigurationManager.ConnectionStrings["ATM"];
+                if (namedConnection != null && !string.IsNullOrWhiteSpace(namedConnection.ConnectionString))
+                {
+                    return "App.config connectionStrings/ATM";
+                }
+
+                string legacyConnection = ConfigurationManager.AppSettings["ConnectionString"];
+                if (!string.IsNullOrWhiteSpace(legacyConnection))
+                {
+                    return "App.config appSettings/ConnectionString";
+                }
+
+                return "Not configured";
+            }
+        }
+
+        public static string DescribeConnectionTarget()
+        {
+            try
+            {
+                var builder = new SqlConnectionStringBuilder(ConnectionString);
+                string authenticationMode = builder.IntegratedSecurity
+                    ? "Windows Authentication"
+                    : "SQL Authentication";
+
+                return $"Server: {builder.DataSource}{Environment.NewLine}" +
+                       $"Database: {builder.InitialCatalog}{Environment.NewLine}" +
+                       $"Authentication: {authenticationMode}{Environment.NewLine}" +
+                       $"Source: {ConnectionStringSource}";
+            }
+            catch (Exception ex)
+            {
+                return $"Connection string could not be parsed. Source: {ConnectionStringSource}{Environment.NewLine}{ex.Message}";
             }
         }
 

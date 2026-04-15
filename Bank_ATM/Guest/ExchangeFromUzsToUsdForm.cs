@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
+using Bank_ATM.Repositories;
 
 namespace Bank_ATM
 {
@@ -14,7 +16,10 @@ namespace Bank_ATM
         private void ExchangeFromUzsToUsdForm_Load(object sender, EventArgs e)
         {
             LanguageManager.Apply(this);
-            ExchangeUzsPrice.Text = LanguageManager.Format("ExchangeRateDisplay", Config.UzsToUsdRate);
+            var usd = new CurrencyRepository().GetCurrencyByCode("USD");
+            ExchangeUzsPrice.Text = usd == null
+                ? LanguageManager.GetString("SelectedCurrencyUnavailable")
+                : LanguageManager.Format("ExchangeRateDisplay", usd.RateToUzs);
         }
 
         private void button1_Click(object sender, EventArgs e) => OpenConverterWithUsdAmount(1m);

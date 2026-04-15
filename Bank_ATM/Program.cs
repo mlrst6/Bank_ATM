@@ -9,10 +9,14 @@ namespace Bank_ATM
         [STAThread]
         static void Main()
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             try
             {
                 AuditLogger.Initialize();
                 AuditLogger.LogInfo("Application Starting...");
+                AuditLogger.LogInfo("Database target:" + Environment.NewLine + DatabaseMigrator.DescribeConnectionTarget());
 
                 if (Config.BootstrapDatabaseOnStartup)
                 {
@@ -25,9 +29,6 @@ namespace Bank_ATM
                     DatabaseMigrator.VerifySchemaReady();
                 }
 
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
                 Application.AddMessageFilter(new UserActivityFilter());
                 TimeoutManager.OnTimeout += HandleTimeout;
 
@@ -36,11 +37,10 @@ namespace Bank_ATM
             catch (Exception ex)
             {
                 AuditLogger.LogError("Application failed to start", ex);
-                MessageBox.Show(
-                    "Application startup failed. Please check the logs and database configuration.",
-                    "Startup Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                using (var form = new DatabaseSetupHelpForm(DatabaseMigrator.DescribeConnectionTarget(), ex))
+                {
+                    form.ShowDialog();
+                }
             }
             finally
             {

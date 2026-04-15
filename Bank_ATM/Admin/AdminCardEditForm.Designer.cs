@@ -18,7 +18,7 @@ namespace Bank_ATM.Admin
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblDialogTitle = new System.Windows.Forms.Label();
             this.lblDialogSubtitle = new System.Windows.Forms.Label();
-            this.txtAccountId = new System.Windows.Forms.TextBox();
+            this.cmbUsers = new System.Windows.Forms.ComboBox();
             this.txtCardNumber = new System.Windows.Forms.TextBox();
             this.txtPin = new System.Windows.Forms.TextBox();
             this.chkBlocked = new System.Windows.Forms.CheckBox();
@@ -60,12 +60,14 @@ namespace Bank_ATM.Admin
             this.lblDialogSubtitle.TabIndex = 1;
             this.lblDialogSubtitle.Text = "Link a card to an account and set access";
             // 
-            // txtAccountId
+            // cmbUsers
             // 
-            this.txtAccountId.Location = new System.Drawing.Point(176, 124);
-            this.txtAccountId.Name = "txtAccountId";
-            this.txtAccountId.Size = new System.Drawing.Size(280, 22);
-            this.txtAccountId.TabIndex = 1;
+            this.cmbUsers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbUsers.FormattingEnabled = true;
+            this.cmbUsers.Location = new System.Drawing.Point(176, 124);
+            this.cmbUsers.Name = "cmbUsers";
+            this.cmbUsers.Size = new System.Drawing.Size(280, 24);
+            this.cmbUsers.TabIndex = 1;
             // 
             // txtCardNumber
             // 
@@ -127,9 +129,9 @@ namespace Bank_ATM.Admin
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(34, 127);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(80, 17);
+            this.label1.Size = new System.Drawing.Size(40, 17);
             this.label1.TabIndex = 8;
-            this.label1.Text = "Account ID:";
+            this.label1.Text = "User:";
             // 
             // label2
             // 
@@ -184,7 +186,7 @@ namespace Bank_ATM.Admin
             this.Controls.Add(this.chkBlocked);
             this.Controls.Add(this.txtPin);
             this.Controls.Add(this.txtCardNumber);
-            this.Controls.Add(this.txtAccountId);
+            this.Controls.Add(this.cmbUsers);
             this.Name = "AdminCardEditForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Card Management";
@@ -199,7 +201,7 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblDialogTitle;
         private System.Windows.Forms.Label lblDialogSubtitle;
-        private System.Windows.Forms.TextBox txtAccountId;
+        private System.Windows.Forms.ComboBox cmbUsers;
         private System.Windows.Forms.TextBox txtCardNumber;
         private System.Windows.Forms.TextBox txtPin;
         private System.Windows.Forms.CheckBox chkBlocked;

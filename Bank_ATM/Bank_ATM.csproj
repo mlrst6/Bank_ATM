@@ -97,6 +97,18 @@
     <Compile Include="Admin\AdminServiceEditForm.Designer.cs">
       <DependentUpon>AdminServiceEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Admin\AdminServiceAccountEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\AdminServiceAccountEditForm.Designer.cs">
+      <DependentUpon>AdminServiceAccountEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\AdminCurrencyEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\AdminCurrencyEditForm.Designer.cs">
+      <DependentUpon>AdminCurrencyEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Admin\AdminLoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -188,9 +200,14 @@
     <Compile Include="Core\TimeoutManager.cs" />
     <Compile Include="Repositories\CardRepository.cs" />
     <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Repositories\AtmRepository.cs" />
+    <Compile Include="Repositories\CurrencyRepository.cs" />
     <Compile Include="Repositories\ServicesRepository.cs" />
     <Compile Include="Repositories\TransactionRepository.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="DatabaseSetupHelpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Config.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Guest\ConverterForm.resx">
