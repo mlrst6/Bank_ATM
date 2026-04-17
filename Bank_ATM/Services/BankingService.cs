@@ -354,7 +354,64 @@ namespace Bank_ATM.Services
             }
 
             AuditLogger.LogInfo($"Guest cash service payment: {amount} UZS for {description}");
-            return new ServiceResult { Success = true, Message = LanguageManager.GetString("ServicePaymentCompleted") };
+            string receiptPath = ReceiptService.GenerateGuestReceipt(
+                LanguageManager.GetString("GuestServicePayment"),
+                new[]
+                {
+                    LanguageManager.Format("ServiceReceiptService", service.ServiceName),
+                    LanguageManager.Format("ServiceReceiptReference", sanitizedReference),
+                    LanguageManager.Format("ServiceReceiptAmount", amount, "UZS"),
+                    LanguageManager.GetString("CashAcceptedBreakdown") + ": " + FormatNotes(noteList)
+                });
+            return new ServiceResult
+            {
+                Success = true,
+                Message = LanguageManager.GetString("ServicePaymentCompleted"),
+                ReceiptPath = receiptPath
+            };
+        }
+
+        public async Task<ServiceResult> ChangeCurrentCardPinAsync(string currentPin, string newPin, string confirmPin)
+        {
+            var currentCard = SessionManager.Instance.CurrentCard;
+            if (currentCard == null || string.IsNullOrWhiteSpace(currentCard.CardNumber))
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("NoActiveCardSession") };
+            }
+
+            string trimmedCurrentPin = (currentPin ?? string.Empty).Trim();
+            string trimmedNewPin = (newPin ?? string.Empty).Trim();
+            string trimmedConfirmPin = (confirmPin ?? string.Empty).Trim();
+
+            if (!IsFourDigitPin(trimmedCurrentPin) || !IsFourDigitPin(trimmedNewPin) || !IsFourDigitPin(trimmedConfirmPin))
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("PinMustBeFourDigits") };
+            }
+
+            if (trimmedNewPin != trimmedConfirmPin)
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("PinConfirmationMismatch") };
+            }
+
+            if (trimmedCurrentPin == trimmedNewPin)
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("NewPinMustBeDifferent") };
+            }
+
+            string message = string.Empty;
+            bool currentPinValid = await Task.Run(() =>
+                _cardRepository.ValidatePin(currentCard.CardNumber, trimmedCurrentPin, out message));
+            if (!currentPinValid)
+            {
+                AuditLogger.LogWarning($"Failed PIN change verification for card {currentCard.CardNumber}: {message}");
+                return new ServiceResult { Success = false, Message = message };
+            }
+
+            string hashedPin = BCrypt.Net.BCrypt.HashPassword(trimmedNewPin, 11);
+            await Task.Run(() => _cardRepository.UpdatePin(currentCard.CardNumber, hashedPin));
+            AuditLogger.LogInfo($"PIN changed for card {currentCard.CardNumber}");
+
+            return new ServiceResult { Success = true, Message = LanguageManager.GetString("PinChangedSuccessfully") };
         }
 
         public string GenerateReceiptForCurrentSession(TransactionDto transaction)
@@ -380,6 +437,11 @@ namespace Bank_ATM.Services
         private static bool IsValidMoneyAmount(decimal amount)
         {
             return amount > 0m && decimal.Round(amount, 2) == amount;
+        }
+
+        private static bool IsFourDigitPin(string pin)
+        {
+            return pin != null && pin.Length == 4 && pin.All(char.IsDigit);
         }
 
         private static string FormatNotes(CashNoteDto[] notes)

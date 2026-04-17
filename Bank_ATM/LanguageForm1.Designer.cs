@@ -37,7 +37,7 @@ namespace Bank_ATM
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(800, 100);
+            this.label1.Size = new System.Drawing.Size(900, 100);
             this.label1.TabIndex = 0;
             this.label1.Text = "Bank ATM";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -51,7 +51,7 @@ namespace Bank_ATM
             this.UZ.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.UZ.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.UZ.ForeColor = System.Drawing.Color.White;
-            this.UZ.Location = new System.Drawing.Point(50, 150);
+            this.UZ.Location = new System.Drawing.Point(110, 259);
             this.UZ.Name = "UZ";
             this.UZ.Size = new System.Drawing.Size(220, 100);
             this.UZ.TabIndex = 1;
@@ -68,7 +68,7 @@ namespace Bank_ATM
             this.RU.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RU.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.RU.ForeColor = System.Drawing.Color.White;
-            this.RU.Location = new System.Drawing.Point(530, 150);
+            this.RU.Location = new System.Drawing.Point(590, 259);
             this.RU.Name = "RU";
             this.RU.Size = new System.Drawing.Size(220, 100);
             this.RU.TabIndex = 1;
@@ -85,7 +85,7 @@ namespace Bank_ATM
             this.ENG.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ENG.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.ENG.ForeColor = System.Drawing.Color.White;
-            this.ENG.Location = new System.Drawing.Point(290, 150);
+            this.ENG.Location = new System.Drawing.Point(349, 259);
             this.ENG.Name = "ENG";
             this.ENG.Size = new System.Drawing.Size(220, 100);
             this.ENG.TabIndex = 1;
@@ -97,7 +97,7 @@ namespace Bank_ATM
             // 
             this.label2.Font = new System.Drawing.Font("Segoe UI", 14F);
             this.label2.ForeColor = System.Drawing.Color.Silver;
-            this.label2.Location = new System.Drawing.Point(0, 300);
+            this.label2.Location = new System.Drawing.Point(47, 448);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(800, 40);
             this.label2.TabIndex = 2;
@@ -110,7 +110,7 @@ namespace Bank_ATM
             this.label3.Cursor = System.Windows.Forms.Cursors.Hand;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold);
             this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(760, 10);
+            this.label3.Location = new System.Drawing.Point(857, 9);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(31, 29);
             this.label3.TabIndex = 3;
@@ -125,7 +125,7 @@ namespace Bank_ATM
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(800, 100);
+            this.pnlHeader.Size = new System.Drawing.Size(900, 100);
             this.pnlHeader.TabIndex = 4;
             // 
             // LanguageForm1
@@ -133,7 +133,7 @@ namespace Bank_ATM
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(800, 400);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.ControlBox = false;
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.label2);

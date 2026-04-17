@@ -4,24 +4,25 @@ using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Services;
 
-namespace Bank_ATM
+namespace Bank_ATM.User
 {
-    public partial class PinEntryForm : Form
+    public partial class UserPinEntryForm : Form
     {
         private readonly string _cardNumber;
         private readonly AuthenticationService _authenticationService;
 
-        public PinEntryForm(string cardNumber)
+        public UserPinEntryForm(string cardNumber)
         {
             InitializeComponent();
             _cardNumber = cardNumber;
             _authenticationService = new AuthenticationService();
         }
 
-        private void PinEntryForm_Load(object sender, EventArgs e)
+        private void UserPinEntryForm_Load(object sender, EventArgs e)
         {
             AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
+            btnBack.Text = LanguageManager.GetString("Back");
             SetupKeypad();
         }
 
@@ -52,7 +53,7 @@ namespace Bank_ATM
                 MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("LoginSuccessful"), MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 FormNavigator.CloseHiddenForm(this.Tag as Form);
-                FormNavigator.ReplaceCurrent(this, new User.UserActionsForm());
+                FormNavigator.ReplaceCurrent(this, new UserActionsForm());
             }
             else
             {
@@ -67,6 +68,21 @@ namespace Bank_ATM
         private void btnClear_Click(object sender, EventArgs e)
         {
             txtPin.Clear();
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            FormNavigator.GoBack(this, () => new UserCardEntryForm("MainFormUser"));
+        }
+
+        private void lblTitle_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

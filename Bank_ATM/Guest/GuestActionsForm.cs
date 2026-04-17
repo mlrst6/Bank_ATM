@@ -24,7 +24,7 @@ namespace Bank_ATM
 
         private void btnExchange_Click(object sender, EventArgs e)
         {
-            FormNavigator.ShowNext(this, new ExchangeFromUzsToUsdForm());
+            FormNavigator.ShowNext(this, new GuestExchangeForm());
         }
 
         private void btnPayServices_Click(object sender, EventArgs e)

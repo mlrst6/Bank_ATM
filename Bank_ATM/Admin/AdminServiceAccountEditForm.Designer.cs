@@ -30,7 +30,7 @@ namespace Bank_ATM.Admin
             this.lblTitle.AutoSize = true;
             this.lblTitle.Location = new System.Drawing.Point(30, 26);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(166, 17);
+            this.lblTitle.Size = new System.Drawing.Size(158, 16);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Add user service account";
             // 
@@ -39,7 +39,7 @@ namespace Bank_ATM.Admin
             this.lblSubtitle.AutoSize = true;
             this.lblSubtitle.Location = new System.Drawing.Point(30, 58);
             this.lblSubtitle.Name = "lblSubtitle";
-            this.lblSubtitle.Size = new System.Drawing.Size(52, 17);
+            this.lblSubtitle.Size = new System.Drawing.Size(53, 16);
             this.lblSubtitle.TabIndex = 1;
             this.lblSubtitle.Text = "Service";
             // 
@@ -48,7 +48,7 @@ namespace Bank_ATM.Admin
             this.lblUser.AutoSize = true;
             this.lblUser.Location = new System.Drawing.Point(30, 112);
             this.lblUser.Name = "lblUser";
-            this.lblUser.Size = new System.Drawing.Size(35, 17);
+            this.lblUser.Size = new System.Drawing.Size(36, 16);
             this.lblUser.TabIndex = 2;
             this.lblUser.Text = "User";
             // 
@@ -65,7 +65,7 @@ namespace Bank_ATM.Admin
             this.lblReference.AutoSize = true;
             this.lblReference.Location = new System.Drawing.Point(30, 184);
             this.lblReference.Name = "lblReference";
-            this.lblReference.Size = new System.Drawing.Size(130, 17);
+            this.lblReference.Size = new System.Drawing.Size(120, 16);
             this.lblReference.TabIndex = 4;
             this.lblReference.Text = "Payment reference";
             // 
@@ -98,7 +98,7 @@ namespace Bank_ATM.Admin
             // 
             // AdminServiceAccountEditForm
             // 
-            this.ClientSize = new System.Drawing.Size(492, 338);
+            this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.txtReference);
@@ -116,6 +116,7 @@ namespace Bank_ATM.Admin
             this.Load += new System.EventHandler(this.AdminServiceAccountEditForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         private System.Windows.Forms.Label lblTitle;

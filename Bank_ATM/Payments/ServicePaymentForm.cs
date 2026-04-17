@@ -34,10 +34,15 @@ namespace Bank_ATM.Payments
                 : LanguageManager.GetString("GuestServicePaymentSubtitle");
             btnPay.Text = LanguageManager.GetString("Pay");
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            NumericInputDialog.Attach(txtReference, LanguageManager.GetString("AccountNumber"));
             if (!_chargeCurrentAccount)
             {
                 txtAmount.ReadOnly = true;
                 txtAmount.Text = LanguageManager.GetString("CashAmountCalculatedFromNotes");
+            }
+            else
+            {
+                NumericInputDialog.Attach(txtAmount, LanguageManager.GetString("Amount"), true);
             }
 
             _services = _bankingService.GetAvailableServices();
@@ -111,7 +116,10 @@ namespace Bank_ATM.Payments
                 return;
             }
 
-            MessageBox.Show(result.Message, LanguageManager.GetString("Payment"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            string successMessage = string.IsNullOrWhiteSpace(result.ReceiptPath)
+                ? result.Message
+                : LanguageManager.Format("ServicePaymentCompletedWithReceipt", result.ReceiptPath);
+            MessageBox.Show(successMessage, LanguageManager.GetString("Payment"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             DialogResult = DialogResult.OK;
             Close();
         }

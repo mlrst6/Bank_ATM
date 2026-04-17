@@ -4,34 +4,57 @@ using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Services;
 
-namespace Bank_ATM
+namespace Bank_ATM.User
 {
-    public partial class GuestForm : BaseForm
+    public partial class UserCardEntryForm : BaseForm
     {
         private string _customTitleKey = "MainFormUser";
         private bool _isCardPlaceholderActive;
         private readonly AuthenticationService _authenticationService = new AuthenticationService();
 
-        public GuestForm()
+        public UserCardEntryForm()
         {
             InitializeComponent();
         }
 
-        public GuestForm(string titleKey) : this()
+        public UserCardEntryForm(string titleKey) : this()
         {
             _customTitleKey = titleKey;
         }
 
-        private void GuestForm_Load(object sender, EventArgs e)
+        private void SetupKeypad()
+        {
+            foreach (Control c in this.Controls)
+            {
+                if (c is Button btn && int.TryParse(btn.Text, out _))
+                {
+                    btn.Click += (s, e) => {
+                        if (_isCardPlaceholderActive)
+                        {
+                            txtCardNumber.Clear();
+                            txtCardNumber.ForeColor = Color.White;
+                            _isCardPlaceholderActive = false;
+                        }
+
+                        if (txtCardNumber.Text.Length < 16)
+                            txtCardNumber.Text += btn.Text;
+                    };
+                }
+            }
+        }
+
+        private void UserCardEntryForm_Load(object sender, EventArgs e)
         {
             AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
             lblTitle.Text = LanguageManager.GetString(_customTitleKey);
             
-            btnExchange.Visible = false; // Hide Guest-only features here, they are in GuestActionsForm
+            btnClear.Text = LanguageManager.GetString("btnClear");
             btnInsertCard.Text = LanguageManager.GetString("btnInsertCard");
             btnBack.Text = LanguageManager.GetString("btnBack");
             InitializeCardPlaceholder();
+            txtCardNumber.ReadOnly = true;
+            SetupKeypad();
             txtCardNumber.Enter -= txtCardNumber_Enter;
             txtCardNumber.Enter += txtCardNumber_Enter;
             txtCardNumber.Leave -= txtCardNumber_Leave;
@@ -49,10 +72,11 @@ namespace Bank_ATM
                     ? MessageBoxIcon.Warning
                     : MessageBoxIcon.Error;
                 MessageBox.Show(access.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, icon);
+                InitializeCardPlaceholder();
                 return;
             }
 
-            NavigateTo(new PinEntryForm(access.SanitizedCardNumber));
+            NavigateTo(new UserPinEntryForm(access.SanitizedCardNumber));
         }
 
         private void btnBack_Click(object sender, EventArgs e)
@@ -90,6 +114,24 @@ namespace Bank_ATM
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true;
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            if (_isCardPlaceholderActive)
+            {
+                return;
+            }
+
+            if (txtCardNumber.Text.Length > 0)
+            {
+                txtCardNumber.Text = txtCardNumber.Text.Substring(0, txtCardNumber.Text.Length - 1);
+            }
+
+            if (txtCardNumber.Text.Length == 0)
+            {
+                InitializeCardPlaceholder();
             }
         }
     }

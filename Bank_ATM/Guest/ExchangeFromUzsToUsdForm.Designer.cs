@@ -32,16 +32,6 @@ namespace Bank_ATM
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pnlHeader
-            // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
-            this.pnlHeader.Controls.Add(this.ExchangeUzsPrice);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(800, 80);
-            this.pnlHeader.TabIndex = 2;
-            // 
             // ExchangeUzsPrice
             // 
             this.ExchangeUzsPrice.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -49,7 +39,7 @@ namespace Bank_ATM
             this.ExchangeUzsPrice.ForeColor = System.Drawing.Color.White;
             this.ExchangeUzsPrice.Location = new System.Drawing.Point(0, 0);
             this.ExchangeUzsPrice.Name = "ExchangeUzsPrice";
-            this.ExchangeUzsPrice.Size = new System.Drawing.Size(800, 80);
+            this.ExchangeUzsPrice.Size = new System.Drawing.Size(900, 80);
             this.ExchangeUzsPrice.TabIndex = 0;
             this.ExchangeUzsPrice.Text = "Exchange from UZS to USD";
             this.ExchangeUzsPrice.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -166,12 +156,22 @@ namespace Bank_ATM
             this.converter.UseVisualStyleBackColor = false;
             this.converter.Click += new System.EventHandler(this.converter_Click);
             // 
+            // pnlHeader
+            // 
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.pnlHeader.Controls.Add(this.ExchangeUzsPrice);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(900, 80);
+            this.pnlHeader.TabIndex = 2;
+            // 
             // ExchangeFromUzsToUsdForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(800, 500);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.ControlBox = false;
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.Back);

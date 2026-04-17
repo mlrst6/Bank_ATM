@@ -46,7 +46,7 @@ namespace Bank_ATM.Payments
             this.lblSubtitle.AutoSize = true;
             this.lblSubtitle.Location = new System.Drawing.Point(18, 47);
             this.lblSubtitle.Name = "lblSubtitle";
-            this.lblSubtitle.Size = new System.Drawing.Size(202, 17);
+            this.lblSubtitle.Size = new System.Drawing.Size(217, 16);
             this.lblSubtitle.TabIndex = 1;
             this.lblSubtitle.Text = "Choose a service and payment info";
             // 
@@ -55,7 +55,7 @@ namespace Bank_ATM.Payments
             this.lblTitle.AutoSize = true;
             this.lblTitle.Location = new System.Drawing.Point(18, 16);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(106, 17);
+            this.lblTitle.Size = new System.Drawing.Size(109, 16);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Service Payment";
             // 
@@ -64,7 +64,7 @@ namespace Bank_ATM.Payments
             this.lblService.AutoSize = true;
             this.lblService.Location = new System.Drawing.Point(36, 132);
             this.lblService.Name = "lblService";
-            this.lblService.Size = new System.Drawing.Size(57, 17);
+            this.lblService.Size = new System.Drawing.Size(53, 16);
             this.lblService.TabIndex = 1;
             this.lblService.Text = "Service";
             // 
@@ -82,7 +82,7 @@ namespace Bank_ATM.Payments
             this.lblCategory.AutoSize = true;
             this.lblCategory.Location = new System.Drawing.Point(36, 188);
             this.lblCategory.Name = "lblCategory";
-            this.lblCategory.Size = new System.Drawing.Size(65, 17);
+            this.lblCategory.Size = new System.Drawing.Size(62, 16);
             this.lblCategory.TabIndex = 3;
             this.lblCategory.Text = "Category";
             // 
@@ -91,7 +91,7 @@ namespace Bank_ATM.Payments
             this.lblCategoryValue.AutoSize = true;
             this.lblCategoryValue.Location = new System.Drawing.Point(107, 188);
             this.lblCategoryValue.Name = "lblCategoryValue";
-            this.lblCategoryValue.Size = new System.Drawing.Size(12, 17);
+            this.lblCategoryValue.Size = new System.Drawing.Size(11, 16);
             this.lblCategoryValue.TabIndex = 4;
             this.lblCategoryValue.Text = "-";
             // 
@@ -100,7 +100,7 @@ namespace Bank_ATM.Payments
             this.lblReference.AutoSize = true;
             this.lblReference.Location = new System.Drawing.Point(36, 223);
             this.lblReference.Name = "lblReference";
-            this.lblReference.Size = new System.Drawing.Size(87, 17);
+            this.lblReference.Size = new System.Drawing.Size(80, 16);
             this.lblReference.TabIndex = 5;
             this.lblReference.Text = "Account/Ref";
             // 
@@ -116,7 +116,7 @@ namespace Bank_ATM.Payments
             this.lblReferenceHint.AutoSize = true;
             this.lblReferenceHint.Location = new System.Drawing.Point(39, 268);
             this.lblReferenceHint.Name = "lblReferenceHint";
-            this.lblReferenceHint.Size = new System.Drawing.Size(0, 17);
+            this.lblReferenceHint.Size = new System.Drawing.Size(0, 16);
             this.lblReferenceHint.TabIndex = 7;
             // 
             // lblAmount
@@ -124,7 +124,7 @@ namespace Bank_ATM.Payments
             this.lblAmount.AutoSize = true;
             this.lblAmount.Location = new System.Drawing.Point(36, 305);
             this.lblAmount.Name = "lblAmount";
-            this.lblAmount.Size = new System.Drawing.Size(86, 17);
+            this.lblAmount.Size = new System.Drawing.Size(82, 16);
             this.lblAmount.TabIndex = 8;
             this.lblAmount.Text = "Amount UZS";
             // 
@@ -157,7 +157,7 @@ namespace Bank_ATM.Payments
             // 
             // ServicePaymentForm
             // 
-            this.ClientSize = new System.Drawing.Size(492, 446);
+            this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnPay);
             this.Controls.Add(this.txtAmount);
@@ -178,6 +178,7 @@ namespace Bank_ATM.Payments
             this.pnlHeader.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         private System.Windows.Forms.Panel pnlHeader;

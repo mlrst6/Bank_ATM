@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
+using Bank_ATM.UI;
 
 namespace Bank_ATM.Admin
 {
@@ -21,6 +22,7 @@ namespace Bank_ATM.Admin
         private void AdminUserEditForm_Load(object sender, EventArgs e)
         {
             ApplyTheme();
+            NumericInputDialog.Attach(txtInitialPin, LanguageManager.GetString("InitialPin"));
             btnSave.Text = LanguageManager.GetString("Save");
             btnCancel.Text = LanguageManager.GetString("Cancel");
             lblDialogTitle.Text = _isEdit

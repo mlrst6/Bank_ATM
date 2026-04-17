@@ -36,7 +36,7 @@ namespace Bank_ATM.Admin
             this.lblTitle.AutoSize = true;
             this.lblTitle.Location = new System.Drawing.Point(30, 26);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(104, 17);
+            this.lblTitle.Size = new System.Drawing.Size(103, 16);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Create Currency";
             // 
@@ -45,7 +45,7 @@ namespace Bank_ATM.Admin
             this.lblCode.AutoSize = true;
             this.lblCode.Location = new System.Drawing.Point(30, 84);
             this.lblCode.Name = "lblCode";
-            this.lblCode.Size = new System.Drawing.Size(90, 17);
+            this.lblCode.Size = new System.Drawing.Size(40, 16);
             this.lblCode.TabIndex = 1;
             this.lblCode.Text = "Code";
             // 
@@ -61,7 +61,7 @@ namespace Bank_ATM.Admin
             this.lblCurrencyName.AutoSize = true;
             this.lblCurrencyName.Location = new System.Drawing.Point(30, 146);
             this.lblCurrencyName.Name = "lblCurrencyName";
-            this.lblCurrencyName.Size = new System.Drawing.Size(104, 17);
+            this.lblCurrencyName.Size = new System.Drawing.Size(97, 16);
             this.lblCurrencyName.TabIndex = 3;
             this.lblCurrencyName.Text = "Currency name";
             // 
@@ -77,7 +77,7 @@ namespace Bank_ATM.Admin
             this.lblRateToUzs.AutoSize = true;
             this.lblRateToUzs.Location = new System.Drawing.Point(30, 208);
             this.lblRateToUzs.Name = "lblRateToUzs";
-            this.lblRateToUzs.Size = new System.Drawing.Size(147, 17);
+            this.lblRateToUzs.Size = new System.Drawing.Size(80, 16);
             this.lblRateToUzs.TabIndex = 5;
             this.lblRateToUzs.Text = "Rate to UZS";
             // 
@@ -93,7 +93,7 @@ namespace Bank_ATM.Admin
             this.lblCashAvailable.AutoSize = true;
             this.lblCashAvailable.Location = new System.Drawing.Point(30, 270);
             this.lblCashAvailable.Name = "lblCashAvailable";
-            this.lblCashAvailable.Size = new System.Drawing.Size(154, 17);
+            this.lblCashAvailable.Size = new System.Drawing.Size(127, 16);
             this.lblCashAvailable.TabIndex = 7;
             this.lblCashAvailable.Text = "ATM cash available";
             // 
@@ -109,7 +109,7 @@ namespace Bank_ATM.Admin
             this.lblDenominations.AutoSize = true;
             this.lblDenominations.Location = new System.Drawing.Point(30, 332);
             this.lblDenominations.Name = "lblDenominations";
-            this.lblDenominations.Size = new System.Drawing.Size(151, 17);
+            this.lblDenominations.Size = new System.Drawing.Size(97, 16);
             this.lblDenominations.TabIndex = 9;
             this.lblDenominations.Text = "Denominations";
             // 
@@ -126,7 +126,7 @@ namespace Bank_ATM.Admin
             this.chkIsActive.AutoSize = true;
             this.chkIsActive.Location = new System.Drawing.Point(33, 432);
             this.chkIsActive.Name = "chkIsActive";
-            this.chkIsActive.Size = new System.Drawing.Size(67, 21);
+            this.chkIsActive.Size = new System.Drawing.Size(66, 20);
             this.chkIsActive.TabIndex = 11;
             this.chkIsActive.Text = "Active";
             this.chkIsActive.UseVisualStyleBackColor = true;
@@ -153,7 +153,7 @@ namespace Bank_ATM.Admin
             // 
             // AdminCurrencyEditForm
             // 
-            this.ClientSize = new System.Drawing.Size(492, 566);
+            this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkIsActive);
@@ -177,6 +177,7 @@ namespace Bank_ATM.Admin
             this.Load += new System.EventHandler(this.AdminCurrencyEditForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         private System.Windows.Forms.Label lblTitle;

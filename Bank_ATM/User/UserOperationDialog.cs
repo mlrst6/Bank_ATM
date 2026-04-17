@@ -33,6 +33,7 @@ namespace Bank_ATM.User
         private Button _primaryButton;
         private Button _secondaryButton;
         private TableLayoutPanel _keypadPanel;
+        private TextBox _activeInputTextBox;
 
         public decimal Amount { get; private set; }
         public string CurrencyCode { get; private set; }
@@ -94,9 +95,13 @@ namespace Bank_ATM.User
                 BackColor = Color.FromArgb(30, 41, 59),
                 ForeColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
-                Font = new Font("Segoe UI", 13F, FontStyle.Regular)
+                Font = new Font("Segoe UI", 13F, FontStyle.Regular),
+                ReadOnly = true,
+                ShortcutsEnabled = false
             };
             _targetCardTextBox.KeyPress += TargetCardTextBox_KeyPress;
+            _targetCardTextBox.Enter += (s, e) => _activeInputTextBox = _targetCardTextBox;
+            _targetCardTextBox.Click += (s, e) => _activeInputTextBox = _targetCardTextBox;
 
             _amountLabel = CreateLabel(LanguageManager.GetString("EnterAmount"), 30, 198);
             _amountTextBox = new TextBox
@@ -110,6 +115,8 @@ namespace Bank_ATM.User
                 Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold),
                 TextAlign = HorizontalAlignment.Right
             };
+            _amountTextBox.Enter += (s, e) => _activeInputTextBox = _amountTextBox;
+            _amountTextBox.Click += (s, e) => _activeInputTextBox = _amountTextBox;
 
             _validationLabel = new Label
             {
@@ -189,6 +196,9 @@ namespace Bank_ATM.User
             Controls.Add(_keypadPanel);
             Controls.Add(_secondaryButton);
             Controls.Add(_primaryButton);
+            _activeInputTextBox = _operationType == UserOperationType.Transfer
+                ? _targetCardTextBox
+                : _amountTextBox;
         }
 
         private void ApplyOperationText()
@@ -250,7 +260,7 @@ namespace Bank_ATM.User
             _validationLabel.Text = string.Empty;
             string key = ((Button)sender).Text;
 
-            if (_operationType == UserOperationType.Transfer && _targetCardTextBox.Focused)
+            if (_operationType == UserOperationType.Transfer && _activeInputTextBox == _targetCardTextBox)
             {
                 if (key == "<")
                 {

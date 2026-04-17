@@ -85,7 +85,7 @@ namespace Bank_ATM.Admin
             this.lblUser.ForeColor = System.Drawing.Color.White;
             this.lblUser.Location = new System.Drawing.Point(50, 80);
             this.lblUser.Name = "lblUser";
-            this.lblUser.Size = new System.Drawing.Size(73, 17);
+            this.lblUser.Size = new System.Drawing.Size(73, 16);
             this.lblUser.TabIndex = 5;
             this.lblUser.Text = "Username:";
             // 
@@ -95,14 +95,14 @@ namespace Bank_ATM.Admin
             this.lblPass.ForeColor = System.Drawing.Color.White;
             this.lblPass.Location = new System.Drawing.Point(50, 150);
             this.lblPass.Name = "lblPass";
-            this.lblPass.Size = new System.Drawing.Size(73, 17);
+            this.lblPass.Size = new System.Drawing.Size(70, 16);
             this.lblPass.TabIndex = 6;
             this.lblPass.Text = "Password:";
             // 
             // AdminLoginForm
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(400, 400);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.Controls.Add(this.lblPass);
             this.Controls.Add(this.lblUser);
             this.Controls.Add(this.lblTitle);

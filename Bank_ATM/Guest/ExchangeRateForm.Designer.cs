@@ -29,16 +29,6 @@ namespace Bank_ATM
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pnlHeader
-            // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
-            this.pnlHeader.Controls.Add(this.ExchangeRate);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(800, 80);
-            this.pnlHeader.TabIndex = 4;
-            // 
             // ExchangeRate
             // 
             this.ExchangeRate.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -46,7 +36,7 @@ namespace Bank_ATM
             this.ExchangeRate.ForeColor = System.Drawing.Color.White;
             this.ExchangeRate.Location = new System.Drawing.Point(0, 0);
             this.ExchangeRate.Name = "ExchangeRate";
-            this.ExchangeRate.Size = new System.Drawing.Size(800, 80);
+            this.ExchangeRate.Size = new System.Drawing.Size(900, 80);
             this.ExchangeRate.TabIndex = 0;
             this.ExchangeRate.Text = "Exchange Rate";
             this.ExchangeRate.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -85,7 +75,7 @@ namespace Bank_ATM
             this.UZSUSD.ForeColor = System.Drawing.Color.White;
             this.UZSUSD.Location = new System.Drawing.Point(150, 140);
             this.UZSUSD.Name = "UZSUSD";
-            this.UZSUSD.Size = new System.Drawing.Size(211, 37);
+            this.UZSUSD.Size = new System.Drawing.Size(205, 37);
             this.UZSUSD.TabIndex = 2;
             this.UZSUSD.Text = "So`m -> Dollar";
             // 
@@ -96,7 +86,7 @@ namespace Bank_ATM
             this.USDUZS.ForeColor = System.Drawing.Color.White;
             this.USDUZS.Location = new System.Drawing.Point(150, 240);
             this.USDUZS.Name = "USDUZS";
-            this.USDUZS.Size = new System.Drawing.Size(211, 37);
+            this.USDUZS.Size = new System.Drawing.Size(205, 37);
             this.USDUZS.TabIndex = 3;
             this.USDUZS.Text = "Dollar -> So`m";
             // 
@@ -114,12 +104,22 @@ namespace Bank_ATM
             this.btnBack.UseVisualStyleBackColor = false;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
+            // pnlHeader
+            // 
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.pnlHeader.Controls.Add(this.ExchangeRate);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(900, 80);
+            this.pnlHeader.TabIndex = 4;
+            // 
             // ExchangeRateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.ControlBox = false;
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.USDUZS);

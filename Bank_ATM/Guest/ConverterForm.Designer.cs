@@ -40,28 +40,6 @@ namespace Bank_ATM
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pnlHeader
-            // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
-            this.pnlHeader.Controls.Add(this.converter);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(530, 60);
-            this.pnlHeader.TabIndex = 5;
-            // 
-            // converter
-            // 
-            this.converter.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.converter.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
-            this.converter.ForeColor = System.Drawing.Color.White;
-            this.converter.Location = new System.Drawing.Point(0, 0);
-            this.converter.Name = "converter";
-            this.converter.Size = new System.Drawing.Size(530, 60);
-            this.converter.TabIndex = 3;
-            this.converter.Text = "Converter";
-            this.converter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // textBox1
             // 
             this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
@@ -73,45 +51,6 @@ namespace Bank_ATM
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(326, 60);
             this.textBox1.TabIndex = 0;
-            // 
-            // textBox2
-            // 
-            this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.Font = new System.Drawing.Font("Segoe UI", 20F);
-            this.textBox2.ForeColor = System.Drawing.Color.LightGreen;
-            this.textBox2.Location = new System.Drawing.Point(135, 160);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(326, 60);
-            this.textBox2.TabIndex = 0;
-            // 
-            // listBox1
-            // 
-            this.listBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
-            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBox1.ForeColor = System.Drawing.Color.White;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 16;
-            this.listBox1.Location = new System.Drawing.Point(60, 80);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(68, 60);
-            this.listBox1.TabIndex = 2;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
-            // 
-            // listBox2
-            // 
-            this.listBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
-            this.listBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBox2.ForeColor = System.Drawing.Color.White;
-            this.listBox2.FormattingEnabled = true;
-            this.listBox2.ItemHeight = 16;
-            this.listBox2.Location = new System.Drawing.Point(60, 160);
-            this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(68, 60);
-            this.listBox2.TabIndex = 2;
-            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
             // 
             // button1
             // 
@@ -125,6 +64,32 @@ namespace Bank_ATM
             this.button1.TabIndex = 1;
             this.button1.Text = "1";
             this.button1.UseVisualStyleBackColor = false;
+            // 
+            // listBox1
+            // 
+            this.listBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.listBox1.ForeColor = System.Drawing.Color.White;
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 16;
+            this.listBox1.Location = new System.Drawing.Point(60, 80);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(68, 50);
+            this.listBox1.TabIndex = 2;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // listBox2
+            // 
+            this.listBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.listBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.listBox2.ForeColor = System.Drawing.Color.White;
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.ItemHeight = 16;
+            this.listBox2.Location = new System.Drawing.Point(60, 160);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(68, 50);
+            this.listBox2.TabIndex = 2;
+            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
             // 
             // button2
             // 
@@ -230,6 +195,20 @@ namespace Bank_ATM
             this.button9.Text = "9";
             this.button9.UseVisualStyleBackColor = false;
             // 
+            // Back
+            // 
+            this.Back.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.Back.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Back.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.Back.ForeColor = System.Drawing.Color.IndianRed;
+            this.Back.Location = new System.Drawing.Point(90, 535);
+            this.Back.Name = "Back";
+            this.Back.Size = new System.Drawing.Size(100, 80);
+            this.Back.TabIndex = 1;
+            this.Back.Text = "Back";
+            this.Back.UseVisualStyleBackColor = false;
+            this.Back.Click += new System.EventHandler(this.Back_Click);
+            // 
             // button11
             // 
             this.button11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
@@ -242,6 +221,31 @@ namespace Bank_ATM
             this.button11.TabIndex = 1;
             this.button11.Text = "0";
             this.button11.UseVisualStyleBackColor = false;
+            // 
+            // textBox2
+            // 
+            this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox2.Font = new System.Drawing.Font("Segoe UI", 20F);
+            this.textBox2.ForeColor = System.Drawing.Color.LightGreen;
+            this.textBox2.Location = new System.Drawing.Point(135, 160);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.ReadOnly = true;
+            this.textBox2.Size = new System.Drawing.Size(326, 60);
+            this.textBox2.TabIndex = 0;
+            // 
+            // converter
+            // 
+            this.converter.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.converter.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.converter.ForeColor = System.Drawing.Color.White;
+            this.converter.Location = new System.Drawing.Point(0, 0);
+            this.converter.Name = "converter";
+            this.converter.Size = new System.Drawing.Size(900, 60);
+            this.converter.TabIndex = 3;
+            this.converter.Text = "Converter";
+            this.converter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button10
             // 
@@ -257,26 +261,22 @@ namespace Bank_ATM
             this.button10.UseVisualStyleBackColor = false;
             this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
-            // Back
+            // pnlHeader
             // 
-            this.Back.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
-            this.Back.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Back.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.Back.ForeColor = System.Drawing.Color.IndianRed;
-            this.Back.Location = new System.Drawing.Point(90, 535);
-            this.Back.Name = "Back";
-            this.Back.Size = new System.Drawing.Size(100, 80);
-            this.Back.TabIndex = 1;
-            this.Back.Text = "Back";
-            this.Back.UseVisualStyleBackColor = false;
-            this.Back.Click += new System.EventHandler(this.Back_Click);
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
+            this.pnlHeader.Controls.Add(this.converter);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(900, 60);
+            this.pnlHeader.TabIndex = 5;
             // 
             // ConverterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(530, 650);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.ControlBox = false;
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.button10);

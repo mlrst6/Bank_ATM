@@ -209,6 +209,130 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<IList<CashNoteDto>> ExchangeGuestCashAsync(
+            CurrencyDto fromCurrency,
+            CurrencyDto toCurrency,
+            IEnumerable<CashNoteDto> insertedNotes,
+            decimal targetCashAmount,
+            decimal amountUzs,
+            string description)
+        {
+            var insertedNoteList = NormalizeNotes(insertedNotes).ToList();
+            if (fromCurrency == null || toCurrency == null ||
+                fromCurrency.Id == toCurrency.Id ||
+                targetCashAmount <= 0m ||
+                amountUzs <= 0m ||
+                !insertedNoteList.Any())
+            {
+                return null;
+            }
+
+            using (var db = new SqlConnection(_connectionString))
+            {
+                await db.OpenAsync();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var targetDenominations = (await db.QueryAsync<CashDenominationDto>(@"
+                            SELECT
+                                d.atm_id as AtmId,
+                                d.currency_id as CurrencyId,
+                                c.code as CurrencyCode,
+                                d.denomination_value as DenominationValue,
+                                d.note_count as NoteCount,
+                                d.updated_at as UpdatedAt
+                            FROM atm_cash_denominations d WITH (UPDLOCK, ROWLOCK)
+                            INNER JOIN currencies c ON c.id = d.currency_id
+                            WHERE d.atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND d.currency_id = @CurrencyId
+                            ORDER BY d.denomination_value DESC",
+                            new { CurrencyId = toCurrency.Id },
+                            trans)).ToList();
+
+                        var dispensedNotes = BuildDispenseBreakdown(targetCashAmount, targetDenominations);
+                        if (dispensedNotes == null || dispensedNotes.Count == 0)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        foreach (var note in insertedNoteList)
+                        {
+                            await db.ExecuteAsync(@"
+                                IF EXISTS (
+                                    SELECT 1 FROM atm_cash_denominations
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId
+                                      AND denomination_value = @DenominationValue
+                                )
+                                BEGIN
+                                    UPDATE atm_cash_denominations
+                                    SET note_count = note_count + @NoteCount,
+                                        updated_at = GETDATE()
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId
+                                      AND denomination_value = @DenominationValue
+                                END
+                                ELSE
+                                BEGIN
+                                    INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                                    VALUES ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, @DenominationValue, @NoteCount)
+                                END",
+                                new
+                                {
+                                    CurrencyId = fromCurrency.Id,
+                                    note.DenominationValue,
+                                    note.NoteCount
+                                },
+                                trans);
+                        }
+
+                        foreach (var note in dispensedNotes)
+                        {
+                            int rows = await db.ExecuteAsync(@"
+                                UPDATE atm_cash_denominations
+                                SET note_count = note_count - @NoteCount,
+                                    updated_at = GETDATE()
+                                WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                  AND currency_id = @CurrencyId
+                                  AND denomination_value = @DenominationValue
+                                  AND note_count >= @NoteCount",
+                                new
+                                {
+                                    CurrencyId = toCurrency.Id,
+                                    note.DenominationValue,
+                                    note.NoteCount
+                                },
+                                trans);
+
+                            if (rows != 1)
+                            {
+                                trans.Rollback();
+                                return null;
+                            }
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
+                            VALUES (NULL, 'Exchange', @Amount, @Description, GETDATE())",
+                            new { Amount = amountUzs, Description = description },
+                            trans);
+
+                        await SyncCashTotalsAsync(db, trans, fromCurrency.Id);
+                        await SyncCashTotalsAsync(db, trans, toCurrency.Id);
+                        trans.Commit();
+                        return dispensedNotes;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         internal static IEnumerable<CashNoteDto> NormalizeNotes(IEnumerable<CashNoteDto> notes)
         {
             return (notes ?? Enumerable.Empty<CashNoteDto>())
@@ -222,6 +346,40 @@ namespace Bank_ATM.Repositories
                     NoteCount = group.Sum(note => note.NoteCount)
                 })
                 .OrderByDescending(note => note.DenominationValue);
+        }
+
+        internal static IList<CashNoteDto> BuildDispenseBreakdown(decimal amount, IEnumerable<CashDenominationDto> denominations)
+        {
+            decimal remaining = decimal.Round(amount, 2);
+            var result = new List<CashNoteDto>();
+
+            foreach (var denomination in (denominations ?? Enumerable.Empty<CashDenominationDto>())
+                .OrderByDescending(d => d.DenominationValue))
+            {
+                if (denomination.NoteCount <= 0 || denomination.DenominationValue <= 0m)
+                {
+                    continue;
+                }
+
+                int needed = (int)Math.Floor(remaining / denomination.DenominationValue);
+                int selected = Math.Min(needed, denomination.NoteCount);
+                if (selected <= 0)
+                {
+                    continue;
+                }
+
+                result.Add(new CashNoteDto
+                {
+                    CurrencyId = denomination.CurrencyId,
+                    CurrencyCode = denomination.CurrencyCode,
+                    DenominationValue = denomination.DenominationValue,
+                    NoteCount = selected
+                });
+                remaining -= denomination.DenominationValue * selected;
+                remaining = decimal.Round(remaining, 2);
+            }
+
+            return remaining == 0m ? result : null;
         }
 
         internal static void SyncCashTotals(IDbConnection db, IDbTransaction trans, int currencyId)

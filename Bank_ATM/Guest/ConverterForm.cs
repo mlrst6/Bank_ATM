@@ -31,6 +31,8 @@ namespace Bank_ATM
         {
             AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
+            textBox1.ReadOnly = true;
+            textBox1.ShortcutsEnabled = false;
             SetupNumericKeypad();
             _currencies = new CurrencyRepository().GetActiveCurrencies().ToArray();
 

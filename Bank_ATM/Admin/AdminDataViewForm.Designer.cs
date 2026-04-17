@@ -54,7 +54,7 @@ namespace Bank_ATM.Admin
             this.lblSubtitle.AutoSize = true;
             this.lblSubtitle.Location = new System.Drawing.Point(27, 64);
             this.lblSubtitle.Name = "lblSubtitle";
-            this.lblSubtitle.Size = new System.Drawing.Size(227, 17);
+            this.lblSubtitle.Size = new System.Drawing.Size(226, 16);
             this.lblSubtitle.TabIndex = 2;
             this.lblSubtitle.Text = "Search, review, and manage records";
             // 
@@ -113,7 +113,7 @@ namespace Bank_ATM.Admin
             this.lblSearch.AutoSize = true;
             this.lblSearch.Location = new System.Drawing.Point(723, 22);
             this.lblSearch.Name = "lblSearch";
-            this.lblSearch.Size = new System.Drawing.Size(109, 17);
+            this.lblSearch.Size = new System.Drawing.Size(99, 16);
             this.lblSearch.TabIndex = 4;
             this.lblSearch.Text = "Search records";
             // 
@@ -122,14 +122,14 @@ namespace Bank_ATM.Admin
             this.lblResults.AutoSize = true;
             this.lblResults.Location = new System.Drawing.Point(27, 109);
             this.lblResults.Name = "lblResults";
-            this.lblResults.Size = new System.Drawing.Size(114, 17);
+            this.lblResults.Size = new System.Drawing.Size(102, 16);
             this.lblResults.TabIndex = 9;
             this.lblResults.Text = "0 results loaded";
             // 
             // AdminDataViewForm
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(1060, 705);
+            this.ClientSize = new System.Drawing.Size(1067, 702);
             this.Controls.Add(this.lblResults);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
@@ -146,6 +146,7 @@ namespace Bank_ATM.Admin
             this.Load += new System.EventHandler(this.AdminDataViewForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

@@ -1,8 +1,8 @@
 using System.Drawing;
 
-namespace Bank_ATM
+namespace Bank_ATM.User
 {
-    partial class PinEntryForm
+    partial class UserPinEntryForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -33,6 +33,7 @@ namespace Bank_ATM
             this.btn8 = new System.Windows.Forms.Button();
             this.btn9 = new System.Windows.Forms.Button();
             this.btn0 = new System.Windows.Forms.Button();
+            this.btnBack = new System.Windows.Forms.Button();
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
             this.pnlHeader.SuspendLayout();
@@ -44,12 +45,13 @@ namespace Bank_ATM
             this.txtPin.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPin.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
             this.txtPin.ForeColor = System.Drawing.Color.White;
-            this.txtPin.Location = new System.Drawing.Point(50, 90);
+            this.txtPin.Location = new System.Drawing.Point(262, 92);
             this.txtPin.MaxLength = 4;
+            this.txtPin.Multiline = true;
             this.txtPin.Name = "txtPin";
-            this.txtPin.PasswordChar = '●';
+            this.txtPin.PasswordChar = '*';
             this.txtPin.ReadOnly = true;
-            this.txtPin.Size = new System.Drawing.Size(240, 47);
+            this.txtPin.Size = new System.Drawing.Size(355, 66);
             this.txtPin.TabIndex = 0;
             this.txtPin.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -60,9 +62,9 @@ namespace Bank_ATM
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(50, 360);
+            this.btnLogin.Location = new System.Drawing.Point(262, 489);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(115, 50);
+            this.btnLogin.Size = new System.Drawing.Size(105, 69);
             this.btnLogin.TabIndex = 1;
             this.btnLogin.Text = "LOGIN";
             this.btnLogin.UseVisualStyleBackColor = false;
@@ -75,9 +77,9 @@ namespace Bank_ATM
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnClear.ForeColor = System.Drawing.Color.IndianRed;
-            this.btnClear.Location = new System.Drawing.Point(175, 360);
+            this.btnClear.Location = new System.Drawing.Point(507, 489);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(115, 50);
+            this.btnClear.Size = new System.Drawing.Size(105, 69);
             this.btnClear.TabIndex = 2;
             this.btnClear.Text = "CLEAR";
             this.btnClear.UseVisualStyleBackColor = false;
@@ -87,7 +89,7 @@ namespace Bank_ATM
             // 
             this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lblStatus.ForeColor = System.Drawing.Color.Silver;
-            this.lblStatus.Location = new System.Drawing.Point(50, 140);
+            this.lblStatus.Location = new System.Drawing.Point(317, 161);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(240, 25);
             this.lblStatus.TabIndex = 3;
@@ -100,12 +102,13 @@ namespace Bank_ATM
             this.btn1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn1.ForeColor = System.Drawing.Color.White;
-            this.btn1.Location = new System.Drawing.Point(50, 175);
+            this.btn1.Location = new System.Drawing.Point(262, 201);
             this.btn1.Name = "btn1";
-            this.btn1.Size = new System.Drawing.Size(70, 50);
+            this.btn1.Size = new System.Drawing.Size(105, 69);
             this.btn1.TabIndex = 4;
             this.btn1.Text = "1";
             this.btn1.UseVisualStyleBackColor = false;
+            this.btn1.Click += new System.EventHandler(this.btn1_Click);
             // 
             // btn2
             // 
@@ -113,9 +116,9 @@ namespace Bank_ATM
             this.btn2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn2.ForeColor = System.Drawing.Color.White;
-            this.btn2.Location = new System.Drawing.Point(135, 175);
+            this.btn2.Location = new System.Drawing.Point(383, 201);
             this.btn2.Name = "btn2";
-            this.btn2.Size = new System.Drawing.Size(70, 50);
+            this.btn2.Size = new System.Drawing.Size(105, 69);
             this.btn2.TabIndex = 5;
             this.btn2.Text = "2";
             this.btn2.UseVisualStyleBackColor = false;
@@ -126,9 +129,9 @@ namespace Bank_ATM
             this.btn3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn3.ForeColor = System.Drawing.Color.White;
-            this.btn3.Location = new System.Drawing.Point(220, 175);
+            this.btn3.Location = new System.Drawing.Point(507, 201);
             this.btn3.Name = "btn3";
-            this.btn3.Size = new System.Drawing.Size(70, 50);
+            this.btn3.Size = new System.Drawing.Size(105, 69);
             this.btn3.TabIndex = 6;
             this.btn3.Text = "3";
             this.btn3.UseVisualStyleBackColor = false;
@@ -139,9 +142,9 @@ namespace Bank_ATM
             this.btn4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn4.ForeColor = System.Drawing.Color.White;
-            this.btn4.Location = new System.Drawing.Point(50, 235);
+            this.btn4.Location = new System.Drawing.Point(262, 298);
             this.btn4.Name = "btn4";
-            this.btn4.Size = new System.Drawing.Size(70, 50);
+            this.btn4.Size = new System.Drawing.Size(105, 69);
             this.btn4.TabIndex = 7;
             this.btn4.Text = "4";
             this.btn4.UseVisualStyleBackColor = false;
@@ -152,9 +155,9 @@ namespace Bank_ATM
             this.btn5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn5.ForeColor = System.Drawing.Color.White;
-            this.btn5.Location = new System.Drawing.Point(135, 235);
+            this.btn5.Location = new System.Drawing.Point(383, 298);
             this.btn5.Name = "btn5";
-            this.btn5.Size = new System.Drawing.Size(70, 50);
+            this.btn5.Size = new System.Drawing.Size(105, 69);
             this.btn5.TabIndex = 8;
             this.btn5.Text = "5";
             this.btn5.UseVisualStyleBackColor = false;
@@ -165,9 +168,9 @@ namespace Bank_ATM
             this.btn6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn6.ForeColor = System.Drawing.Color.White;
-            this.btn6.Location = new System.Drawing.Point(220, 235);
+            this.btn6.Location = new System.Drawing.Point(507, 298);
             this.btn6.Name = "btn6";
-            this.btn6.Size = new System.Drawing.Size(70, 50);
+            this.btn6.Size = new System.Drawing.Size(105, 69);
             this.btn6.TabIndex = 9;
             this.btn6.Text = "6";
             this.btn6.UseVisualStyleBackColor = false;
@@ -178,9 +181,9 @@ namespace Bank_ATM
             this.btn7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn7.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn7.ForeColor = System.Drawing.Color.White;
-            this.btn7.Location = new System.Drawing.Point(50, 295);
+            this.btn7.Location = new System.Drawing.Point(262, 393);
             this.btn7.Name = "btn7";
-            this.btn7.Size = new System.Drawing.Size(70, 50);
+            this.btn7.Size = new System.Drawing.Size(105, 69);
             this.btn7.TabIndex = 10;
             this.btn7.Text = "7";
             this.btn7.UseVisualStyleBackColor = false;
@@ -191,9 +194,9 @@ namespace Bank_ATM
             this.btn8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn8.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn8.ForeColor = System.Drawing.Color.White;
-            this.btn8.Location = new System.Drawing.Point(135, 295);
+            this.btn8.Location = new System.Drawing.Point(383, 393);
             this.btn8.Name = "btn8";
-            this.btn8.Size = new System.Drawing.Size(70, 50);
+            this.btn8.Size = new System.Drawing.Size(105, 69);
             this.btn8.TabIndex = 11;
             this.btn8.Text = "8";
             this.btn8.UseVisualStyleBackColor = false;
@@ -204,9 +207,9 @@ namespace Bank_ATM
             this.btn9.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn9.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn9.ForeColor = System.Drawing.Color.White;
-            this.btn9.Location = new System.Drawing.Point(220, 295);
+            this.btn9.Location = new System.Drawing.Point(507, 393);
             this.btn9.Name = "btn9";
-            this.btn9.Size = new System.Drawing.Size(70, 50);
+            this.btn9.Size = new System.Drawing.Size(105, 69);
             this.btn9.TabIndex = 12;
             this.btn9.Text = "9";
             this.btn9.UseVisualStyleBackColor = false;
@@ -217,13 +220,27 @@ namespace Bank_ATM
             this.btn0.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn0.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btn0.ForeColor = System.Drawing.Color.White;
-            this.btn0.Location = new System.Drawing.Point(135, 355);
+            this.btn0.Location = new System.Drawing.Point(383, 489);
             this.btn0.Name = "btn0";
-            this.btn0.Size = new System.Drawing.Size(70, 50);
+            this.btn0.Size = new System.Drawing.Size(105, 69);
             this.btn0.TabIndex = 13;
             this.btn0.Text = "0";
             this.btn0.UseVisualStyleBackColor = false;
-            this.btn0.Visible = false;
+            // 
+            // btnBack
+            // 
+            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.btnBack.FlatAppearance.BorderColor = System.Drawing.Color.IndianRed;
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnBack.ForeColor = System.Drawing.Color.IndianRed;
+            this.btnBack.Location = new System.Drawing.Point(312, 575);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(247, 46);
+            this.btnBack.TabIndex = 14;
+            this.btnBack.Text = "BACK";
+            this.btnBack.UseVisualStyleBackColor = false;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
             // pnlHeader
             // 
@@ -232,7 +249,7 @@ namespace Bank_ATM
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(340, 70);
+            this.pnlHeader.Size = new System.Drawing.Size(900, 70);
             this.pnlHeader.TabIndex = 14;
             // 
             // lblTitle
@@ -242,19 +259,21 @@ namespace Bank_ATM
             this.lblTitle.ForeColor = System.Drawing.Color.White;
             this.lblTitle.Location = new System.Drawing.Point(0, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(340, 70);
+            this.lblTitle.Size = new System.Drawing.Size(900, 70);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "PIN Entry";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblTitle.Click += new System.EventHandler(this.lblTitle_Click);
             // 
-            // PinEntryForm
+            // UserPinEntryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(340, 450);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.ControlBox = false;
             this.Controls.Add(this.pnlHeader);
+            this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btn0);
             this.Controls.Add(this.btn9);
             this.Controls.Add(this.btn8);
@@ -270,10 +289,10 @@ namespace Bank_ATM
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtPin);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "PinEntryForm";
+            this.Name = "UserPinEntryForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "PIN Entry";
-            this.Load += new System.EventHandler(this.PinEntryForm_Load);
+            this.Load += new System.EventHandler(this.UserPinEntryForm_Load);
             this.pnlHeader.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -296,6 +315,7 @@ namespace Bank_ATM
         private System.Windows.Forms.Button btn8;
         private System.Windows.Forms.Button btn9;
         private System.Windows.Forms.Button btn0;
+        private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTitle;
     }

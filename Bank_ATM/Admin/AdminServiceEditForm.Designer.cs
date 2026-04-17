@@ -41,7 +41,7 @@ namespace Bank_ATM.Admin
             this.lblTitle.AutoSize = true;
             this.lblTitle.Location = new System.Drawing.Point(30, 26);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(94, 17);
+            this.lblTitle.Size = new System.Drawing.Size(96, 16);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Create Service";
             // 
@@ -50,7 +50,7 @@ namespace Bank_ATM.Admin
             this.lblSubtitle.AutoSize = true;
             this.lblSubtitle.Location = new System.Drawing.Point(30, 58);
             this.lblSubtitle.Name = "lblSubtitle";
-            this.lblSubtitle.Size = new System.Drawing.Size(255, 17);
+            this.lblSubtitle.Size = new System.Drawing.Size(272, 16);
             this.lblSubtitle.TabIndex = 1;
             this.lblSubtitle.Text = "Set up a service users can pay from the ATM";
             // 
@@ -59,7 +59,7 @@ namespace Bank_ATM.Admin
             this.lblServiceName.AutoSize = true;
             this.lblServiceName.Location = new System.Drawing.Point(30, 112);
             this.lblServiceName.Name = "lblServiceName";
-            this.lblServiceName.Size = new System.Drawing.Size(91, 17);
+            this.lblServiceName.Size = new System.Drawing.Size(90, 16);
             this.lblServiceName.TabIndex = 2;
             this.lblServiceName.Text = "Service name";
             // 
@@ -75,7 +75,7 @@ namespace Bank_ATM.Admin
             this.lblCategory.AutoSize = true;
             this.lblCategory.Location = new System.Drawing.Point(30, 176);
             this.lblCategory.Name = "lblCategory";
-            this.lblCategory.Size = new System.Drawing.Size(65, 17);
+            this.lblCategory.Size = new System.Drawing.Size(62, 16);
             this.lblCategory.TabIndex = 4;
             this.lblCategory.Text = "Category";
             // 
@@ -92,7 +92,7 @@ namespace Bank_ATM.Admin
             this.lblAccountHint.AutoSize = true;
             this.lblAccountHint.Location = new System.Drawing.Point(30, 240);
             this.lblAccountHint.Name = "lblAccountHint";
-            this.lblAccountHint.Size = new System.Drawing.Size(111, 17);
+            this.lblAccountHint.Size = new System.Drawing.Size(120, 16);
             this.lblAccountHint.TabIndex = 6;
             this.lblAccountHint.Text = "Payment reference";
             // 
@@ -108,7 +108,7 @@ namespace Bank_ATM.Admin
             this.lblHint.AutoSize = true;
             this.lblHint.Location = new System.Drawing.Point(33, 288);
             this.lblHint.Name = "lblHint";
-            this.lblHint.Size = new System.Drawing.Size(280, 17);
+            this.lblHint.Size = new System.Drawing.Size(280, 16);
             this.lblHint.TabIndex = 8;
             this.lblHint.Text = "Example: phone number, subscriber ID, meter.";
             // 
@@ -117,7 +117,7 @@ namespace Bank_ATM.Admin
             this.lblValidReferences.AutoSize = true;
             this.lblValidReferences.Location = new System.Drawing.Point(30, 322);
             this.lblValidReferences.Name = "lblValidReferences";
-            this.lblValidReferences.Size = new System.Drawing.Size(138, 17);
+            this.lblValidReferences.Size = new System.Drawing.Size(140, 16);
             this.lblValidReferences.TabIndex = 9;
             this.lblValidReferences.Text = "User service accounts";
             // 
@@ -168,14 +168,14 @@ namespace Bank_ATM.Admin
             this.chkIsActive.AutoSize = true;
             this.chkIsActive.Location = new System.Drawing.Point(33, 534);
             this.chkIsActive.Name = "chkIsActive";
-            this.chkIsActive.Size = new System.Drawing.Size(100, 21);
+            this.chkIsActive.Size = new System.Drawing.Size(113, 20);
             this.chkIsActive.TabIndex = 13;
             this.chkIsActive.Text = "Active service";
             this.chkIsActive.UseVisualStyleBackColor = true;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(189, 582);
+            this.btnSave.Location = new System.Drawing.Point(174, 549);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(128, 42);
             this.btnSave.TabIndex = 14;
@@ -185,7 +185,7 @@ namespace Bank_ATM.Admin
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(327, 582);
+            this.btnCancel.Location = new System.Drawing.Point(327, 549);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(128, 42);
             this.btnCancel.TabIndex = 15;
@@ -195,7 +195,7 @@ namespace Bank_ATM.Admin
             // 
             // AdminServiceEditForm
             // 
-            this.ClientSize = new System.Drawing.Size(492, 650);
+            this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkIsActive);

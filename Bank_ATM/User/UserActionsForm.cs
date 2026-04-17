@@ -32,6 +32,8 @@ namespace Bank_ATM.User
             btnTransfer.Text = LanguageManager.GetString("Transfer");
             btnServices.Text = LanguageManager.GetString("PayServices");
             btnBalance.Text = LanguageManager.GetString("ViewBalance");
+            btnSettings.Text = LanguageManager.GetString("UserSettings");
+            btnBack.Text = LanguageManager.GetString("Back");
             btnLogout.Text = LanguageManager.GetString("Logout");
         }
 
@@ -161,7 +163,21 @@ namespace Bank_ATM.User
             }
         }
 
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            using (var form = new UserSettingsForm())
+            {
+                form.ShowDialog(this);
+            }
+        }
+
         private void btnLogout_Click(object sender, EventArgs e)
+        {
+            _authenticationService.Logout();
+            FormNavigator.ShowExistingOrNew<MainForm>(this);
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
         {
             _authenticationService.Logout();
             FormNavigator.ShowExistingOrNew<MainForm>(this);
@@ -269,6 +285,8 @@ namespace Bank_ATM.User
             StyleActionButton(btnTransfer, Color.FromArgb(124, 58, 237));
             StyleActionButton(btnServices, Color.FromArgb(22, 163, 74));
             StyleActionButton(btnBalance, Color.FromArgb(234, 88, 12));
+            StyleActionButton(btnSettings, Color.FromArgb(79, 70, 229));
+            StyleActionButton(btnBack, Color.FromArgb(71, 85, 105));
             StyleActionButton(btnLogout, Color.FromArgb(71, 85, 105));
         }
 

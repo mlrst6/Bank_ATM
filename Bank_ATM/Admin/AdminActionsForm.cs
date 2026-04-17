@@ -97,7 +97,8 @@ namespace Bank_ATM.Admin
                 LanguageManager.GetString("RefillAtmCash"),
                 LanguageManager.GetString("RefillCashNotesSubtitle"),
                 currencies,
-                code => _adminService.GetCashDenominations(code).ToArray()))
+                code => _adminService.GetCashDenominations(code).ToArray(),
+                true))
             {
                 if (dialog.ShowDialog(this) != DialogResult.OK)
                 {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
+using Bank_ATM.UI;
 
 namespace Bank_ATM.Admin
 {
@@ -25,6 +26,7 @@ namespace Bank_ATM.Admin
             lblReference.Text = _service.AccountHint;
             btnSave.Text = LanguageManager.GetString("Save");
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            NumericInputDialog.Attach(txtReference, _service.AccountHint);
 
             var users = (await _adminService.GetAllUsersAsync())
                 .Where(user => user.IsActive && user.Role == "User")

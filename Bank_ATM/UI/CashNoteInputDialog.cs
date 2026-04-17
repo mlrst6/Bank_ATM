@@ -12,6 +12,7 @@ namespace Bank_ATM.UI
     {
         private readonly CurrencyDto[] _currencies;
         private readonly Func<string, CashDenominationDto[]> _denominationProvider;
+        private readonly bool _showAvailableNotes;
         private readonly List<NoteInputRow> _rows = new List<NoteInputRow>();
 
         private Label _titleLabel;
@@ -32,10 +33,12 @@ namespace Bank_ATM.UI
             string title,
             string subtitle,
             CurrencyDto[] currencies,
-            Func<string, CashDenominationDto[]> denominationProvider)
+            Func<string, CashDenominationDto[]> denominationProvider,
+            bool showAvailableNotes = false)
         {
             _currencies = currencies ?? new CurrencyDto[0];
             _denominationProvider = denominationProvider ?? (_ => new CashDenominationDto[0]);
+            _showAvailableNotes = showAvailableNotes;
             InitializeComponent(title, subtitle);
         }
 
@@ -183,7 +186,7 @@ namespace Bank_ATM.UI
                 {
                     Text = denomination.DenominationValue.ToString("N0", CultureInfo.CurrentCulture) + " " + currency.Code,
                     Location = new Point(16, y + 8),
-                    Size = new Size(220, 24),
+                    Size = new Size(_showAvailableNotes ? 220 : 330, 24),
                     ForeColor = Color.White
                 };
 
@@ -208,9 +211,15 @@ namespace Bank_ATM.UI
                 };
                 countTextBox.KeyPress += CountTextBox_KeyPress;
                 countTextBox.TextChanged += (s, e) => UpdateTotal();
+                NumericInputDialog.Attach(
+                    countTextBox,
+                    denomination.DenominationValue.ToString("N0", CultureInfo.CurrentCulture) + " " + currency.Code);
 
                 _notesPanel.Controls.Add(valueLabel);
-                _notesPanel.Controls.Add(availableLabel);
+                if (_showAvailableNotes)
+                {
+                    _notesPanel.Controls.Add(availableLabel);
+                }
                 _notesPanel.Controls.Add(countTextBox);
                 _rows.Add(new NoteInputRow(denomination, countTextBox));
                 y += 42;

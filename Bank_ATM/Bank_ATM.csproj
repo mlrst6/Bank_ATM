@@ -121,6 +121,9 @@
     <Compile Include="User\UserOperationDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="User\UserSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="User\UserActionsForm.Designer.cs">
       <DependentUpon>UserActionsForm.cs</DependentUpon>
     </Compile>
@@ -142,11 +145,14 @@
     <Compile Include="Guest\ExchangeRateForm.Designer.cs">
       <DependentUpon>ExchangeRateForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Guest\GuestForm.cs">
+    <Compile Include="Guest\GuestExchangeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Guest\GuestForm.Designer.cs">
-      <DependentUpon>GuestForm.cs</DependentUpon>
+    <Compile Include="User\UserCardEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\UserCardEntryForm.Designer.cs">
+      <DependentUpon>UserCardEntryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Guest\GuestActionsForm.cs">
       <SubType>Form</SubType>
@@ -173,11 +179,11 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Guest\PinEntryForm.cs">
+    <Compile Include="User\UserPinEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Guest\PinEntryForm.Designer.cs">
-      <DependentUpon>PinEntryForm.cs</DependentUpon>
+    <Compile Include="User\UserPinEntryForm.Designer.cs">
+      <DependentUpon>UserPinEntryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\AppWindow.cs" />
     <Compile Include="Core\AudioManager.cs" />
@@ -189,12 +195,16 @@
     <Compile Include="Services\ServiceResults.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
     <Compile Include="Services\BankingService.cs" />
+    <Compile Include="Services\GuestExchangeService.cs" />
     <Compile Include="Services\AdminService.cs" />
     <Compile Include="UI\RoundedButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\ModernKeypad.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\NumericInputDialog.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\CashNoteInputDialog.cs">
       <SubType>Form</SubType>
@@ -218,6 +228,30 @@
     </Compile>
     <Compile Include="Config.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Admin\AdminActionsForm.resx">
+      <DependentUpon>AdminActionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminCardEditForm.resx">
+      <DependentUpon>AdminCardEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminCurrencyEditForm.resx">
+      <DependentUpon>AdminCurrencyEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminDataViewForm.resx">
+      <DependentUpon>AdminDataViewForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminLoginForm.resx">
+      <DependentUpon>AdminLoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminServiceAccountEditForm.resx">
+      <DependentUpon>AdminServiceAccountEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminServiceEditForm.resx">
+      <DependentUpon>AdminServiceEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\AdminUserEditForm.resx">
+      <DependentUpon>AdminUserEditForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Guest\ConverterForm.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -227,14 +261,23 @@
     <EmbeddedResource Include="Guest\ExchangeRateForm.resx">
       <DependentUpon>ExchangeRateForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Guest\GuestForm.resx">
-      <DependentUpon>GuestForm.cs</DependentUpon>
+    <EmbeddedResource Include="Guest\GuestActionsForm.resx">
+      <DependentUpon>GuestActionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User\UserCardEntryForm.resx">
+      <DependentUpon>UserCardEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User\UserPinEntryForm.resx">
+      <DependentUpon>UserPinEntryForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LanguageForm1.resx">
       <DependentUpon>LanguageForm1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments\ServicePaymentForm.resx">
+      <DependentUpon>ServicePaymentForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

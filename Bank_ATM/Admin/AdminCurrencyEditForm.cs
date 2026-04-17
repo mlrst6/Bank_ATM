@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
+using Bank_ATM.UI;
 
 namespace Bank_ATM.Admin
 {
@@ -29,6 +30,9 @@ namespace Bank_ATM.Admin
         private void AdminCurrencyEditForm_Load(object sender, EventArgs e)
         {
             ApplyTheme();
+            NumericInputDialog.Attach(txtRateToUzs, lblRateToUzs.Text, true);
+            NumericInputDialog.Attach(txtCashAvailable, lblCashAvailable.Text, true);
+            NumericInputDialog.Attach(txtDenominations, lblDenominations.Text, true, true);
             lblTitle.Text = _isEdit ? "Edit Currency" : "Create Currency";
             btnSave.Text = LanguageManager.GetString("Save");
             btnCancel.Text = LanguageManager.GetString("Cancel");

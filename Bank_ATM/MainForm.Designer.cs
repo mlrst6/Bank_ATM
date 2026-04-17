@@ -37,7 +37,7 @@ namespace Bank_ATM
             this.MainFormGuest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.MainFormGuest.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.MainFormGuest.ForeColor = System.Drawing.Color.White;
-            this.MainFormGuest.Location = new System.Drawing.Point(60, 130);
+            this.MainFormGuest.Location = new System.Drawing.Point(110, 236);
             this.MainFormGuest.Name = "MainFormGuest";
             this.MainFormGuest.Size = new System.Drawing.Size(320, 110);
             this.MainFormGuest.TabIndex = 0;
@@ -54,7 +54,7 @@ namespace Bank_ATM
             this.MainFormUser.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.MainFormUser.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.MainFormUser.ForeColor = System.Drawing.Color.White;
-            this.MainFormUser.Location = new System.Drawing.Point(420, 130);
+            this.MainFormUser.Location = new System.Drawing.Point(470, 236);
             this.MainFormUser.Name = "MainFormUser";
             this.MainFormUser.Size = new System.Drawing.Size(320, 110);
             this.MainFormUser.TabIndex = 1;
@@ -71,7 +71,7 @@ namespace Bank_ATM
             this.MainFormAdmin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.MainFormAdmin.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.MainFormAdmin.ForeColor = System.Drawing.Color.White;
-            this.MainFormAdmin.Location = new System.Drawing.Point(60, 260);
+            this.MainFormAdmin.Location = new System.Drawing.Point(110, 366);
             this.MainFormAdmin.Name = "MainFormAdmin";
             this.MainFormAdmin.Size = new System.Drawing.Size(320, 110);
             this.MainFormAdmin.TabIndex = 2;
@@ -88,7 +88,7 @@ namespace Bank_ATM
             this.Back.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Back.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.Back.ForeColor = System.Drawing.Color.IndianRed;
-            this.Back.Location = new System.Drawing.Point(420, 260);
+            this.Back.Location = new System.Drawing.Point(470, 366);
             this.Back.Name = "Back";
             this.Back.Size = new System.Drawing.Size(320, 110);
             this.Back.TabIndex = 3;
@@ -103,7 +103,7 @@ namespace Bank_ATM
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(800, 80);
+            this.pnlHeader.Size = new System.Drawing.Size(900, 80);
             this.pnlHeader.TabIndex = 4;
             // 
             // MainFormInfo
@@ -113,7 +113,7 @@ namespace Bank_ATM
             this.MainFormInfo.ForeColor = System.Drawing.Color.White;
             this.MainFormInfo.Location = new System.Drawing.Point(0, 0);
             this.MainFormInfo.Name = "MainFormInfo";
-            this.MainFormInfo.Size = new System.Drawing.Size(800, 80);
+            this.MainFormInfo.Size = new System.Drawing.Size(900, 80);
             this.MainFormInfo.TabIndex = 0;
             this.MainFormInfo.Text = "ATM Terminal";
             this.MainFormInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -123,7 +123,7 @@ namespace Bank_ATM
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.ControlBox = false;
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.Back);

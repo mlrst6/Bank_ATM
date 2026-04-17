@@ -16,8 +16,8 @@ namespace Bank_ATM.Admin
         private void InitializeComponent()
         {
             this.pnlHeader = new System.Windows.Forms.Panel();
-            this.lblDialogTitle = new System.Windows.Forms.Label();
             this.lblDialogSubtitle = new System.Windows.Forms.Label();
+            this.lblDialogTitle = new System.Windows.Forms.Label();
             this.cmbUsers = new System.Windows.Forms.ComboBox();
             this.txtCardNumber = new System.Windows.Forms.TextBox();
             this.txtPin = new System.Windows.Forms.TextBox();
@@ -42,23 +42,23 @@ namespace Bank_ATM.Admin
             this.pnlHeader.Size = new System.Drawing.Size(432, 72);
             this.pnlHeader.TabIndex = 0;
             // 
-            // lblDialogTitle
-            // 
-            this.lblDialogTitle.AutoSize = true;
-            this.lblDialogTitle.Location = new System.Drawing.Point(18, 12);
-            this.lblDialogTitle.Name = "lblDialogTitle";
-            this.lblDialogTitle.Size = new System.Drawing.Size(91, 17);
-            this.lblDialogTitle.TabIndex = 0;
-            this.lblDialogTitle.Text = "Payment Card";
-            // 
             // lblDialogSubtitle
             // 
             this.lblDialogSubtitle.AutoSize = true;
             this.lblDialogSubtitle.Location = new System.Drawing.Point(18, 41);
             this.lblDialogSubtitle.Name = "lblDialogSubtitle";
-            this.lblDialogSubtitle.Size = new System.Drawing.Size(219, 17);
+            this.lblDialogSubtitle.Size = new System.Drawing.Size(248, 16);
             this.lblDialogSubtitle.TabIndex = 1;
             this.lblDialogSubtitle.Text = "Link a card to an account and set access";
+            // 
+            // lblDialogTitle
+            // 
+            this.lblDialogTitle.AutoSize = true;
+            this.lblDialogTitle.Location = new System.Drawing.Point(18, 12);
+            this.lblDialogTitle.Name = "lblDialogTitle";
+            this.lblDialogTitle.Size = new System.Drawing.Size(92, 16);
+            this.lblDialogTitle.TabIndex = 0;
+            this.lblDialogTitle.Text = "Payment Card";
             // 
             // cmbUsers
             // 
@@ -91,7 +91,7 @@ namespace Bank_ATM.Admin
             this.chkBlocked.AutoSize = true;
             this.chkBlocked.Location = new System.Drawing.Point(176, 344);
             this.chkBlocked.Name = "chkBlocked";
-            this.chkBlocked.Size = new System.Drawing.Size(80, 21);
+            this.chkBlocked.Size = new System.Drawing.Size(79, 20);
             this.chkBlocked.TabIndex = 5;
             this.chkBlocked.Text = "Blocked";
             this.chkBlocked.UseVisualStyleBackColor = true;
@@ -129,7 +129,7 @@ namespace Bank_ATM.Admin
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(34, 127);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(40, 17);
+            this.label1.Size = new System.Drawing.Size(39, 16);
             this.label1.TabIndex = 8;
             this.label1.Text = "User:";
             // 
@@ -138,7 +138,7 @@ namespace Bank_ATM.Admin
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(34, 183);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(96, 17);
+            this.label2.Size = new System.Drawing.Size(90, 16);
             this.label2.TabIndex = 9;
             this.label2.Text = "Card Number:";
             // 
@@ -147,7 +147,7 @@ namespace Bank_ATM.Admin
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(34, 239);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(34, 17);
+            this.label3.Size = new System.Drawing.Size(32, 16);
             this.label3.TabIndex = 10;
             this.label3.Text = "PIN:";
             // 
@@ -156,7 +156,7 @@ namespace Bank_ATM.Admin
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(34, 295);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(84, 17);
+            this.label4.Size = new System.Drawing.Size(79, 16);
             this.label4.TabIndex = 11;
             this.label4.Text = "Expiry Date:";
             // 
@@ -167,13 +167,13 @@ namespace Bank_ATM.Admin
             this.lblPinNote.ForeColor = System.Drawing.Color.Gray;
             this.lblPinNote.Location = new System.Drawing.Point(173, 262);
             this.lblPinNote.Name = "lblPinNote";
-            this.lblPinNote.Size = new System.Drawing.Size(166, 15);
+            this.lblPinNote.Size = new System.Drawing.Size(179, 15);
             this.lblPinNote.TabIndex = 12;
             this.lblPinNote.Text = "Use exactly 4 digits for ATM PIN";
             // 
             // AdminCardEditForm
             // 
-            this.ClientSize = new System.Drawing.Size(484, 460);
+            this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.lblPinNote);
             this.Controls.Add(this.label4);

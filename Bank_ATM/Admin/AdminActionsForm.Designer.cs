@@ -48,7 +48,7 @@ namespace Bank_ATM.Admin
             this.lblAdminTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold);
             this.lblAdminTitle.Location = new System.Drawing.Point(36, 28);
             this.lblAdminTitle.Name = "lblAdminTitle";
-            this.lblAdminTitle.Size = new System.Drawing.Size(110, 24);
+            this.lblAdminTitle.Size = new System.Drawing.Size(184, 29);
             this.lblAdminTitle.TabIndex = 0;
             this.lblAdminTitle.Text = "ADMIN PANEL";
             // 
@@ -57,7 +57,7 @@ namespace Bank_ATM.Admin
             this.lblAdminSubtitle.AutoSize = true;
             this.lblAdminSubtitle.Location = new System.Drawing.Point(39, 65);
             this.lblAdminSubtitle.Name = "lblAdminSubtitle";
-            this.lblAdminSubtitle.Size = new System.Drawing.Size(224, 17);
+            this.lblAdminSubtitle.Size = new System.Drawing.Size(220, 16);
             this.lblAdminSubtitle.TabIndex = 1;
             this.lblAdminSubtitle.Text = "Manage customers, cards, and logs";
             // 
@@ -75,7 +75,7 @@ namespace Bank_ATM.Admin
             this.lblUsersCount.AutoSize = true;
             this.lblUsersCount.Location = new System.Drawing.Point(18, 18);
             this.lblUsersCount.Name = "lblUsersCount";
-            this.lblUsersCount.Size = new System.Drawing.Size(24, 17);
+            this.lblUsersCount.Size = new System.Drawing.Size(21, 16);
             this.lblUsersCount.TabIndex = 1;
             this.lblUsersCount.Text = "00";
             // 
@@ -84,7 +84,7 @@ namespace Bank_ATM.Admin
             this.lblUsersCaption.AutoSize = true;
             this.lblUsersCaption.Location = new System.Drawing.Point(18, 72);
             this.lblUsersCaption.Name = "lblUsersCaption";
-            this.lblUsersCaption.Size = new System.Drawing.Size(80, 17);
+            this.lblUsersCaption.Size = new System.Drawing.Size(74, 16);
             this.lblUsersCaption.TabIndex = 0;
             this.lblUsersCaption.Text = "Total users";
             // 
@@ -102,7 +102,7 @@ namespace Bank_ATM.Admin
             this.lblCardsCount.AutoSize = true;
             this.lblCardsCount.Location = new System.Drawing.Point(18, 18);
             this.lblCardsCount.Name = "lblCardsCount";
-            this.lblCardsCount.Size = new System.Drawing.Size(24, 17);
+            this.lblCardsCount.Size = new System.Drawing.Size(21, 16);
             this.lblCardsCount.TabIndex = 1;
             this.lblCardsCount.Text = "00";
             // 
@@ -111,7 +111,7 @@ namespace Bank_ATM.Admin
             this.lblCardsCaption.AutoSize = true;
             this.lblCardsCaption.Location = new System.Drawing.Point(18, 72);
             this.lblCardsCaption.Name = "lblCardsCaption";
-            this.lblCardsCaption.Size = new System.Drawing.Size(79, 17);
+            this.lblCardsCaption.Size = new System.Drawing.Size(81, 16);
             this.lblCardsCaption.TabIndex = 0;
             this.lblCardsCaption.Text = "Active cards";
             // 
@@ -129,7 +129,7 @@ namespace Bank_ATM.Admin
             this.lblServicesCount.AutoSize = true;
             this.lblServicesCount.Location = new System.Drawing.Point(18, 18);
             this.lblServicesCount.Name = "lblServicesCount";
-            this.lblServicesCount.Size = new System.Drawing.Size(24, 17);
+            this.lblServicesCount.Size = new System.Drawing.Size(21, 16);
             this.lblServicesCount.TabIndex = 1;
             this.lblServicesCount.Text = "00";
             // 
@@ -138,7 +138,7 @@ namespace Bank_ATM.Admin
             this.lblServicesCaption.AutoSize = true;
             this.lblServicesCaption.Location = new System.Drawing.Point(18, 72);
             this.lblServicesCaption.Name = "lblServicesCaption";
-            this.lblServicesCaption.Size = new System.Drawing.Size(98, 17);
+            this.lblServicesCaption.Size = new System.Drawing.Size(98, 16);
             this.lblServicesCaption.TabIndex = 0;
             this.lblServicesCaption.Text = "Active services";
             // 
@@ -156,7 +156,7 @@ namespace Bank_ATM.Admin
             this.lblTransactionsCount.AutoSize = true;
             this.lblTransactionsCount.Location = new System.Drawing.Point(18, 18);
             this.lblTransactionsCount.Name = "lblTransactionsCount";
-            this.lblTransactionsCount.Size = new System.Drawing.Size(24, 17);
+            this.lblTransactionsCount.Size = new System.Drawing.Size(21, 16);
             this.lblTransactionsCount.TabIndex = 1;
             this.lblTransactionsCount.Text = "00";
             // 
@@ -165,7 +165,7 @@ namespace Bank_ATM.Admin
             this.lblTransactionsCaption.AutoSize = true;
             this.lblTransactionsCaption.Location = new System.Drawing.Point(18, 72);
             this.lblTransactionsCaption.Name = "lblTransactionsCaption";
-            this.lblTransactionsCaption.Size = new System.Drawing.Size(123, 17);
+            this.lblTransactionsCaption.Size = new System.Drawing.Size(125, 16);
             this.lblTransactionsCaption.TabIndex = 0;
             this.lblTransactionsCaption.Text = "Recent transactions";
             // 
@@ -241,7 +241,7 @@ namespace Bank_ATM.Admin
             // 
             // AdminActionsForm
             // 
-            this.ClientSize = new System.Drawing.Size(860, 500);
+            this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.btnLogout);
             this.Controls.Add(this.btnRefillAtm);
             this.Controls.Add(this.btnManageCurrencies);
@@ -269,6 +269,7 @@ namespace Bank_ATM.Admin
             this.pnlTransactions.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         private System.Windows.Forms.Label lblAdminTitle;

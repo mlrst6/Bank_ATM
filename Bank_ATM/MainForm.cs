@@ -39,7 +39,7 @@ namespace Bank_ATM
 
         private void MainFormUser_Click(object sender, EventArgs e)
         {
-            NavigateTo(new GuestForm("MainFormUser"));
+            NavigateTo(new User.UserCardEntryForm("MainFormUser"));
         }
 
         private void MainFormAdmin_Click(object sender, EventArgs e)

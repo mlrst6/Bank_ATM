@@ -32,6 +32,8 @@ namespace Bank_ATM.User
             this.btnTransfer = new System.Windows.Forms.Button();
             this.btnServices = new System.Windows.Forms.Button();
             this.btnBalance = new System.Windows.Forms.Button();
+            this.btnSettings = new System.Windows.Forms.Button();
+            this.btnBack = new System.Windows.Forms.Button();
             this.btnLogout = new System.Windows.Forms.Button();
             this.pnlHeader.SuspendLayout();
             this.pnlAccountCard.SuspendLayout();
@@ -201,12 +203,32 @@ namespace Bank_ATM.User
             this.btnBalance.UseVisualStyleBackColor = true;
             this.btnBalance.Click += new System.EventHandler(this.btnBalance_Click);
             // 
+            // btnSettings
+            // 
+            this.btnSettings.Location = new System.Drawing.Point(28, 540);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Size = new System.Drawing.Size(220, 48);
+            this.btnSettings.TabIndex = 6;
+            this.btnSettings.Text = "Settings";
+            this.btnSettings.UseVisualStyleBackColor = true;
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
+            // 
+            // btnBack
+            // 
+            this.btnBack.Location = new System.Drawing.Point(282, 540);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(180, 48);
+            this.btnBack.TabIndex = 7;
+            this.btnBack.Text = "Back";
+            this.btnBack.UseVisualStyleBackColor = true;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
+            // 
             // btnLogout
             // 
             this.btnLogout.Location = new System.Drawing.Point(576, 540);
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.Size = new System.Drawing.Size(180, 48);
-            this.btnLogout.TabIndex = 6;
+            this.btnLogout.TabIndex = 8;
             this.btnLogout.Text = "Logout";
             this.btnLogout.UseVisualStyleBackColor = true;
             this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
@@ -217,6 +239,8 @@ namespace Bank_ATM.User
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 621);
             this.Controls.Add(this.btnLogout);
+            this.Controls.Add(this.btnBack);
+            this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.btnServices);
             this.Controls.Add(this.btnBalance);
             this.Controls.Add(this.btnTransfer);
@@ -252,6 +276,8 @@ namespace Bank_ATM.User
         private System.Windows.Forms.Button btnTransfer;
         private System.Windows.Forms.Button btnServices;
         private System.Windows.Forms.Button btnBalance;
+        private System.Windows.Forms.Button btnSettings;
+        private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Button btnLogout;
     }
 }

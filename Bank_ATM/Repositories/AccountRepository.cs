@@ -641,6 +641,8 @@ namespace Bank_ATM.Repositories
                         role,
                         username,
                         password_hash as PasswordHash,
+                        phone_number as PhoneNumber,
+                        created_at as CreatedAt,
                         is_active as IsActive
                     FROM users
                     WHERE id = @UserId AND is_active = 1", new { UserId = userId });

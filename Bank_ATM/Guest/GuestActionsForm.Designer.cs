@@ -29,9 +29,9 @@ namespace Bank_ATM
             this.btnExchange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExchange.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.btnExchange.ForeColor = System.Drawing.Color.White;
-            this.btnExchange.Location = new System.Drawing.Point(50, 110);
+            this.btnExchange.Location = new System.Drawing.Point(60, 230);
             this.btnExchange.Name = "btnExchange";
-            this.btnExchange.Size = new System.Drawing.Size(350, 70);
+            this.btnExchange.Size = new System.Drawing.Size(350, 118);
             this.btnExchange.TabIndex = 0;
             this.btnExchange.Text = "EXCHANGE";
             this.btnExchange.UseVisualStyleBackColor = false;
@@ -43,9 +43,9 @@ namespace Bank_ATM
             this.btnPayServices.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPayServices.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.btnPayServices.ForeColor = System.Drawing.Color.White;
-            this.btnPayServices.Location = new System.Drawing.Point(50, 200);
+            this.btnPayServices.Location = new System.Drawing.Point(484, 230);
             this.btnPayServices.Name = "btnPayServices";
-            this.btnPayServices.Size = new System.Drawing.Size(350, 70);
+            this.btnPayServices.Size = new System.Drawing.Size(350, 118);
             this.btnPayServices.TabIndex = 1;
             this.btnPayServices.Text = "PAY SERVICES";
             this.btnPayServices.UseVisualStyleBackColor = false;
@@ -56,7 +56,7 @@ namespace Bank_ATM
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnBack.ForeColor = System.Drawing.Color.IndianRed;
-            this.btnBack.Location = new System.Drawing.Point(50, 290);
+            this.btnBack.Location = new System.Drawing.Point(269, 412);
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(350, 45);
             this.btnBack.TabIndex = 2;
@@ -71,7 +71,7 @@ namespace Bank_ATM
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(450, 80);
+            this.pnlHeader.Size = new System.Drawing.Size(900, 80);
             this.pnlHeader.TabIndex = 3;
             // 
             // lblTitle
@@ -81,7 +81,7 @@ namespace Bank_ATM
             this.lblTitle.ForeColor = System.Drawing.Color.White;
             this.lblTitle.Location = new System.Drawing.Point(0, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(450, 80);
+            this.lblTitle.Size = new System.Drawing.Size(900, 80);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "GUEST ACTIONS";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -89,7 +89,7 @@ namespace Bank_ATM
             // GuestActionsForm
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(450, 380);
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnPayServices);
