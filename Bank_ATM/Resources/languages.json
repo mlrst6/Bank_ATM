@@ -1,7 +1,6 @@
 {
   "uz": {
     "label1": "Bank ATM",
-    "label2": "Tilni tanlang",
     "label3": "X",
     "UZ": "O'zbekcha",
     "ENG": "English",
@@ -226,7 +225,6 @@
   },
   "eng": {
     "label1": "Bank ATM",
-    "label2": "Choose Language",
     "label3": "X",
     "UZ": "O'zbekcha",
     "ENG": "English",
@@ -451,7 +449,6 @@
   },
   "ru": {
     "label1": "Bank ATM",
-    "label2": "Выберите язык",
     "label3": "X",
     "UZ": "O'zbekcha",
     "ENG": "English",

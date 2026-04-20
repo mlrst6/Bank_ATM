@@ -41,7 +41,9 @@ namespace Bank_ATM.Payments
                 ? LanguageManager.GetString("PayFromAccountSubtitle")
                 : LanguageManager.GetString("GuestServicePaymentSubtitle");
             btnPay.Text = LanguageManager.GetString("Pay");
+            btnPay.Values.Text = btnPay.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             NumericInputDialog.Attach(txtReference, LanguageManager.GetString("AccountNumber"));
             if (!_chargeCurrentAccount)
             {
@@ -145,7 +147,9 @@ namespace Bank_ATM.Payments
             txtReference.Enabled = false;
             txtAmount.Enabled = false;
             btnPay.Text = LanguageManager.GetString("Confirm");
+            btnPay.Values.Text = btnPay.Text;
             btnCancel.Text = LanguageManager.GetString("Back");
+            btnCancel.Values.Text = btnCancel.Text;
 
             ShowStatus(StatusBannerKind.Info, LanguageManager.GetString("Confirm"), BuildReviewMessage());
         }
@@ -172,6 +176,7 @@ namespace Bank_ATM.Payments
             ShowStatus(StatusBannerKind.Success, LanguageManager.GetString("Payment"), successMessage);
             btnPay.Enabled = false;
             btnCancel.Text = LanguageManager.GetString("Close");
+            btnCancel.Values.Text = btnCancel.Text;
             cmbServices.Enabled = false;
             txtReference.Enabled = false;
             txtAmount.Enabled = false;
@@ -232,16 +237,6 @@ namespace Bank_ATM.Payments
             cmbServices.ForeColor = Color.White;
             cmbServices.FlatStyle = FlatStyle.Flat;
 
-            btnPay.BackColor = Color.FromArgb(16, 185, 129);
-            btnPay.ForeColor = Color.White;
-            btnPay.FlatStyle = FlatStyle.Flat;
-            btnPay.FlatAppearance.BorderSize = 0;
-
-            btnCancel.BackColor = Color.FromArgb(51, 65, 85);
-            btnCancel.ForeColor = Color.White;
-            btnCancel.FlatStyle = FlatStyle.Flat;
-            btnCancel.FlatAppearance.BorderSize = 0;
-
             lblService.ForeColor = Color.FromArgb(148, 163, 184);
             lblCategory.ForeColor = Color.FromArgb(148, 163, 184);
             lblCategoryValue.ForeColor = Color.White;
@@ -280,7 +275,9 @@ namespace Bank_ATM.Payments
             _pendingAmount = 0m;
             _pendingNotes = null;
             btnPay.Text = LanguageManager.GetString("Pay");
+            btnPay.Values.Text = btnPay.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             cmbServices.Enabled = true;
             txtReference.Enabled = true;
             txtAmount.Enabled = true;

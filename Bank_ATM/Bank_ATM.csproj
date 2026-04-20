@@ -43,6 +43,7 @@
       <Version>4.0.3</Version>
     </PackageReference>
     <PackageReference Include="itext7" Version="9.5.0" />
+    <PackageReference Include="Krypton.Toolkit" Version="105.26.4.110" />
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>
@@ -126,24 +127,6 @@
     </Compile>
     <Compile Include="User\UserActionsForm.Designer.cs">
       <DependentUpon>UserActionsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Guest\ConverterForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Guest\ConverterForm.Designer.cs">
-      <DependentUpon>ConverterForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Guest\ExchangeFromUzsToUsdForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Guest\ExchangeFromUzsToUsdForm.Designer.cs">
-      <DependentUpon>ExchangeFromUzsToUsdForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Guest\ExchangeRateForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Guest\ExchangeRateForm.Designer.cs">
-      <DependentUpon>ExchangeRateForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Guest\GuestExchangeForm.cs">
       <SubType>Form</SubType>
@@ -258,14 +241,8 @@
     <EmbeddedResource Include="Admin\AdminUserEditForm.resx">
       <DependentUpon>AdminUserEditForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Guest\ConverterForm.resx">
-      <DependentUpon>ConverterForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Guest\ExchangeFromUzsToUsdForm.resx">
-      <DependentUpon>ExchangeFromUzsToUsdForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Guest\ExchangeRateForm.resx">
-      <DependentUpon>ExchangeRateForm.cs</DependentUpon>
+    <EmbeddedResource Include="DatabaseSetupHelpForm.resx">
+      <DependentUpon>DatabaseSetupHelpForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Guest\GuestActionsForm.resx">
       <DependentUpon>GuestActionsForm.cs</DependentUpon>

@@ -1,17 +1,18 @@
-using System;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Models;
 using Bank_ATM.Services;
 using Bank_ATM.UI;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Bank_ATM
 {
     public sealed class GuestExchangeForm : Form
     {
-        private readonly GuestExchangeService _exchangeService = new GuestExchangeService();
+        private readonly GuestExchangeService _exchangeService;
         private CurrencyDto[] _currencies = new CurrencyDto[0];
         private CashNoteDto[] _insertedNotes = new CashNoteDto[0];
         private GuestExchangeResult _preview;
@@ -29,10 +30,14 @@ namespace Bank_ATM
         private Button _previewButton;
         private Button _confirmButton;
         private Button _backButton;
+        private bool IsInDesignMode => LicenseManager.UsageMode == LicenseUsageMode.Designtime || DesignMode;
 
         public GuestExchangeForm()
         {
             InitializeComponent();
+            if (IsInDesignMode)
+                return;
+            _exchangeService = new GuestExchangeService();
         }
 
         private void InitializeComponent()
@@ -127,6 +132,9 @@ namespace Bank_ATM
 
         private void GuestExchangeForm_Load(object sender, EventArgs e)
         {
+            if (IsInDesignMode)
+                return;
+
             AppWindow.ApplyMainScreen(this);
             _currencies = _exchangeService.GetActiveCurrencies();
             _fromCurrencyComboBox.DataSource = _currencies.ToArray();

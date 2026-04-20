@@ -20,9 +20,9 @@ namespace Bank_ATM
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.UZ = new System.Windows.Forms.Button();
-            this.RU = new System.Windows.Forms.Button();
-            this.ENG = new System.Windows.Forms.Button();
+            this.UZ = new Krypton.Toolkit.KryptonButton();
+            this.RU = new Krypton.Toolkit.KryptonButton();
+            this.ENG = new Krypton.Toolkit.KryptonButton();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.pnlHeader = new System.Windows.Forms.Panel();
@@ -44,64 +44,112 @@ namespace Bank_ATM
             // 
             // UZ
             // 
-            this.UZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.UZ.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.UZ.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.UZ.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
-            this.UZ.FlatAppearance.BorderSize = 2;
-            this.UZ.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.UZ.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.UZ.ForeColor = System.Drawing.Color.White;
             this.UZ.Location = new System.Drawing.Point(110, 259);
             this.UZ.Name = "UZ";
+            this.UZ.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.UZ.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.UZ.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
+            this.UZ.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.UZ.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.UZ.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
             this.UZ.Size = new System.Drawing.Size(220, 100);
+            this.UZ.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.UZ.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.UZ.StateCommon.Back.ColorAngle = 30F;
+            this.UZ.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
+            this.UZ.StateCommon.Border.Rounding = 8F;
+            this.UZ.StateCommon.Border.Width = 2;
+            this.UZ.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.UZ.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.UZ.StateNormal.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.UZ.StateNormal.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.UZ.StatePressed.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(76)))), ((int)(((byte)(160)))));
+            this.UZ.StatePressed.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(55)))), ((int)(((byte)(120)))));
+            this.UZ.StateTracking.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(112)))), ((int)(((byte)(210)))));
+            this.UZ.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(83)))), ((int)(((byte)(170)))));
             this.UZ.TabIndex = 1;
-            this.UZ.Text = "O\'zbekcha";
-            this.UZ.UseVisualStyleBackColor = false;
+            this.UZ.TabStop = false;
+            this.UZ.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.UZ.Values.Text = "O\'zbekcha";
             this.UZ.Click += new System.EventHandler(this.button1_Click);
             // 
             // RU
             // 
-            this.RU.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.RU.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.RU.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.RU.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
-            this.RU.FlatAppearance.BorderSize = 2;
-            this.RU.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.RU.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.RU.ForeColor = System.Drawing.Color.White;
             this.RU.Location = new System.Drawing.Point(590, 259);
             this.RU.Name = "RU";
+            this.RU.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.RU.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.RU.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
+            this.RU.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.RU.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.RU.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
             this.RU.Size = new System.Drawing.Size(220, 100);
+            this.RU.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.RU.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.RU.StateCommon.Back.ColorAngle = 30F;
+            this.RU.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
+            this.RU.StateCommon.Border.Rounding = 8F;
+            this.RU.StateCommon.Border.Width = 2;
+            this.RU.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.RU.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.RU.StateNormal.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.RU.StateNormal.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.RU.StatePressed.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(76)))), ((int)(((byte)(160)))));
+            this.RU.StatePressed.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(55)))), ((int)(((byte)(120)))));
+            this.RU.StateTracking.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(112)))), ((int)(((byte)(210)))));
+            this.RU.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(83)))), ((int)(((byte)(170)))));
             this.RU.TabIndex = 1;
-            this.RU.Text = "Русский";
-            this.RU.UseVisualStyleBackColor = false;
+            this.RU.TabStop = false;
+            this.RU.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.RU.Values.Text = "Русский";
             this.RU.Click += new System.EventHandler(this.button2_Click);
             // 
             // ENG
             // 
-            this.ENG.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.ENG.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.ENG.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.ENG.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
-            this.ENG.FlatAppearance.BorderSize = 2;
-            this.ENG.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ENG.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.ENG.ForeColor = System.Drawing.Color.White;
             this.ENG.Location = new System.Drawing.Point(349, 259);
             this.ENG.Name = "ENG";
+            this.ENG.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.ENG.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.ENG.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
+            this.ENG.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.ENG.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.ENG.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
             this.ENG.Size = new System.Drawing.Size(220, 100);
+            this.ENG.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.ENG.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.ENG.StateCommon.Back.ColorAngle = 30F;
+            this.ENG.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
+            this.ENG.StateCommon.Border.Rounding = 8F;
+            this.ENG.StateCommon.Border.Width = 2;
+            this.ENG.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.ENG.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.ENG.StateNormal.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
+            this.ENG.StateNormal.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
+            this.ENG.StatePressed.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(76)))), ((int)(((byte)(160)))));
+            this.ENG.StatePressed.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(55)))), ((int)(((byte)(120)))));
+            this.ENG.StateTracking.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(112)))), ((int)(((byte)(210)))));
+            this.ENG.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(83)))), ((int)(((byte)(170)))));
             this.ENG.TabIndex = 1;
-            this.ENG.Text = "English";
-            this.ENG.UseVisualStyleBackColor = false;
+            this.ENG.TabStop = false;
+            this.ENG.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.ENG.Values.Text = "English";
             this.ENG.Click += new System.EventHandler(this.button3_Click);
             // 
             // label2
             // 
             this.label2.Font = new System.Drawing.Font("Segoe UI", 14F);
             this.label2.ForeColor = System.Drawing.Color.Silver;
-            this.label2.Location = new System.Drawing.Point(47, 448);
+            this.label2.Location = new System.Drawing.Point(110, 408);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(800, 40);
+            this.label2.Size = new System.Drawing.Size(700, 58);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Tilni tanlang / Choose language / Выберите язык";
+            this.label2.Text = "Tilni tanlang/Choose Language/Выберите язык";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label3
@@ -154,9 +202,9 @@ namespace Bank_ATM
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button UZ;
-        private System.Windows.Forms.Button RU;
-        private System.Windows.Forms.Button ENG;
+        private Krypton.Toolkit.KryptonButton UZ;
+        private Krypton.Toolkit.KryptonButton RU;
+        private Krypton.Toolkit.KryptonButton ENG;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel pnlHeader;
