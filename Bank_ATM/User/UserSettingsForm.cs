@@ -138,14 +138,14 @@ namespace Bank_ATM.User
             _usernameValue.Text = ValueOrDash(user?.Username);
             _phoneValue.Text = ValueOrDash(user?.PhoneNumber);
             _accountValue.Text = ValueOrDash(account?.AccountNumber);
-            _balanceValue.Text = account == null
+            _balanceValue.Text = card == null
                 ? "-"
-                : LanguageManager.Format("CurrencyAmountUzs", account.Balance);
+                : LanguageManager.Format("CurrencyAmountUzs", card.Balance);
             _accountStatusValue.Text = account != null && account.IsActive
                 ? LanguageManager.GetString("AccountActive")
                 : LanguageManager.GetString("AccountInactive");
 
-            _cardNumberValue.Text = card == null ? "-" : MaskCardNumber(card.CardNumber);
+            _cardNumberValue.Text = card == null ? "-" : $"{card.CardType} {MaskCardNumber(card.CardNumber)}";
             _cardExpiryValue.Text = card == null ? "-" : card.ExpiryDate.ToString("yyyy-MM-dd");
             _cardStatusValue.Text = GetCardStatus(card);
             _sessionTimeoutValue.Text = LanguageManager.Format("SessionTimeoutValue", Config.SessionTimeoutSeconds);

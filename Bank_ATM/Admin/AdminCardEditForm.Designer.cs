@@ -19,6 +19,7 @@ namespace Bank_ATM.Admin
             this.lblDialogSubtitle = new System.Windows.Forms.Label();
             this.lblDialogTitle = new System.Windows.Forms.Label();
             this.cmbUsers = new System.Windows.Forms.ComboBox();
+            this.cmbCardType = new System.Windows.Forms.ComboBox();
             this.txtCardNumber = new System.Windows.Forms.TextBox();
             this.txtPin = new System.Windows.Forms.TextBox();
             this.chkBlocked = new System.Windows.Forms.CheckBox();
@@ -29,6 +30,7 @@ namespace Bank_ATM.Admin
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.lblCardType = new System.Windows.Forms.Label();
             this.lblPinNote = new System.Windows.Forms.Label();
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
@@ -69,57 +71,66 @@ namespace Bank_ATM.Admin
             this.cmbUsers.Size = new System.Drawing.Size(280, 24);
             this.cmbUsers.TabIndex = 1;
             // 
+            // cmbCardType
+            // 
+            this.cmbCardType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCardType.FormattingEnabled = true;
+            this.cmbCardType.Location = new System.Drawing.Point(176, 176);
+            this.cmbCardType.Name = "cmbCardType";
+            this.cmbCardType.Size = new System.Drawing.Size(280, 24);
+            this.cmbCardType.TabIndex = 2;
+            // 
             // txtCardNumber
             // 
-            this.txtCardNumber.Location = new System.Drawing.Point(176, 180);
+            this.txtCardNumber.Location = new System.Drawing.Point(176, 232);
             this.txtCardNumber.MaxLength = 16;
             this.txtCardNumber.Name = "txtCardNumber";
             this.txtCardNumber.Size = new System.Drawing.Size(280, 22);
-            this.txtCardNumber.TabIndex = 2;
+            this.txtCardNumber.TabIndex = 3;
             // 
             // txtPin
             // 
-            this.txtPin.Location = new System.Drawing.Point(176, 236);
+            this.txtPin.Location = new System.Drawing.Point(176, 288);
             this.txtPin.MaxLength = 4;
             this.txtPin.Name = "txtPin";
             this.txtPin.PasswordChar = '*';
             this.txtPin.Size = new System.Drawing.Size(280, 22);
-            this.txtPin.TabIndex = 3;
+            this.txtPin.TabIndex = 4;
             // 
             // chkBlocked
             // 
             this.chkBlocked.AutoSize = true;
-            this.chkBlocked.Location = new System.Drawing.Point(176, 344);
+            this.chkBlocked.Location = new System.Drawing.Point(176, 396);
             this.chkBlocked.Name = "chkBlocked";
             this.chkBlocked.Size = new System.Drawing.Size(79, 20);
-            this.chkBlocked.TabIndex = 5;
+            this.chkBlocked.TabIndex = 6;
             this.chkBlocked.Text = "Blocked";
             this.chkBlocked.UseVisualStyleBackColor = true;
             // 
             // dtpExpiry
             // 
             this.dtpExpiry.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpExpiry.Location = new System.Drawing.Point(176, 292);
+            this.dtpExpiry.Location = new System.Drawing.Point(176, 344);
             this.dtpExpiry.Name = "dtpExpiry";
             this.dtpExpiry.Size = new System.Drawing.Size(280, 22);
-            this.dtpExpiry.TabIndex = 4;
+            this.dtpExpiry.TabIndex = 5;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(176, 392);
+            this.btnSave.Location = new System.Drawing.Point(176, 444);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(132, 44);
-            this.btnSave.TabIndex = 6;
+            this.btnSave.TabIndex = 7;
             this.btnSave.Text = "SAVE";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(324, 392);
+            this.btnCancel.Location = new System.Drawing.Point(324, 444);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(132, 44);
-            this.btnCancel.TabIndex = 7;
+            this.btnCancel.TabIndex = 8;
             this.btnCancel.Text = "CANCEL";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -136,7 +147,7 @@ namespace Bank_ATM.Admin
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(34, 183);
+            this.label2.Location = new System.Drawing.Point(34, 235);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(90, 16);
             this.label2.TabIndex = 9;
@@ -145,7 +156,7 @@ namespace Bank_ATM.Admin
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 239);
+            this.label3.Location = new System.Drawing.Point(34, 291);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(32, 16);
             this.label3.TabIndex = 10;
@@ -154,21 +165,30 @@ namespace Bank_ATM.Admin
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(34, 295);
+            this.label4.Location = new System.Drawing.Point(34, 347);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(79, 16);
             this.label4.TabIndex = 11;
             this.label4.Text = "Expiry Date:";
+            // 
+            // lblCardType
+            // 
+            this.lblCardType.AutoSize = true;
+            this.lblCardType.Location = new System.Drawing.Point(34, 179);
+            this.lblCardType.Name = "lblCardType";
+            this.lblCardType.Size = new System.Drawing.Size(70, 16);
+            this.lblCardType.TabIndex = 13;
+            this.lblCardType.Text = "Card Type:";
             // 
             // lblPinNote
             // 
             this.lblPinNote.AutoSize = true;
             this.lblPinNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.lblPinNote.ForeColor = System.Drawing.Color.Gray;
-            this.lblPinNote.Location = new System.Drawing.Point(173, 262);
+            this.lblPinNote.Location = new System.Drawing.Point(173, 314);
             this.lblPinNote.Name = "lblPinNote";
             this.lblPinNote.Size = new System.Drawing.Size(179, 15);
-            this.lblPinNote.TabIndex = 12;
+            this.lblPinNote.TabIndex = 14;
             this.lblPinNote.Text = "Use exactly 4 digits for ATM PIN";
             // 
             // AdminCardEditForm
@@ -176,6 +196,7 @@ namespace Bank_ATM.Admin
             this.ClientSize = new System.Drawing.Size(882, 603);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.lblPinNote);
+            this.Controls.Add(this.lblCardType);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -186,6 +207,7 @@ namespace Bank_ATM.Admin
             this.Controls.Add(this.chkBlocked);
             this.Controls.Add(this.txtPin);
             this.Controls.Add(this.txtCardNumber);
+            this.Controls.Add(this.cmbCardType);
             this.Controls.Add(this.cmbUsers);
             this.Name = "AdminCardEditForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -212,6 +234,8 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblCardType;
+        private System.Windows.Forms.ComboBox cmbCardType;
         private System.Windows.Forms.Label lblPinNote;
     }
 }

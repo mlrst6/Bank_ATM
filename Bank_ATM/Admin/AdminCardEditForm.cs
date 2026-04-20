@@ -16,7 +16,8 @@ namespace Bank_ATM.Admin
         public AdminCardEditForm(CardDto card = null)
         {
             InitializeComponent();
-            _card = card ?? new CardDto { ExpiryDate = DateTime.Now.AddYears(5) };
+            _card = card ?? new CardDto { ExpiryDate = DateTime.Now.AddYears(5), CardType = CardTypes.Uzcard };
+            _card.CardType = CardTypes.Normalize(_card.CardType);
             _isEdit = card != null;
         }
 
@@ -26,6 +27,7 @@ namespace Bank_ATM.Admin
             btnSave.Text = LanguageManager.GetString("Save");
             btnCancel.Text = LanguageManager.GetString("Cancel");
             label1.Text = "User:";
+            lblCardType.Text = LanguageManager.GetString("CardType");
             lblDialogTitle.Text = _isEdit
                 ? LanguageManager.GetString("EditCard")
                 : LanguageManager.GetString("CreateCard");
@@ -39,9 +41,18 @@ namespace Bank_ATM.Admin
                 dtpExpiry.Value = _card.ExpiryDate;
                 lblPinNote.Text = LanguageManager.GetString("LeaveBlankToKeepPin");
             }
+
+            cmbCardType.DataSource = CardTypes.All.ToArray();
+            cmbCardType.SelectedItem = CardTypes.Normalize(_card.CardType);
+            cmbCardType.SelectedIndexChanged += cmbCardType_SelectedIndexChanged;
+
+            if (!_isEdit)
+            {
+                txtCardNumber.Text = _adminService.GenerateCardNumber(cmbCardType.SelectedItem.ToString());
+            }
             else
             {
-                txtCardNumber.Text = _adminService.GenerateCardNumber();
+                cmbCardType.Enabled = false;
             }
 
             txtCardNumber.ReadOnly = true;
@@ -93,6 +104,7 @@ namespace Bank_ATM.Admin
             }
 
             _card.CardNumber = sanitizedCardNumber;
+            _card.CardType = CardTypes.Normalize(cmbCardType.SelectedItem?.ToString());
             _card.IsBlocked = chkBlocked.Checked;
             _card.ExpiryDate = dtpExpiry.Value.Date;
             _card.AccountId = _isEdit ? _card.AccountId : selectedUser.PrimaryAccountId.Value;
@@ -112,6 +124,14 @@ namespace Bank_ATM.Admin
 
         private void btnCancel_Click(object sender, EventArgs e) => this.Close();
 
+        private void cmbCardType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_isEdit && cmbCardType.SelectedItem != null)
+            {
+                txtCardNumber.Text = _adminService.GenerateCardNumber(cmbCardType.SelectedItem.ToString());
+            }
+        }
+
         private void ApplyTheme()
         {
             AdminTheme.ApplyForm(this);
@@ -122,11 +142,12 @@ namespace Bank_ATM.Admin
             AdminTheme.StyleLabel(label2, true);
             AdminTheme.StyleLabel(label3, true);
             AdminTheme.StyleLabel(label4, true);
+            AdminTheme.StyleLabel(lblCardType, true);
             AdminTheme.StyleLabel(lblPinNote, true);
-            cmbUsers.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            cmbUsers.ForeColor = System.Drawing.Color.White;
-            cmbUsers.FlatStyle = FlatStyle.Flat;
+            AdminTheme.StyleComboBox(cmbUsers);
+            AdminTheme.StyleComboBox(cmbCardType);
             cmbUsers.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbCardType.DropDownStyle = ComboBoxStyle.DropDownList;
             AdminTheme.StyleTextBox(txtCardNumber);
             txtCardNumber.BackColor = System.Drawing.Color.FromArgb(40, 52, 70);
             AdminTheme.StyleTextBox(txtPin);

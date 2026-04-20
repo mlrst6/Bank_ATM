@@ -9,6 +9,44 @@ namespace Bank_ATM.Models
         Admin 
     }
 
+    public static class CardTypes
+    {
+        public const string Humo = "HUMO";
+        public const string Uzcard = "UZCARD";
+        public const string Visa = "VISA";
+        public const string Mastercard = "MASTERCARD";
+
+        public static readonly string[] All = { Humo, Uzcard, Visa, Mastercard };
+
+        public static string Normalize(string cardType)
+        {
+            string normalized = (cardType ?? string.Empty).Trim().ToUpperInvariant();
+            foreach (string supported in All)
+            {
+                if (normalized == supported)
+                {
+                    return supported;
+                }
+            }
+
+            return Uzcard;
+        }
+
+        public static string GetPrefix(string cardType)
+        {
+            switch (Normalize(cardType))
+            {
+                case Humo:
+                    return "9860";
+                case Visa:
+                case Mastercard:
+                    return "4916";
+                default:
+                    return "8600";
+            }
+        }
+    }
+
     public class UserDto
     {
         public int Id { get; set; }
@@ -32,7 +70,9 @@ namespace Bank_ATM.Models
         public int Id { get; set; }
         public int AccountId { get; set; }
         public string CardNumber { get; set; }
+        public string CardType { get; set; }
         public string PinHash { get; set; }
+        public decimal Balance { get; set; }
         public bool IsBlocked { get; set; }
         public DateTime ExpiryDate { get; set; }
         public int FailedAttempts { get; set; }
@@ -55,6 +95,8 @@ namespace Bank_ATM.Models
         public int Id { get; set; }
         public int? AccountId { get; set; }
         public int? TargetAccountId { get; set; }
+        public int? CardId { get; set; }
+        public int? TargetCardId { get; set; }
         public string Type { get; set; } // Withdraw, Deposit, Transfer, BillPayment, Exchange
         public decimal Amount { get; set; }
         public string Description { get; set; }

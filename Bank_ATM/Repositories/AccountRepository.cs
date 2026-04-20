@@ -48,6 +48,304 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<IList<CashNoteDto>> WithdrawCurrencyWithDenominationsByCardAsync(
+            int cardId,
+            int accountId,
+            decimal cashAmount,
+            decimal debitAmountUzs,
+            int currencyId,
+            string currencyCode)
+        {
+            if (!IsValidMoneyAmount(cashAmount) || !IsValidMoneyAmount(debitAmountUzs)) return null;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var card = await db.QueryFirstOrDefaultAsync<CardDto>(@"
+                            SELECT id, account_id as AccountId, balance, is_blocked as IsBlocked, expiry_date as ExpiryDate
+                            FROM cards WITH (UPDLOCK, ROWLOCK)
+                            WHERE id = @CardId AND account_id = @AccountId",
+                            new { CardId = cardId, AccountId = accountId },
+                            trans);
+                        if (card == null || card.IsBlocked || card.ExpiryDate.Date < DateTime.Today || card.Balance < debitAmountUzs)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        var denominations = (await db.QueryAsync<CashDenominationDto>(@"
+                            SELECT
+                                d.atm_id as AtmId,
+                                d.currency_id as CurrencyId,
+                                c.code as CurrencyCode,
+                                d.denomination_value as DenominationValue,
+                                d.note_count as NoteCount,
+                                d.updated_at as UpdatedAt
+                            FROM atm_cash_denominations d WITH (UPDLOCK, ROWLOCK)
+                            INNER JOIN currencies c ON c.id = d.currency_id
+                            WHERE d.atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                              AND d.currency_id = @CurrencyId
+                            ORDER BY d.denomination_value DESC",
+                            new { CurrencyId = currencyId },
+                            trans)).ToList();
+
+                        var breakdown = BuildWithdrawalBreakdown(cashAmount, denominations);
+                        if (breakdown == null || breakdown.Count == 0)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        foreach (var note in breakdown)
+                        {
+                            int rows = await db.ExecuteAsync(@"
+                                UPDATE atm_cash_denominations
+                                SET note_count = note_count - @NoteCount,
+                                    updated_at = GETDATE()
+                                WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                  AND currency_id = @CurrencyId
+                                  AND denomination_value = @DenominationValue
+                                  AND note_count >= @NoteCount",
+                                new
+                                {
+                                    CurrencyId = currencyId,
+                                    note.DenominationValue,
+                                    note.NoteCount
+                                },
+                                trans);
+
+                            if (rows != 1)
+                            {
+                                trans.Rollback();
+                                return null;
+                            }
+                        }
+
+                        int cardRows = await db.ExecuteAsync(
+                            "UPDATE cards SET balance = balance - @Amount WHERE id = @CardId AND account_id = @AccountId AND balance >= @Amount AND is_blocked = 0",
+                            new { Amount = debitAmountUzs, CardId = cardId, AccountId = accountId },
+                            trans);
+                        if (cardRows != 1)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        await SyncAccountBalanceAsync(db, trans, accountId);
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, card_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, @CardId, 'Withdraw', @Amount, @Description, GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                CardId = cardId,
+                                Amount = debitAmountUzs,
+                                Description = $"Cash withdrawal: {cashAmount:N2} {currencyCode}; Notes: {FormatNotes(breakdown)}"
+                            },
+                            trans);
+
+                        await CashRepository.SyncCashTotalsAsync(db, trans, currencyId);
+                        trans.Commit();
+                        return breakdown;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task<IList<CashNoteDto>> DepositCurrencyWithDenominationsByCardAsync(
+            int cardId,
+            int accountId,
+            IEnumerable<CashNoteDto> notes,
+            decimal creditAmountUzs,
+            int currencyId,
+            string currencyCode)
+        {
+            var noteList = CashRepository.NormalizeNotes(notes).ToList();
+            if (!noteList.Any() || !IsValidMoneyAmount(creditAmountUzs)) return null;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var card = await db.QueryFirstOrDefaultAsync<CardDto>(@"
+                            SELECT id, account_id as AccountId, is_blocked as IsBlocked, expiry_date as ExpiryDate
+                            FROM cards WITH (UPDLOCK, ROWLOCK)
+                            WHERE id = @CardId AND account_id = @AccountId",
+                            new { CardId = cardId, AccountId = accountId },
+                            trans);
+                        if (card == null || card.IsBlocked || card.ExpiryDate.Date < DateTime.Today)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        int cardRows = await db.ExecuteAsync(
+                            "UPDATE cards SET balance = balance + @Amount WHERE id = @CardId AND account_id = @AccountId AND is_blocked = 0",
+                            new { Amount = creditAmountUzs, CardId = cardId, AccountId = accountId },
+                            trans);
+                        if (cardRows != 1)
+                        {
+                            trans.Rollback();
+                            return null;
+                        }
+
+                        foreach (var note in noteList)
+                        {
+                            await db.ExecuteAsync(@"
+                                IF EXISTS (
+                                    SELECT 1 FROM atm_cash_denominations
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId
+                                      AND denomination_value = @DenominationValue
+                                )
+                                BEGIN
+                                    UPDATE atm_cash_denominations
+                                    SET note_count = note_count + @NoteCount,
+                                        updated_at = GETDATE()
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId
+                                      AND denomination_value = @DenominationValue
+                                END
+                                ELSE
+                                BEGIN
+                                    INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                                    VALUES ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, @DenominationValue, @NoteCount)
+                                END",
+                                new
+                                {
+                                    CurrencyId = currencyId,
+                                    note.DenominationValue,
+                                    note.NoteCount
+                                },
+                                trans);
+                        }
+
+                        await SyncAccountBalanceAsync(db, trans, accountId);
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, card_id, type, amount, description, transaction_date)
+                            VALUES (@AccountId, @CardId, 'Deposit', @Amount, @Description, GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                CardId = cardId,
+                                Amount = creditAmountUzs,
+                                Description = $"Cash deposit: {noteList.Sum(note => note.TotalValue):N2} {currencyCode}; Notes: {FormatNotes(noteList)}"
+                            },
+                            trans);
+
+                        await CashRepository.SyncCashTotalsAsync(db, trans, currencyId);
+                        trans.Commit();
+                        return noteList;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task<bool> TransferByCardAsync(int sourceCardId, int targetCardId, decimal amount)
+        {
+            if (!IsValidMoneyAmount(amount) || sourceCardId == targetCardId) return false;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var source = await db.QueryFirstOrDefaultAsync<CardDto>(@"
+                            SELECT id, account_id as AccountId, balance, is_blocked as IsBlocked, expiry_date as ExpiryDate
+                            FROM cards WITH (UPDLOCK, ROWLOCK)
+                            WHERE id = @Id",
+                            new { Id = sourceCardId },
+                            trans);
+                        if (source == null || source.IsBlocked || source.ExpiryDate.Date < DateTime.Today || source.Balance < amount)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        var target = await db.QueryFirstOrDefaultAsync<CardDto>(@"
+                            SELECT id, account_id as AccountId, is_blocked as IsBlocked, expiry_date as ExpiryDate
+                            FROM cards WITH (UPDLOCK, ROWLOCK)
+                            WHERE id = @Id",
+                            new { Id = targetCardId },
+                            trans);
+                        if (target == null || target.IsBlocked || target.ExpiryDate.Date < DateTime.Today)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int debitRows = await db.ExecuteAsync(
+                            "UPDATE cards SET balance = balance - @Amount WHERE id = @Id AND balance >= @Amount AND is_blocked = 0",
+                            new { Amount = amount, Id = sourceCardId },
+                            trans);
+                        if (debitRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int creditRows = await db.ExecuteAsync(
+                            "UPDATE cards SET balance = balance + @Amount WHERE id = @Id AND is_blocked = 0",
+                            new { Amount = amount, Id = targetCardId },
+                            trans);
+                        if (creditRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        await SyncAccountBalanceAsync(db, trans, source.AccountId);
+                        if (target.AccountId != source.AccountId)
+                        {
+                            await SyncAccountBalanceAsync(db, trans, target.AccountId);
+                        }
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (account_id, target_account_id, card_id, target_card_id, type, amount, transaction_date)
+                            VALUES (@SourceAccountId, @TargetAccountId, @SourceCardId, @TargetCardId, 'Transfer', @Amount, GETDATE())",
+                            new
+                            {
+                                SourceAccountId = source.AccountId,
+                                TargetAccountId = target.AccountId,
+                                SourceCardId = sourceCardId,
+                                TargetCardId = targetCardId,
+                                Amount = amount
+                            },
+                            trans);
+
+                        trans.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task<bool> WithdrawAsync(int accountId, decimal amount)
         {
             if (!IsValidMoneyAmount(amount)) return false;
@@ -771,6 +1069,93 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<bool> PayServiceByCardAsync(
+            int cardId,
+            int accountId,
+            decimal amount,
+            string description,
+            int serviceId,
+            int serviceAccountId,
+            string paymentReference)
+        {
+            if (!IsValidMoneyAmount(amount)) return false;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                db.Open();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var card = await db.QueryFirstOrDefaultAsync<CardDto>(@"
+                            SELECT id, account_id as AccountId, balance, is_blocked as IsBlocked, expiry_date as ExpiryDate
+                            FROM cards WITH (UPDLOCK, ROWLOCK)
+                            WHERE id = @CardId AND account_id = @AccountId",
+                            new { CardId = cardId, AccountId = accountId },
+                            trans);
+                        if (card == null || card.IsBlocked || card.ExpiryDate.Date < DateTime.Today || card.Balance < amount)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int updatedRows = await db.ExecuteAsync(
+                            "UPDATE cards SET balance = balance - @Amount WHERE id = @CardId AND account_id = @AccountId AND balance >= @Amount AND is_blocked = 0",
+                            new { Amount = amount, CardId = cardId, AccountId = accountId },
+                            trans);
+                        if (updatedRows != 1)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        await SyncAccountBalanceAsync(db, trans, accountId);
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (
+                                account_id,
+                                card_id,
+                                type,
+                                amount,
+                                description,
+                                service_id,
+                                service_account_id,
+                                payment_reference,
+                                transaction_date)
+                            VALUES (
+                                @AccountId,
+                                @CardId,
+                                'BillPayment',
+                                @Amount,
+                                @Description,
+                                @ServiceId,
+                                @ServiceAccountId,
+                                @PaymentReference,
+                                GETDATE())",
+                            new
+                            {
+                                AccountId = accountId,
+                                CardId = cardId,
+                                Amount = amount,
+                                Description = description,
+                                ServiceId = serviceId,
+                                ServiceAccountId = serviceAccountId,
+                                PaymentReference = paymentReference
+                            },
+                            trans);
+
+                        trans.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task<int> CreateUserAsync(UserDto user, string password)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
@@ -790,7 +1175,7 @@ namespace Bank_ATM.Repositories
             }
         }
 
-        public async Task<int> CreateUserWithProvisioningAsync(UserDto user, string password, string initialPin)
+        public async Task<int> CreateUserWithProvisioningAsync(UserDto user, string password, string initialPin, string initialCardType = null)
         {
             using (var db = new SqlConnection(_connectionString))
             {
@@ -826,15 +1211,17 @@ namespace Bank_ATM.Repositories
 
                             if (!string.IsNullOrWhiteSpace(initialPin))
                             {
-                                string cardNumber = await GenerateUniqueCardNumberAsync(db, trans);
+                                string cardType = CardTypes.Normalize(initialCardType);
+                                string cardNumber = await GenerateUniqueCardNumberAsync(db, trans, cardType);
                                 string pinHash = BCrypt.Net.BCrypt.HashPassword(initialPin, 11);
                                 await db.ExecuteAsync(@"
-                                    INSERT INTO cards (account_id, card_number, pin_hash, expiry_date, is_blocked, failed_attempts)
-                                    VALUES (@AccountId, @CardNumber, @PinHash, @ExpiryDate, 0, 0)",
+                                    INSERT INTO cards (account_id, card_number, card_type, balance, pin_hash, expiry_date, is_blocked, failed_attempts)
+                                    VALUES (@AccountId, @CardNumber, @CardType, 0, @PinHash, @ExpiryDate, 0, 0)",
                                     new
                                     {
                                         AccountId = accountId,
                                         CardNumber = cardNumber,
+                                        CardType = cardType,
                                         PinHash = pinHash,
                                         ExpiryDate = DateTime.Today.AddYears(5)
                                     },
@@ -960,11 +1347,12 @@ namespace Bank_ATM.Repositories
             throw new InvalidOperationException("Could not generate a unique account number.");
         }
 
-        private async Task<string> GenerateUniqueCardNumberAsync(SqlConnection db, IDbTransaction trans)
+        private async Task<string> GenerateUniqueCardNumberAsync(SqlConnection db, IDbTransaction trans, string cardType)
         {
+            string prefix = CardTypes.GetPrefix(cardType);
             for (int attempt = 0; attempt < 10; attempt++)
             {
-                string candidate = $"{DateTime.UtcNow:yyyyMMddHHmmss}{attempt % 10}{(attempt + 7) % 10}";
+                string candidate = $"{prefix}{DateTime.UtcNow:MMddHHmmss}{attempt % 10}{(attempt + 7) % 10}";
                 int exists = await db.ExecuteScalarAsync<int>(
                     "SELECT COUNT(*) FROM cards WHERE card_number = @CardNumber",
                     new { CardNumber = candidate },
@@ -1011,6 +1399,20 @@ namespace Bank_ATM.Repositories
         {
             return string.Join(", ", CashRepository.NormalizeNotes(notes)
                 .Select(note => $"{note.DenominationValue:N2} x {note.NoteCount}"));
+        }
+
+        private static async Task SyncAccountBalanceAsync(IDbConnection db, IDbTransaction trans, int accountId)
+        {
+            await db.ExecuteAsync(@"
+                UPDATE accounts
+                SET balance = ISNULL((
+                    SELECT SUM(balance)
+                    FROM cards
+                    WHERE account_id = @AccountId
+                ), 0)
+                WHERE id = @AccountId",
+                new { AccountId = accountId },
+                trans);
         }
 
         private static bool IsValidMoneyAmount(decimal amount)

@@ -21,7 +21,19 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT id, account_id as AccountId, card_number as CardNumber, pin_hash as PinHash, is_blocked as IsBlocked, expiry_date as ExpiryDate, failed_attempts as FailedAttempts, locked_until as LockedUntil FROM cards WHERE card_number = @CardNumber";
+                string sql = @"SELECT
+                                id,
+                                account_id as AccountId,
+                                card_number as CardNumber,
+                                card_type as CardType,
+                                balance,
+                                pin_hash as PinHash,
+                                is_blocked as IsBlocked,
+                                expiry_date as ExpiryDate,
+                                failed_attempts as FailedAttempts,
+                                locked_until as LockedUntil
+                               FROM cards
+                               WHERE card_number = @CardNumber";
                 return db.QueryFirstOrDefault<CardDto>(sql, new { CardNumber = cardNumber });
             }
         }
@@ -68,18 +80,31 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT id, account_id as AccountId, card_number as CardNumber, pin_hash as PinHash, is_blocked as IsBlocked, expiry_date as ExpiryDate, failed_attempts as FailedAttempts, locked_until as LockedUntil, created_at as CreatedAt FROM cards";
+                string sql = @"SELECT
+                                id,
+                                account_id as AccountId,
+                                card_number as CardNumber,
+                                card_type as CardType,
+                                balance,
+                                pin_hash as PinHash,
+                                is_blocked as IsBlocked,
+                                expiry_date as ExpiryDate,
+                                failed_attempts as FailedAttempts,
+                                locked_until as LockedUntil,
+                                created_at as CreatedAt
+                               FROM cards";
                 return db.Query<CardDto>(sql);
             }
         }
 
-        public string GenerateUniqueCardNumber()
+        public string GenerateUniqueCardNumber(string cardType = null)
         {
+            string prefix = CardTypes.GetPrefix(cardType);
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 for (int attempt = 0; attempt < 20; attempt++)
                 {
-                    string candidate = GenerateCardNumberCandidate();
+                    string candidate = GenerateCardNumberCandidate(prefix);
                     int exists = db.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM cards WHERE card_number = @CardNumber",
                         new { CardNumber = candidate });
@@ -107,13 +132,14 @@ namespace Bank_ATM.Repositories
 
                 if (string.IsNullOrWhiteSpace(card.CardNumber))
                 {
-                    card.CardNumber = GenerateUniqueCardNumber();
+                    card.CardNumber = GenerateUniqueCardNumber(card.CardType);
                 }
 
+                string cardType = CardTypes.Normalize(card.CardType);
                 string hashedPin = BCrypt.Net.BCrypt.HashPassword(pin, 11);
-                string sql = @"INSERT INTO cards (account_id, card_number, pin_hash, expiry_date) 
-                               VALUES (@AccountId, @CardNumber, @PinHash, @ExpiryDate)";
-                db.Execute(sql, new { card.AccountId, card.CardNumber, PinHash = hashedPin, card.ExpiryDate });
+                string sql = @"INSERT INTO cards (account_id, card_number, card_type, balance, pin_hash, expiry_date) 
+                               VALUES (@AccountId, @CardNumber, @CardType, @Balance, @PinHash, @ExpiryDate)";
+                db.Execute(sql, new { card.AccountId, card.CardNumber, CardType = cardType, card.Balance, PinHash = hashedPin, card.ExpiryDate });
             }
         }
 
@@ -121,7 +147,8 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                string sql = "UPDATE cards SET card_number = @CardNumber, is_blocked = @IsBlocked, expiry_date = @ExpiryDate";
+                card.CardType = CardTypes.Normalize(card.CardType);
+                string sql = "UPDATE cards SET card_number = @CardNumber, card_type = @CardType, balance = @Balance, is_blocked = @IsBlocked, expiry_date = @ExpiryDate";
                 var parameters = new DynamicParameters(card);
 
                 if (!string.IsNullOrEmpty(newPin))
@@ -139,6 +166,12 @@ namespace Bank_ATM.Repositories
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
+                decimal balance = db.ExecuteScalar<decimal>("SELECT balance FROM cards WHERE id = @Id", new { Id = cardId });
+                if (balance > 0m)
+                {
+                    throw new InvalidOperationException("Cannot delete a card that still has money on it.");
+                }
+
                 db.Execute("DELETE FROM cards WHERE id = @Id", new { Id = cardId });
             }
         }
@@ -208,7 +241,7 @@ namespace Bank_ATM.Repositories
             return isValid;
         }
 
-        private static string GenerateCardNumberCandidate()
+        private static string GenerateCardNumberCandidate(string prefix)
         {
             byte[] bytes = new byte[8];
             using (var rng = RandomNumberGenerator.Create())
@@ -217,7 +250,7 @@ namespace Bank_ATM.Repositories
             }
 
             ulong number = BitConverter.ToUInt64(bytes, 0) % 1000000000000UL;
-            return "8600" + number.ToString("D12");
+            return prefix + number.ToString("D12");
         }
     }
 }

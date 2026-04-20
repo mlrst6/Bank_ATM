@@ -18,7 +18,7 @@ namespace Bank_ATM.Services
 
         public Task<IEnumerable<UserDto>> GetAllUsersAsync() => _accountRepository.GetAllUsersAsync();
         public IEnumerable<CardDto> GetAllCards() => _cardRepository.GetAllCards();
-        public string GenerateCardNumber() => _cardRepository.GenerateUniqueCardNumber();
+        public string GenerateCardNumber(string cardType = null) => _cardRepository.GenerateUniqueCardNumber(cardType);
         public IEnumerable<TransactionDto> GetAllTransactions() => _transactionRepository.GetAllTransactions();
         public IEnumerable<ServiceDto> GetAllServices() => _servicesRepository.GetAllServices();
         public IEnumerable<CurrencyDto> GetAllCurrencies() => _currencyRepository.GetAllCurrencies();
@@ -32,7 +32,7 @@ namespace Bank_ATM.Services
         public void AddAtmCash(decimal amount) => _atmRepository.AddCash(amount);
         public void AddAtmCashNotes(int currencyId, IEnumerable<CashNoteDto> notes) => _cashRepository.AddCashNotes(currencyId, notes);
 
-        public async Task<ServiceResult> SaveUserAsync(UserDto user, string password, string initialPin, bool isEdit)
+        public async Task<ServiceResult> SaveUserAsync(UserDto user, string password, string initialPin, bool isEdit, string initialCardType = null)
         {
             if (isEdit)
             {
@@ -40,7 +40,7 @@ namespace Bank_ATM.Services
             }
             else
             {
-                await _accountRepository.CreateUserWithProvisioningAsync(user, password, initialPin);
+                await _accountRepository.CreateUserWithProvisioningAsync(user, password, initialPin, initialCardType);
             }
 
             return new ServiceResult { Success = true };

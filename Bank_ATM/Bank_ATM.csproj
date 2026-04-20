@@ -197,7 +197,13 @@
     <Compile Include="Services\BankingService.cs" />
     <Compile Include="Services\GuestExchangeService.cs" />
     <Compile Include="Services\AdminService.cs" />
+    <Compile Include="UI\ReceiptChoiceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\RoundedButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\StatusBanner.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\ModernKeypad.cs">

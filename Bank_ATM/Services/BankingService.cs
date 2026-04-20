@@ -25,7 +25,8 @@ namespace Bank_ATM.Services
         public async Task<BankingResult> WithdrawAsync(decimal amount, string currencyCode)
         {
             var currentAccount = SessionManager.Instance.CurrentAccount;
-            if (currentAccount == null || !currentAccount.IsActive)
+            var currentCard = SessionManager.Instance.CurrentCard;
+            if (currentAccount == null || !currentAccount.IsActive || currentCard == null || currentCard.IsBlocked)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("NoActiveAccountSession") };
             }
@@ -46,7 +47,7 @@ namespace Bank_ATM.Services
             }
 
             decimal debitAmountUzs = decimal.Round(amount * currency.RateToUzs, 2);
-            if (currentAccount.Balance < debitAmountUzs)
+            if (currentCard.Balance < debitAmountUzs)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("InsufficientFunds") };
             }
@@ -56,7 +57,8 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("AtmInsufficientCash") };
             }
 
-            var breakdown = await _accountRepository.WithdrawCurrencyWithDenominationsAsync(
+            var breakdown = await _accountRepository.WithdrawCurrencyWithDenominationsByCardAsync(
+                currentCard.Id,
                 currentAccount.Id,
                 amount,
                 debitAmountUzs,
@@ -67,7 +69,7 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("AtmCannotDispenseRequestedAmount") };
             }
 
-            var account = await RefreshCurrentSessionAccountAsync();
+            var account = await RefreshCurrentSessionAsync();
             return new BankingResult
             {
                 Success = true,
@@ -127,7 +129,7 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("DepositFailed") };
             }
 
-            var account = await RefreshCurrentSessionAccountAsync();
+            var account = await RefreshCurrentSessionAsync();
             return new BankingResult
             {
                 Success = true,
@@ -141,7 +143,8 @@ namespace Bank_ATM.Services
         public async Task<BankingResult> DepositCashNotesAsync(string currencyCode, CashNoteDto[] notes)
         {
             var currentAccount = SessionManager.Instance.CurrentAccount;
-            if (currentAccount == null || !currentAccount.IsActive)
+            var currentCard = SessionManager.Instance.CurrentCard;
+            if (currentAccount == null || !currentAccount.IsActive || currentCard == null || currentCard.IsBlocked)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("NoActiveAccountSession") };
             }
@@ -164,7 +167,8 @@ namespace Bank_ATM.Services
             }
 
             decimal creditAmountUzs = decimal.Round(cashAmount * currency.RateToUzs, 2);
-            var savedNotes = await _accountRepository.DepositCurrencyWithDenominationsAsync(
+            var savedNotes = await _accountRepository.DepositCurrencyWithDenominationsByCardAsync(
+                currentCard.Id,
                 currentAccount.Id,
                 noteList,
                 creditAmountUzs,
@@ -175,7 +179,7 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("DepositFailed") };
             }
 
-            var account = await RefreshCurrentSessionAccountAsync();
+            var account = await RefreshCurrentSessionAsync();
             return new BankingResult
             {
                 Success = true,
@@ -190,7 +194,8 @@ namespace Bank_ATM.Services
         public async Task<BankingResult> TransferByCardAsync(string targetCardNumber, decimal amount)
         {
             var currentAccount = SessionManager.Instance.CurrentAccount;
-            if (currentAccount == null || !currentAccount.IsActive)
+            var currentCard = SessionManager.Instance.CurrentCard;
+            if (currentAccount == null || !currentAccount.IsActive || currentCard == null || currentCard.IsBlocked)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("NoActiveAccountSession") };
             }
@@ -217,18 +222,18 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("TargetCardUnavailable") };
             }
 
-            if (targetCard.AccountId == currentAccount.Id)
+            if (targetCard.Id == currentCard.Id)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("TransferSameAccount") };
             }
 
-            bool success = await _accountRepository.TransferAsync(currentAccount.Id, targetCard.AccountId, amount);
+            bool success = await _accountRepository.TransferByCardAsync(currentCard.Id, targetCard.Id, amount);
             if (!success)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("TransferFailed") };
             }
 
-            var account = await RefreshCurrentSessionAccountAsync();
+            var account = await RefreshCurrentSessionAsync();
             return new BankingResult { Success = true, Account = account, TargetCard = targetCard };
         }
 
@@ -268,12 +273,14 @@ namespace Bank_ATM.Services
             if (chargeCurrentAccount)
             {
                 var currentAccount = SessionManager.Instance.CurrentAccount;
-                if (currentAccount == null || !currentAccount.IsActive)
+                var currentCard = SessionManager.Instance.CurrentCard;
+                if (currentAccount == null || !currentAccount.IsActive || currentCard == null || currentCard.IsBlocked)
                 {
                     return new ServiceResult { Success = false, Message = LanguageManager.GetString("NoActiveAccountSession") };
                 }
 
-                bool success = await _accountRepository.PayServiceAsync(
+                bool success = await _accountRepository.PayServiceByCardAsync(
+                    currentCard.Id,
                     currentAccount.Id,
                     amount,
                     description,
@@ -285,7 +292,7 @@ namespace Bank_ATM.Services
                     return new ServiceResult { Success = false, Message = LanguageManager.GetString("InsufficientFunds") };
                 }
 
-                await RefreshCurrentSessionAccountAsync();
+                await RefreshCurrentSessionAsync();
                 AuditLogger.LogInfo($"Account service payment: {amount} UZS for {description}");
                 return new ServiceResult { Success = true, Message = LanguageManager.GetString("ServicePaymentCompleted") };
             }
@@ -423,10 +430,14 @@ namespace Bank_ATM.Services
                 return null;
             }
 
+            decimal remainingBalance = SessionManager.Instance.CurrentCard == null
+                ? SessionManager.Instance.CurrentAccount.Balance
+                : SessionManager.Instance.CurrentCard.Balance;
+
             return ReceiptService.GenerateReceipt(
                 transaction,
                 SessionManager.Instance.CurrentUser.FullName,
-                SessionManager.Instance.CurrentAccount.Balance);
+                remainingBalance);
         }
 
         private static string SanitizeCardNumber(string rawCardNumber)
@@ -449,7 +460,7 @@ namespace Bank_ATM.Services
             return string.Join(", ", notes.Select(note => $"{note.DenominationValue:N2} x {note.NoteCount}"));
         }
 
-        private async Task<AccountDto> RefreshCurrentSessionAccountAsync()
+        private async Task<AccountDto> RefreshCurrentSessionAsync()
         {
             var refreshed = await _accountRepository.GetAccountByIdAsync(SessionManager.Instance.CurrentAccount.Id);
             if (refreshed != null)
@@ -457,6 +468,18 @@ namespace Bank_ATM.Services
                 SessionManager.Instance.CurrentAccount.Balance = refreshed.Balance;
                 SessionManager.Instance.CurrentAccount.IsActive = refreshed.IsActive;
                 SessionManager.Instance.CurrentAccount.AccountNumber = refreshed.AccountNumber;
+            }
+
+            if (SessionManager.Instance.CurrentCard != null)
+            {
+                var refreshedCard = _cardRepository.GetCardByNumber(SessionManager.Instance.CurrentCard.CardNumber);
+                if (refreshedCard != null)
+                {
+                    SessionManager.Instance.CurrentCard.Balance = refreshedCard.Balance;
+                    SessionManager.Instance.CurrentCard.IsBlocked = refreshedCard.IsBlocked;
+                    SessionManager.Instance.CurrentCard.ExpiryDate = refreshedCard.ExpiryDate;
+                    SessionManager.Instance.CurrentCard.CardType = refreshedCard.CardType;
+                }
             }
 
             return refreshed;

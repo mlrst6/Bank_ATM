@@ -23,6 +23,7 @@ namespace Bank_ATM.Admin
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.txtPhone = new System.Windows.Forms.TextBox();
             this.cmbRole = new System.Windows.Forms.ComboBox();
+            this.cmbInitialCardType = new System.Windows.Forms.ComboBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -32,6 +33,7 @@ namespace Bank_ATM.Admin
             this.label5 = new System.Windows.Forms.Label();
             this.lblPassNote = new System.Windows.Forms.Label();
             this.lblInitialPin = new System.Windows.Forms.Label();
+            this.lblInitialCardType = new System.Windows.Forms.Label();
             this.txtInitialPin = new System.Windows.Forms.TextBox();
             this.lblPinNote = new System.Windows.Forms.Label();
             this.pnlHeader.SuspendLayout();
@@ -105,22 +107,31 @@ namespace Bank_ATM.Admin
             this.cmbRole.Size = new System.Drawing.Size(288, 24);
             this.cmbRole.TabIndex = 5;
             // 
+            // cmbInitialCardType
+            // 
+            this.cmbInitialCardType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbInitialCardType.FormattingEnabled = true;
+            this.cmbInitialCardType.Location = new System.Drawing.Point(188, 396);
+            this.cmbInitialCardType.Name = "cmbInitialCardType";
+            this.cmbInitialCardType.Size = new System.Drawing.Size(288, 24);
+            this.cmbInitialCardType.TabIndex = 6;
+            // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(188, 452);
+            this.btnSave.Location = new System.Drawing.Point(188, 506);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(136, 44);
-            this.btnSave.TabIndex = 7;
+            this.btnSave.TabIndex = 8;
             this.btnSave.Text = "SAVE";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(340, 452);
+            this.btnCancel.Location = new System.Drawing.Point(340, 506);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(136, 44);
-            this.btnCancel.TabIndex = 8;
+            this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "CANCEL";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -184,27 +195,36 @@ namespace Bank_ATM.Admin
             // lblInitialPin
             // 
             this.lblInitialPin.AutoSize = true;
-            this.lblInitialPin.Location = new System.Drawing.Point(36, 399);
+            this.lblInitialPin.Location = new System.Drawing.Point(36, 453);
             this.lblInitialPin.Name = "lblInitialPin";
             this.lblInitialPin.Size = new System.Drawing.Size(65, 16);
             this.lblInitialPin.TabIndex = 15;
             this.lblInitialPin.Text = "Initial PIN:";
             // 
+            // lblInitialCardType
+            // 
+            this.lblInitialCardType.AutoSize = true;
+            this.lblInitialCardType.Location = new System.Drawing.Point(36, 399);
+            this.lblInitialCardType.Name = "lblInitialCardType";
+            this.lblInitialCardType.Size = new System.Drawing.Size(70, 16);
+            this.lblInitialCardType.TabIndex = 17;
+            this.lblInitialCardType.Text = "Card Type:";
+            // 
             // txtInitialPin
             // 
-            this.txtInitialPin.Location = new System.Drawing.Point(188, 396);
+            this.txtInitialPin.Location = new System.Drawing.Point(188, 450);
             this.txtInitialPin.MaxLength = 4;
             this.txtInitialPin.Name = "txtInitialPin";
             this.txtInitialPin.PasswordChar = '*';
             this.txtInitialPin.Size = new System.Drawing.Size(288, 22);
-            this.txtInitialPin.TabIndex = 6;
+            this.txtInitialPin.TabIndex = 7;
             // 
             // lblPinNote
             // 
             this.lblPinNote.AutoSize = true;
             this.lblPinNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.lblPinNote.ForeColor = System.Drawing.Color.Gray;
-            this.lblPinNote.Location = new System.Drawing.Point(185, 422);
+            this.lblPinNote.Location = new System.Drawing.Point(185, 476);
             this.lblPinNote.Name = "lblPinNote";
             this.lblPinNote.Size = new System.Drawing.Size(182, 15);
             this.lblPinNote.TabIndex = 16;
@@ -216,6 +236,8 @@ namespace Bank_ATM.Admin
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.lblPinNote);
             this.Controls.Add(this.txtInitialPin);
+            this.Controls.Add(this.lblInitialCardType);
+            this.Controls.Add(this.cmbInitialCardType);
             this.Controls.Add(this.lblInitialPin);
             this.Controls.Add(this.lblPassNote);
             this.Controls.Add(this.label5);
@@ -249,6 +271,7 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.TextBox txtPhone;
         private System.Windows.Forms.ComboBox cmbRole;
+        private System.Windows.Forms.ComboBox cmbInitialCardType;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label label1;
@@ -258,6 +281,7 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lblPassNote;
         private System.Windows.Forms.Label lblInitialPin;
+        private System.Windows.Forms.Label lblInitialCardType;
         private System.Windows.Forms.TextBox txtInitialPin;
         private System.Windows.Forms.Label lblPinNote;
     }

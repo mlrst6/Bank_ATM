@@ -14,6 +14,8 @@ namespace Bank_ATM.User
     {
         private readonly BankingService _bankingService = new BankingService();
         private readonly AuthenticationService _authenticationService = new AuthenticationService();
+        private StatusBanner _statusBanner;
+        private bool _statusLayoutApplied;
 
         public UserActionsForm()
         {
@@ -22,6 +24,8 @@ namespace Bank_ATM.User
 
         private void UserActionsForm_Load(object sender, EventArgs e)
         {
+            ClientSize = new Size(784, 715);
+            EnsureStatusBanner();
             AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
             ApplyTheme();
@@ -42,7 +46,7 @@ namespace Bank_ATM.User
             var currencies = _bankingService.GetActiveCurrencies();
             if (currencies.Length == 0)
             {
-                MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Error"), LanguageManager.GetString("SelectedCurrencyUnavailable"));
                 return;
             }
 
@@ -61,16 +65,15 @@ namespace Bank_ATM.User
                 {
                     AuditLogger.LogTransaction("Withdraw", result.DebitedAmountUzs, SessionManager.Instance.CurrentAccount.AccountNumber);
                     RefreshAccountSummary();
-                    ShowCashBreakdown(LanguageManager.GetString("CashDispensedBreakdown"), result.CashBreakdown);
-                    bool showedReceiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{dialog.Amount:N2} {dialog.CurrencyCode}");
-                    if (!showedReceiptMessage)
-                    {
-                        MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Withdraw"), MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    string receiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{dialog.Amount:N2} {dialog.CurrencyCode}");
+                    ShowStatus(
+                        StatusBannerKind.Success,
+                        LanguageManager.GetString("Withdraw"),
+                        BuildOperationSummary(LanguageManager.GetString("Success"), LanguageManager.GetString("CashDispensedBreakdown"), result.CashBreakdown, receiptMessage));
                 }
                 else
                 {
-                    MessageBox.Show(result.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Error"), result.Message);
                 }
             }
         }
@@ -80,7 +83,7 @@ namespace Bank_ATM.User
             var currencies = _bankingService.GetActiveCurrencies();
             if (currencies.Length == 0)
             {
-                MessageBox.Show(LanguageManager.GetString("SelectedCurrencyUnavailable"), LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Error"), LanguageManager.GetString("SelectedCurrencyUnavailable"));
                 return;
             }
 
@@ -102,12 +105,14 @@ namespace Bank_ATM.User
                 if (result.Success)
                 {
                     RefreshAccountSummary();
-                    ShowCashBreakdown(LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown);
-                    MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Deposit"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ShowStatus(
+                        StatusBannerKind.Success,
+                        LanguageManager.GetString("Deposit"),
+                        BuildOperationSummary(LanguageManager.GetString("Success"), LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown, null));
                 }
                 else
                 {
-                    MessageBox.Show(result.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Error"), result.Message);
                 }
             }
         }
@@ -129,15 +134,15 @@ namespace Bank_ATM.User
                 {
                     AuditLogger.LogTransaction("Transfer", dialog.Amount, $"{SessionManager.Instance.CurrentAccount.AccountNumber} -> {result.TargetCard.CardNumber}");
                     RefreshAccountSummary();
-                    bool showedReceiptMessage = OfferDigitalReceipt("Transfer", dialog.Amount, LanguageManager.Format("TransferReceiptDescription", result.TargetCard.CardNumber));
-                    if (!showedReceiptMessage)
-                    {
-                        MessageBox.Show(LanguageManager.GetString("Success"), LanguageManager.GetString("Transfer"), MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    string receiptMessage = OfferDigitalReceipt("Transfer", dialog.Amount, LanguageManager.Format("TransferReceiptDescription", result.TargetCard.CardNumber));
+                    ShowStatus(
+                        StatusBannerKind.Success,
+                        LanguageManager.GetString("Transfer"),
+                        BuildOperationSummary(LanguageManager.GetString("Success"), null, null, receiptMessage));
                 }
                 else
                 {
-                    MessageBox.Show(result.Message, LanguageManager.GetString("Error"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Error"), result.Message);
                 }
             }
         }
@@ -145,11 +150,10 @@ namespace Bank_ATM.User
         private void btnBalance_Click(object sender, EventArgs e)
         {
             RefreshAccountSummary();
-            MessageBox.Show(
-                LanguageManager.Format("CurrentBalanceMessage", SessionManager.Instance.CurrentAccount.Balance),
+            ShowStatus(
+                StatusBannerKind.Info,
                 LanguageManager.GetString("BalanceInfo"),
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+                LanguageManager.Format("CurrentBalanceMessage", SessionManager.Instance.CurrentCard.Balance));
         }
 
         private void btnServices_Click(object sender, EventArgs e)
@@ -159,6 +163,7 @@ namespace Bank_ATM.User
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     RefreshAccountSummary();
+                    ShowStatus(StatusBannerKind.Success, LanguageManager.GetString("Payment"), LanguageManager.GetString("ServicePaymentCompleted"));
                 }
             }
         }
@@ -193,8 +198,9 @@ namespace Bank_ATM.User
         {
             var user = SessionManager.Instance.CurrentUser;
             var account = SessionManager.Instance.CurrentAccount;
+            var card = SessionManager.Instance.CurrentCard;
 
-            if (user == null || account == null)
+            if (user == null || account == null || card == null)
             {
                 lblWelcome.Text = LanguageManager.GetString("AccountSessionUnavailable");
                 lblAccountValue.Text = "-";
@@ -205,22 +211,21 @@ namespace Bank_ATM.User
 
             lblWelcome.Text = LanguageManager.Format("WelcomeBackUser", user.FullName);
             lblSubtitle.Text = LanguageManager.GetString("UserDashboardSubtitle");
-            lblAccountValue.Text = account.AccountNumber;
-            lblBalanceValue.Text = LanguageManager.Format("CurrencyAmountUzs", account.Balance);
+            lblAccountValue.Text = $"{card.CardType} {MaskCardNumber(card.CardNumber)}";
+            lblBalanceValue.Text = LanguageManager.Format("CurrencyAmountUzs", card.Balance);
             lblStatusValue.Text = account.IsActive
                 ? LanguageManager.GetString("AccountActive")
                 : LanguageManager.GetString("AccountInactive");
         }
 
-        private bool OfferDigitalReceipt(string transactionType, decimal amount, string description)
+        private string OfferDigitalReceipt(string transactionType, decimal amount, string description)
         {
-            if (MessageBox.Show(
-                LanguageManager.GetString("DigitalReceiptPrompt"),
-                LanguageManager.GetString("Receipt"),
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question) != DialogResult.Yes)
+            using (var dialog = new ReceiptChoiceDialog(LanguageManager.GetString("ReceiptChoiceSubtitle")))
             {
-                return false;
+                if (dialog.ShowDialog(this) != DialogResult.OK || dialog.Choice != ReceiptChoice.SavePdf)
+                {
+                    return null;
+                }
             }
 
             var transaction = new TransactionDto
@@ -234,27 +239,77 @@ namespace Bank_ATM.User
             string path = _bankingService.GenerateReceiptForCurrentSession(transaction);
             if (!string.IsNullOrWhiteSpace(path))
             {
-                MessageBox.Show(
-                    LanguageManager.Format("ReceiptSavedTo", path),
-                    LanguageManager.GetString("Success"),
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return true;
+                using (var savedDialog = new ReceiptSavedDialog(path))
+                {
+                    savedDialog.ShowDialog(this);
+                }
+
+                return LanguageManager.Format("ReceiptSavedTo", path);
             }
 
-            return false;
+            return null;
         }
 
-        private void ShowCashBreakdown(string title, CashNoteDto[] notes)
+        private string BuildOperationSummary(string message, string cashTitle, CashNoteDto[] notes, string receiptMessage)
         {
-            if (notes == null || notes.Length == 0)
+            var parts = new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                parts.Add(message);
+            }
+
+            if (notes != null && notes.Length > 0)
+            {
+                parts.Add(cashTitle + ": " + string.Join("; ", notes.Select(note =>
+                    $"{note.DenominationValue:N0} {note.CurrencyCode} x {note.NoteCount}")));
+            }
+
+            if (!string.IsNullOrWhiteSpace(receiptMessage))
+            {
+                parts.Add(receiptMessage);
+            }
+
+            return string.Join(Environment.NewLine, parts);
+        }
+
+        private void ShowStatus(StatusBannerKind kind, string title, string message)
+        {
+            EnsureStatusBanner();
+            _statusBanner.ShowMessage(kind, title, message);
+        }
+
+        private void EnsureStatusBanner()
+        {
+            if (_statusBanner == null)
+            {
+                _statusBanner = new StatusBanner
+                {
+                    Location = new Point(28, 332),
+                    Size = new Size(728, 82),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                };
+                Controls.Add(_statusBanner);
+            }
+
+            if (_statusLayoutApplied)
             {
                 return;
             }
 
-            string message = string.Join(Environment.NewLine, notes.Select(note =>
-                $"{note.DenominationValue:N0} {note.CurrencyCode} x {note.NoteCount} = {note.TotalValue:N0} {note.CurrencyCode}"));
-            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ShiftControl(btnWithdraw, 94);
+            ShiftControl(btnDeposit, 94);
+            ShiftControl(btnTransfer, 94);
+            ShiftControl(btnServices, 94);
+            ShiftControl(btnBalance, 94);
+            ShiftControl(btnSettings, 94);
+            ShiftControl(btnBack, 94);
+            ShiftControl(btnLogout, 94);
+            _statusLayoutApplied = true;
+        }
+
+        private static void ShiftControl(Control control, int deltaY)
+        {
+            control.Location = new Point(control.Location.X, control.Location.Y + deltaY);
         }
 
         private void ApplyTheme()
@@ -298,6 +353,17 @@ namespace Bank_ATM.User
             button.FlatAppearance.BorderSize = 0;
             button.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
             button.Cursor = Cursors.Hand;
+        }
+
+        private static string MaskCardNumber(string cardNumber)
+        {
+            string digits = (cardNumber ?? string.Empty).Trim();
+            if (digits.Length <= 4)
+            {
+                return digits;
+            }
+
+            return "**** " + digits.Substring(digits.Length - 4);
         }
 
     }

@@ -166,6 +166,24 @@ namespace Bank_ATM.Core
                         throw new InvalidOperationException(
                             "Database schema is outdated. Apply the ATM cash denominations migration before starting the application.");
                     }
+
+                    int cardMoneyColumns = connection.ExecuteScalar<int>(@"
+                        SELECT
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.cards')
+                               AND name IN ('card_type', 'balance'))
+                            +
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.transactions')
+                               AND name IN ('card_id', 'target_card_id'))");
+
+                    if (cardMoneyColumns < 4)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the card balance and card type migration before starting the application.");
+                    }
                 }
             }
             catch (Exception ex)

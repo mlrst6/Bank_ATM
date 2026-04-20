@@ -406,7 +406,7 @@ namespace Bank_ATM.User
             if (_operationType == UserOperationType.Transfer)
             {
                 return $"{GetOperationTitle()}{Environment.NewLine}{Environment.NewLine}" +
-                       $"{LanguageManager.GetString("TargetCardNumber")}: {TargetCardNumber}{Environment.NewLine}" +
+                       $"{LanguageManager.GetString("TargetCardNumber")}: {MaskCardNumber(TargetCardNumber)}{Environment.NewLine}" +
                        amountLine;
             }
 
@@ -458,6 +458,17 @@ namespace Bank_ATM.User
 
             amount = 0m;
             return false;
+        }
+
+        private static string MaskCardNumber(string cardNumber)
+        {
+            string digits = (cardNumber ?? string.Empty).Trim();
+            if (digits.Length < 4)
+            {
+                return "****";
+            }
+
+            return "**** **** **** " + digits.Substring(digits.Length - 4);
         }
 
         private void TargetCardTextBox_KeyPress(object sender, KeyPressEventArgs e)

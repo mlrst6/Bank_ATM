@@ -286,6 +286,7 @@ namespace Bank_ATM.Admin
                 case "PrimaryAccountId": return "Account ID";
                 case "PrimaryAccountNumber": return "Account Number";
                 case "CardNumber": return "Card Number";
+                case "CardType": return "Card Type";
                 case "PhoneNumber": return "Phone";
                 case "FullName": return "Full Name";
                 case "CreatedAt": return "Created";
@@ -310,6 +311,8 @@ namespace Bank_ATM.Admin
                 case "TransactionDate": return "Transaction Date";
                 case "TargetAccountId": return "Target Account";
                 case "AccountId": return "Account";
+                case "CardId": return "Card";
+                case "TargetCardId": return "Target Card";
                 default:
                     if (string.IsNullOrEmpty(propertyName)) return propertyName;
                     var chars = propertyName.Select((c, i) => i > 0 && char.IsUpper(c) ? " " + c : c.ToString());

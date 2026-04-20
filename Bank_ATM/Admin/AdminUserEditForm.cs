@@ -23,6 +23,9 @@ namespace Bank_ATM.Admin
         {
             ApplyTheme();
             NumericInputDialog.Attach(txtInitialPin, LanguageManager.GetString("InitialPin"));
+            cmbInitialCardType.DataSource = CardTypes.All;
+            cmbInitialCardType.SelectedItem = CardTypes.Uzcard;
+            lblInitialCardType.Text = LanguageManager.GetString("CardType");
             btnSave.Text = LanguageManager.GetString("Save");
             btnCancel.Text = LanguageManager.GetString("Cancel");
             lblDialogTitle.Text = _isEdit
@@ -40,6 +43,8 @@ namespace Bank_ATM.Admin
                 lblPassNote.Text = LanguageManager.GetString("LeaveBlankToKeepPassword");
                 txtInitialPin.Visible = false;
                 lblInitialPin.Visible = false;
+                cmbInitialCardType.Visible = false;
+                lblInitialCardType.Visible = false;
                 lblPinNote.Visible = false;
             }
             else
@@ -88,7 +93,10 @@ namespace Bank_ATM.Admin
 
             try
             {
-                await _adminService.SaveUserAsync(_user, txtPassword.Text, txtInitialPin.Text, _isEdit);
+                string initialCardType = cmbInitialCardType.SelectedItem == null
+                    ? CardTypes.Uzcard
+                    : cmbInitialCardType.SelectedItem.ToString();
+                await _adminService.SaveUserAsync(_user, txtPassword.Text, txtInitialPin.Text, _isEdit, initialCardType);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -111,6 +119,8 @@ namespace Bank_ATM.Admin
             bool isUser = !_isEdit && cmbRole.SelectedItem != null && cmbRole.SelectedItem.ToString() == "User";
             txtInitialPin.Visible = isUser;
             lblInitialPin.Visible = isUser;
+            cmbInitialCardType.Visible = isUser;
+            lblInitialCardType.Visible = isUser;
             lblPinNote.Visible = isUser;
             lblPinNote.Text = isUser ? LanguageManager.GetString("CreatesUserAccountCard") : string.Empty;
         }
@@ -128,6 +138,7 @@ namespace Bank_ATM.Admin
             AdminTheme.StyleLabel(label5, true);
             AdminTheme.StyleLabel(lblPassNote, true);
             AdminTheme.StyleLabel(lblInitialPin, true);
+            AdminTheme.StyleLabel(lblInitialCardType, true);
             AdminTheme.StyleLabel(lblPinNote, true);
             AdminTheme.StyleTextBox(txtFullName);
             AdminTheme.StyleTextBox(txtUsername);
@@ -135,6 +146,7 @@ namespace Bank_ATM.Admin
             AdminTheme.StyleTextBox(txtPhone);
             AdminTheme.StyleTextBox(txtInitialPin);
             AdminTheme.StyleComboBox(cmbRole);
+            AdminTheme.StyleComboBox(cmbInitialCardType);
             AdminTheme.StyleSuccessButton(btnSave);
             AdminTheme.StyleSecondaryButton(btnCancel);
         }
