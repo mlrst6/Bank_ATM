@@ -18,7 +18,9 @@ namespace Bank_ATM.Payments
         private StatusBanner _statusBanner;
         private bool _completed;
         private bool _isReviewing;
+        private bool _referenceVerified;
         private ServiceDto _pendingService;
+        private ServiceAccountDto _verifiedServiceAccount;
         private string _pendingReference;
         private decimal _pendingAmount;
         private CashNoteDto[] _pendingNotes;
@@ -44,6 +46,8 @@ namespace Bank_ATM.Payments
             btnPay.Values.Text = btnPay.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
             btnCancel.Values.Text = btnCancel.Text;
+            lblCustomerNameValue.Text = "-";
+            lblReferenceStatusValue.Text = LanguageManager.GetString("WaitingForVerification");
             NumericInputDialog.Attach(txtReference, LanguageManager.GetString("AccountNumber"));
             if (!_chargeCurrentAccount)
             {
@@ -66,7 +70,12 @@ namespace Bank_ATM.Payments
                 UpdateHint();
             }
 
-            cmbServices.SelectedIndexChanged += (s, args) => UpdateHint();
+            cmbServices.SelectedIndexChanged += (s, args) =>
+            {
+                UpdateHint();
+                ResetVerificationState();
+            };
+            txtReference.TextChanged += (s, args) => ResetVerificationState();
         }
 
         private async void btnPay_Click(object sender, EventArgs e)
@@ -82,14 +91,66 @@ namespace Bank_ATM.Payments
                 return;
             }
 
+            if (!_referenceVerified)
+            {
+                VerifyReference();
+                return;
+            }
+
             PreparePaymentReview();
         }
 
-        private void PreparePaymentReview()
+        private void VerifyReference()
         {
             if (cmbServices.SelectedItem == null)
             {
                 ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Validation"), LanguageManager.GetString("PleaseSelectService"));
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtReference.Text))
+            {
+                ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Validation"), LanguageManager.GetString("InvalidServicePaymentInput"));
+                txtReference.Focus();
+                return;
+            }
+
+            var service = (ServiceDto)cmbServices.SelectedItem;
+            var lookup = _bankingService.VerifyServiceAccount(service.Id, txtReference.Text);
+            if (!lookup.Success)
+            {
+                ResetVerificationState();
+                ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Validation"), lookup.Message);
+                return;
+            }
+
+            _referenceVerified = true;
+            _verifiedServiceAccount = lookup.ServiceAccount;
+            lblCustomerNameValue.Text = string.IsNullOrWhiteSpace(lookup.ServiceAccount.CustomerName)
+                ? lookup.ServiceAccount.ReferenceNumber
+                : lookup.ServiceAccount.CustomerName;
+            lblReferenceStatusValue.Text = LanguageManager.GetString("Verified");
+            btnPay.Text = LanguageManager.GetString("Continue");
+            btnPay.Values.Text = btnPay.Text;
+
+            ShowStatus(
+                StatusBannerKind.Success,
+                LanguageManager.GetString("Success"),
+                LanguageManager.Format(
+                    "ServiceReferenceVerifiedSummary",
+                    lookup.Service.ServiceName,
+                    lblCustomerNameValue.Text,
+                    lookup.ServiceAccount.ReferenceNumber));
+        }
+
+        private void PreparePaymentReview()
+        {
+            if (!_referenceVerified || _verifiedServiceAccount == null || cmbServices.SelectedItem == null)
+            {
+                ShowStatus(
+                    StatusBannerKind.Warning,
+                    LanguageManager.GetString("Validation"),
+                    LanguageManager.GetString("VerifyServiceReferenceBeforeContinuing"));
                 return;
             }
 
@@ -108,7 +169,7 @@ namespace Bank_ATM.Payments
             }
 
             var service = (ServiceDto)cmbServices.SelectedItem;
-            string reference = txtReference.Text.Trim();
+            string reference = _verifiedServiceAccount.ReferenceNumber;
             CashNoteDto[] notes = null;
             if (!_chargeCurrentAccount)
             {
@@ -134,6 +195,7 @@ namespace Bank_ATM.Payments
 
                     notes = notesDialog.Notes;
                     amount = notesDialog.TotalAmount;
+                    txtAmount.Text = amount.ToString("N2");
                 }
             }
 
@@ -203,6 +265,21 @@ namespace Bank_ATM.Payments
                 : LanguageManager.Format("RequiredFieldHint", selected.AccountHint);
         }
 
+        private void ResetVerificationState()
+        {
+            if (_isReviewing || _completed)
+            {
+                return;
+            }
+
+            _referenceVerified = false;
+            _verifiedServiceAccount = null;
+            lblCustomerNameValue.Text = "-";
+            lblReferenceStatusValue.Text = LanguageManager.GetString("WaitingForVerification");
+            btnPay.Text = LanguageManager.GetString("Pay");
+            btnPay.Values.Text = btnPay.Text;
+        }
+
         private void SetLoading(bool isLoading)
         {
             UseWaitCursor = isLoading;
@@ -218,7 +295,6 @@ namespace Bank_ATM.Payments
             BackColor = Color.FromArgb(14, 23, 38);
             ForeColor = Color.White;
             Font = new Font("Segoe UI", 10F);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
 
             pnlHeader.BackColor = Color.FromArgb(23, 37, 61);
             lblTitle.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold);
@@ -243,6 +319,11 @@ namespace Bank_ATM.Payments
             lblReference.ForeColor = Color.FromArgb(148, 163, 184);
             lblAmount.ForeColor = Color.FromArgb(148, 163, 184);
             lblReferenceHint.ForeColor = Color.FromArgb(148, 163, 184);
+            pnlVerification.BackColor = Color.FromArgb(19, 32, 56);
+            lblCustomerNameCaption.ForeColor = Color.FromArgb(148, 163, 184);
+            lblReferenceStatusCaption.ForeColor = Color.FromArgb(148, 163, 184);
+            lblCustomerNameValue.ForeColor = Color.White;
+            lblReferenceStatusValue.ForeColor = Color.FromArgb(125, 211, 252);
         }
 
         private void ShowStatus(StatusBannerKind kind, string title, string message)
@@ -260,9 +341,9 @@ namespace Bank_ATM.Payments
 
             _statusBanner = new StatusBanner
             {
-                Location = new Point(39, 438),
-                Size = new Size(417, 82),
-                Anchor = AnchorStyles.Left | AnchorStyles.Bottom
+                Location = new Point(39, 486),
+                Size = new Size(797, 58),
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
             };
             Controls.Add(_statusBanner);
         }
@@ -271,17 +352,17 @@ namespace Bank_ATM.Payments
         {
             _isReviewing = false;
             _pendingService = null;
+            _verifiedServiceAccount = null;
             _pendingReference = null;
             _pendingAmount = 0m;
             _pendingNotes = null;
-            btnPay.Text = LanguageManager.GetString("Pay");
-            btnPay.Values.Text = btnPay.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
             btnCancel.Values.Text = btnCancel.Text;
             cmbServices.Enabled = true;
             txtReference.Enabled = true;
             txtAmount.Enabled = true;
             _statusBanner.Clear();
+            ResetVerificationState();
         }
 
         private string BuildReviewMessage()
@@ -290,6 +371,7 @@ namespace Bank_ATM.Payments
             string message =
                 LanguageManager.Format("ServiceReceiptService", _pendingService.ServiceName) + Environment.NewLine +
                 LanguageManager.Format("ServiceReceiptReference", _pendingReference) + Environment.NewLine +
+                LanguageManager.Format("ServiceReceiptCustomer", lblCustomerNameValue.Text) + Environment.NewLine +
                 amountLine;
 
             if (_pendingNotes != null && _pendingNotes.Length > 0)

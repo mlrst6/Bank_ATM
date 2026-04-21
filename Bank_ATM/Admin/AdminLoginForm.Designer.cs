@@ -103,6 +103,7 @@ namespace Bank_ATM.Admin
             // 
             // AdminLoginForm
             // 
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
             this.ClientSize = new System.Drawing.Size(900, 650);
             this.Controls.Add(this.lblPass);

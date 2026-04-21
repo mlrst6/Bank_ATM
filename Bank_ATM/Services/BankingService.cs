@@ -242,6 +242,48 @@ namespace Bank_ATM.Services
             return _servicesRepository.GetActiveServices().ToArray();
         }
 
+        public ServiceLookupResult VerifyServiceAccount(int serviceId, string accountReference)
+        {
+            string sanitizedReference = (accountReference ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(sanitizedReference))
+            {
+                return new ServiceLookupResult
+                {
+                    Success = false,
+                    Message = LanguageManager.GetString("InvalidServicePaymentInput")
+                };
+            }
+
+            var service = _servicesRepository.GetServiceById(serviceId);
+            if (service == null || !service.IsActive)
+            {
+                return new ServiceLookupResult
+                {
+                    Success = false,
+                    Message = LanguageManager.GetString("SelectedServiceUnavailable")
+                };
+            }
+
+            var serviceAccount = _servicesRepository.GetActiveServiceAccount(service.Id, sanitizedReference);
+            if (serviceAccount == null)
+            {
+                return new ServiceLookupResult
+                {
+                    Success = false,
+                    Message = LanguageManager.Format("ServiceReferenceNotFound", sanitizedReference, service.ServiceName),
+                    Service = service
+                };
+            }
+
+            return new ServiceLookupResult
+            {
+                Success = true,
+                Message = $"{service.ServiceName}: {serviceAccount.CustomerName}",
+                Service = service,
+                ServiceAccount = serviceAccount
+            };
+        }
+
         public async Task<ServiceResult> PayServiceAsync(int serviceId, string accountReference, decimal amount, bool chargeCurrentAccount)
         {
             string sanitizedReference = (accountReference ?? string.Empty).Trim();

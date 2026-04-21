@@ -24,7 +24,6 @@ namespace Bank_ATM.User
 
         private void UserActionsForm_Load(object sender, EventArgs e)
         {
-            ClientSize = new Size(784, 715);
             EnsureStatusBanner();
             AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);

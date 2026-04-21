@@ -32,10 +32,19 @@ namespace Bank_ATM.Services
         public string ToCurrencyCode { get; set; }
         public decimal SourceAmount { get; set; }
         public decimal SourceAmountUzs { get; set; }
+        public decimal RequestedTargetAmount { get; set; }
         public decimal TargetAmount { get; set; }
         public decimal Rate { get; set; }
+        public bool IsApproximateAmount { get; set; }
+        public decimal UnavailableAmount { get; set; }
         public CashNoteDto[] InsertedNotes { get; set; }
         public CashNoteDto[] DispensedNotes { get; set; }
+    }
+
+    public class ServiceLookupResult : ServiceResult
+    {
+        public ServiceDto Service { get; set; }
+        public ServiceAccountDto ServiceAccount { get; set; }
     }
 
     public class CardAccessResult : ServiceResult

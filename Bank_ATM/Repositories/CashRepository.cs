@@ -382,6 +382,123 @@ namespace Bank_ATM.Repositories
             return remaining == 0m ? result : null;
         }
 
+        internal static IList<CashNoteDto> BuildClosestDispenseBreakdown(
+            decimal requestedAmount,
+            IEnumerable<CashDenominationDto> denominations,
+            out decimal actualAmount)
+        {
+            actualAmount = 0m;
+
+            var denominationList = (denominations ?? Enumerable.Empty<CashDenominationDto>())
+                .Where(d => d != null && d.NoteCount > 0 && d.DenominationValue > 0m)
+                .OrderByDescending(d => d.DenominationValue)
+                .ToList();
+            if (!denominationList.Any() || requestedAmount <= 0m)
+            {
+                return null;
+            }
+
+            decimal bestAmount = 0m;
+            int[] bestCounts = null;
+            int[] currentCounts = new int[denominationList.Count];
+
+            SearchBestDispense(
+                denominationList,
+                0,
+                decimal.Round(requestedAmount, 2),
+                0m,
+                currentCounts,
+                ref bestAmount,
+                ref bestCounts);
+
+            if (bestCounts == null || bestAmount <= 0m)
+            {
+                return null;
+            }
+
+            var result = new List<CashNoteDto>();
+            for (int i = 0; i < denominationList.Count; i++)
+            {
+                if (bestCounts[i] <= 0)
+                {
+                    continue;
+                }
+
+                result.Add(new CashNoteDto
+                {
+                    CurrencyId = denominationList[i].CurrencyId,
+                    CurrencyCode = denominationList[i].CurrencyCode,
+                    DenominationValue = denominationList[i].DenominationValue,
+                    NoteCount = bestCounts[i]
+                });
+            }
+
+            actualAmount = decimal.Round(bestAmount, 2);
+            return result;
+        }
+
+        private static void SearchBestDispense(
+            IList<CashDenominationDto> denominations,
+            int index,
+            decimal targetAmount,
+            decimal currentAmount,
+            int[] currentCounts,
+            ref decimal bestAmount,
+            ref int[] bestCounts)
+        {
+            currentAmount = decimal.Round(currentAmount, 2);
+            if (currentAmount > bestAmount)
+            {
+                bestAmount = currentAmount;
+                bestCounts = (int[])currentCounts.Clone();
+                if (bestAmount == targetAmount)
+                {
+                    return;
+                }
+            }
+
+            if (index >= denominations.Count || currentAmount >= targetAmount)
+            {
+                return;
+            }
+
+            decimal remainingCapacity = 0m;
+            for (int i = index; i < denominations.Count; i++)
+            {
+                remainingCapacity += denominations[i].DenominationValue * denominations[i].NoteCount;
+            }
+
+            if (decimal.Round(currentAmount + remainingCapacity, 2) <= bestAmount)
+            {
+                return;
+            }
+
+            var denomination = denominations[index];
+            int maxCount = (int)Math.Min(
+                denomination.NoteCount,
+                Math.Floor((double)((targetAmount - currentAmount) / denomination.DenominationValue)));
+
+            for (int count = maxCount; count >= 0; count--)
+            {
+                currentCounts[index] = count;
+                SearchBestDispense(
+                    denominations,
+                    index + 1,
+                    targetAmount,
+                    currentAmount + (denomination.DenominationValue * count),
+                    currentCounts,
+                    ref bestAmount,
+                    ref bestCounts);
+
+                if (bestAmount == targetAmount)
+                {
+                    return;
+                }
+            }
+
+            currentCounts[index] = 0;
+        }
+
         internal static void SyncCashTotals(IDbConnection db, IDbTransaction trans, int currencyId)
         {
             db.Execute(@"

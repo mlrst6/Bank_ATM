@@ -32,8 +32,13 @@ namespace Bank_ATM.Services
                 return validation;
             }
 
+            decimal requestedTargetAmount = validation.TargetAmount;
             var targetDenominations = _cashRepository.GetDenominations(validation.ToCurrencyCode).ToArray();
-            var dispensedNotes = CashRepository.BuildDispenseBreakdown(validation.TargetAmount, targetDenominations);
+            decimal actualTargetAmount;
+            var dispensedNotes = CashRepository.BuildClosestDispenseBreakdown(
+                validation.TargetAmount,
+                targetDenominations,
+                out actualTargetAmount);
             if (dispensedNotes == null || dispensedNotes.Count == 0)
             {
                 validation.Success = false;
@@ -42,6 +47,10 @@ namespace Bank_ATM.Services
             }
 
             validation.Success = true;
+            validation.RequestedTargetAmount = requestedTargetAmount;
+            validation.TargetAmount = actualTargetAmount;
+            validation.IsApproximateAmount = actualTargetAmount < requestedTargetAmount;
+            validation.UnavailableAmount = decimal.Round(requestedTargetAmount - actualTargetAmount, 2);
             validation.Message = BuildExchangeSummary(validation, dispensedNotes.ToArray());
             validation.DispensedNotes = dispensedNotes.ToArray();
             return validation;
@@ -148,6 +157,16 @@ namespace Bank_ATM.Services
 
         private static string BuildExchangeSummary(GuestExchangeResult result, CashNoteDto[] dispensedNotes)
         {
+            if (result.IsApproximateAmount)
+            {
+                return LanguageManager.Format(
+                    "ExchangeApproximatePreviewSummary",
+                    result.RequestedTargetAmount,
+                    result.ToCurrencyCode,
+                    result.TargetAmount,
+                    FormatNotes(dispensedNotes));
+            }
+
             return LanguageManager.Format(
                 "ExchangePreviewSummary",
                 result.SourceAmount,

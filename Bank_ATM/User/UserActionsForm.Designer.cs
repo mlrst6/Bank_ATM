@@ -236,8 +236,8 @@ namespace Bank_ATM.User
             // UserActionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 621);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.ClientSize = new System.Drawing.Size(900, 650);
             this.Controls.Add(this.btnLogout);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnSettings);

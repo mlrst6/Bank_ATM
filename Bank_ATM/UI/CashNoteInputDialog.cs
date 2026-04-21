@@ -198,22 +198,28 @@ namespace Bank_ATM.UI
                     ForeColor = Color.FromArgb(170, 184, 204)
                 };
 
-                var countTextBox = new TextBox
-                {
-                    Text = "0",
-                    Location = new Point(370, y + 4),
-                    Size = new Size(90, 30),
-                    BackColor = Color.FromArgb(30, 41, 59),
-                    ForeColor = Color.White,
-                    BorderStyle = BorderStyle.FixedSingle,
-                    TextAlign = HorizontalAlignment.Right,
-                    Tag = denomination
-                };
-                countTextBox.KeyPress += CountTextBox_KeyPress;
-                countTextBox.TextChanged += (s, e) => UpdateTotal();
-                NumericInputDialog.Attach(
-                    countTextBox,
-                    denomination.DenominationValue.ToString("N0", CultureInfo.CurrentCulture) + " " + currency.Code);
+                 var countTextBox = new TextBox
+                 {
+                     Text = "0",
+                     Location = new Point(370, y + 4),
+                     Size = new Size(90, 30),
+                     MaxLength = 5,
+                     BackColor = Color.FromArgb(30, 41, 59),
+                     ForeColor = Color.White,
+                     BorderStyle = BorderStyle.FixedSingle,
+                     TextAlign = HorizontalAlignment.Right,
+                     Tag = denomination
+                 };
+                 countTextBox.KeyPress += CountTextBox_KeyPress;
+                 countTextBox.TextChanged += (s, e) => UpdateTotal();
+                 countTextBox.Enter += (s, e) => countTextBox.SelectAll();
+                 countTextBox.Leave += (s, e) =>
+                 {
+                     if (string.IsNullOrWhiteSpace(countTextBox.Text))
+                     {
+                         countTextBox.Text = "0";
+                     }
+                 };
 
                 _notesPanel.Controls.Add(valueLabel);
                 if (_showAvailableNotes)

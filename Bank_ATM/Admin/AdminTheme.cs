@@ -19,10 +19,6 @@ namespace Bank_ATM.Admin
             form.BackColor = Background;
             form.ForeColor = TextPrimary;
             form.Font = new Font("Segoe UI", 10F, FontStyle.Regular);
-            if (form.FormBorderStyle != FormBorderStyle.None)
-            {
-                form.FormBorderStyle = FormBorderStyle.FixedDialog;
-            }
         }
 
         public static void StyleTitle(Label label)

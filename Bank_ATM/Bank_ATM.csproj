@@ -131,6 +131,9 @@
     <Compile Include="Guest\GuestExchangeForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Guest\GuestExchangeForm.Designer.cs">
+      <DependentUpon>GuestExchangeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="User\UserCardEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
