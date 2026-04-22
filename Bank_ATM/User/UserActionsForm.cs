@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
@@ -10,34 +9,38 @@ using Bank_ATM.UI;
 
 namespace Bank_ATM.User
 {
-    public partial class UserActionsForm : Form
-    {
-        private readonly BankingService _bankingService = new BankingService();
-        private readonly AuthenticationService _authenticationService = new AuthenticationService();
-        private StatusBanner _statusBanner;
-        private bool _statusLayoutApplied;
-
-        public UserActionsForm()
+        public partial class UserActionsForm : Form
         {
-            InitializeComponent();
+            private readonly BankingService _bankingService = new BankingService();
+            private readonly AuthenticationService _authenticationService = new AuthenticationService();
+
+            public UserActionsForm()
+            {
+                InitializeComponent();
         }
 
         private void UserActionsForm_Load(object sender, EventArgs e)
         {
-            EnsureStatusBanner();
             AppWindow.ApplyMainScreen(this);
             LanguageManager.Apply(this);
-            ApplyTheme();
             RefreshAccountSummary();
 
             btnWithdraw.Text = LanguageManager.GetString("Withdraw");
+            btnWithdraw.Values.Text = btnWithdraw.Text;
             btnDeposit.Text = LanguageManager.GetString("Deposit");
+            btnDeposit.Values.Text = btnDeposit.Text;
             btnTransfer.Text = LanguageManager.GetString("Transfer");
+            btnTransfer.Values.Text = btnTransfer.Text;
             btnServices.Text = LanguageManager.GetString("PayServices");
+            btnServices.Values.Text = btnServices.Text;
             btnBalance.Text = LanguageManager.GetString("ViewBalance");
+            btnBalance.Values.Text = btnBalance.Text;
             btnSettings.Text = LanguageManager.GetString("UserSettings");
+            btnSettings.Values.Text = btnSettings.Text;
             btnBack.Text = LanguageManager.GetString("Back");
+            btnBack.Values.Text = btnBack.Text;
             btnLogout.Text = LanguageManager.GetString("Logout");
+            btnLogout.Values.Text = btnLogout.Text;
         }
 
         private async void btnWithdraw_Click(object sender, EventArgs e)
@@ -273,85 +276,7 @@ namespace Bank_ATM.User
 
         private void ShowStatus(StatusBannerKind kind, string title, string message)
         {
-            EnsureStatusBanner();
-            _statusBanner.ShowMessage(kind, title, message);
-        }
-
-        private void EnsureStatusBanner()
-        {
-            if (_statusBanner == null)
-            {
-                _statusBanner = new StatusBanner
-                {
-                    Location = new Point(28, 332),
-                    Size = new Size(728, 82),
-                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-                };
-                Controls.Add(_statusBanner);
-            }
-
-            if (_statusLayoutApplied)
-            {
-                return;
-            }
-
-            ShiftControl(btnWithdraw, 94);
-            ShiftControl(btnDeposit, 94);
-            ShiftControl(btnTransfer, 94);
-            ShiftControl(btnServices, 94);
-            ShiftControl(btnBalance, 94);
-            ShiftControl(btnSettings, 94);
-            ShiftControl(btnBack, 94);
-            ShiftControl(btnLogout, 94);
-            _statusLayoutApplied = true;
-        }
-
-        private static void ShiftControl(Control control, int deltaY)
-        {
-            control.Location = new Point(control.Location.X, control.Location.Y + deltaY);
-        }
-
-        private void ApplyTheme()
-        {
-            BackColor = Color.FromArgb(9, 14, 28);
-            ForeColor = Color.White;
-            Font = new Font("Segoe UI", 10F);
-
-            pnlHeader.BackColor = Color.FromArgb(15, 23, 42);
-            lblWelcome.Font = new Font("Segoe UI Semibold", 24F, FontStyle.Bold);
-            lblWelcome.ForeColor = Color.White;
-            lblSubtitle.ForeColor = Color.FromArgb(148, 163, 184);
-
-            pnlAccountCard.BackColor = Color.FromArgb(19, 32, 56);
-            pnlAccountCard.BorderStyle = BorderStyle.FixedSingle;
-            lblCardTitle.ForeColor = Color.FromArgb(191, 219, 254);
-            lblAccountCaption.ForeColor = Color.FromArgb(148, 163, 184);
-            lblBalanceCaption.ForeColor = Color.FromArgb(148, 163, 184);
-            lblStatusCaption.ForeColor = Color.FromArgb(148, 163, 184);
-            lblAccountValue.ForeColor = Color.White;
-            lblBalanceValue.ForeColor = Color.FromArgb(125, 211, 252);
-            lblBalanceValue.Font = new Font("Segoe UI Semibold", 24F, FontStyle.Bold);
-            lblStatusValue.ForeColor = Color.FromArgb(74, 222, 128);
-            lblHelper.ForeColor = Color.FromArgb(148, 163, 184);
-
-            StyleActionButton(btnWithdraw, Color.FromArgb(37, 99, 235));
-            StyleActionButton(btnDeposit, Color.FromArgb(8, 145, 178));
-            StyleActionButton(btnTransfer, Color.FromArgb(124, 58, 237));
-            StyleActionButton(btnServices, Color.FromArgb(22, 163, 74));
-            StyleActionButton(btnBalance, Color.FromArgb(234, 88, 12));
-            StyleActionButton(btnSettings, Color.FromArgb(79, 70, 229));
-            StyleActionButton(btnBack, Color.FromArgb(71, 85, 105));
-            StyleActionButton(btnLogout, Color.FromArgb(71, 85, 105));
-        }
-
-        private void StyleActionButton(Button button, Color backColor)
-        {
-            button.BackColor = backColor;
-            button.ForeColor = Color.White;
-            button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
-            button.Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold);
-            button.Cursor = Cursors.Hand;
+            statusBanner.ShowMessage(kind, title, message);
         }
 
         private static string MaskCardNumber(string cardNumber)
