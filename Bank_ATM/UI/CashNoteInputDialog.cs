@@ -220,8 +220,11 @@ namespace Bank_ATM.UI
                          countTextBox.Text = "0";
                      }
                  };
+                 NumericInputDialog.Attach(
+                     countTextBox,
+                     denomination.DenominationValue.ToString("N0", CultureInfo.CurrentCulture) + " " + currency.Code);
 
-                _notesPanel.Controls.Add(valueLabel);
+                 _notesPanel.Controls.Add(valueLabel);
                 if (_showAvailableNotes)
                 {
                     _notesPanel.Controls.Add(availableLabel);

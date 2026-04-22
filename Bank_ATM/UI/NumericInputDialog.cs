@@ -80,15 +80,39 @@ namespace Bank_ATM.UI
                 return;
             }
 
-            textBox.ReadOnly = true;
-            textBox.ShortcutsEnabled = false;
-            textBox.KeyPress += (s, e) => e.Handled = true;
-            textBox.MouseUp += (s, e) =>
+            bool opening = false;
+            Action showDialog = () =>
             {
-                if (textBox.Enabled)
+                if (opening || !textBox.Enabled)
+                {
+                    return;
+                }
+
+                opening = true;
+                try
                 {
                     ShowForTextBox(textBox, title, allowDecimal, allowSeparators);
                 }
+                finally
+                {
+                    opening = false;
+                }
+            };
+
+            textBox.ReadOnly = true;
+            textBox.ShortcutsEnabled = false;
+            textBox.KeyPress += (s, e) => e.Handled = true;
+            textBox.Click += (s, e) => showDialog();
+            textBox.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Tab || e.KeyCode == Keys.ShiftKey)
+                {
+                    return;
+                }
+
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+                showDialog();
             };
         }
 

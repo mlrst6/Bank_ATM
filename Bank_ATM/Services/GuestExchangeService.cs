@@ -56,6 +56,38 @@ namespace Bank_ATM.Services
             return validation;
         }
 
+        public GuestExchangeResult PreviewExchange(string fromCurrencyCode, string toCurrencyCode, decimal sourceAmount)
+        {
+            var validation = ValidateExchangeInput(fromCurrencyCode, toCurrencyCode, sourceAmount);
+            if (!validation.Success)
+            {
+                return validation;
+            }
+
+            decimal requestedTargetAmount = validation.TargetAmount;
+            var targetDenominations = _cashRepository.GetDenominations(validation.ToCurrencyCode).ToArray();
+            decimal actualTargetAmount;
+            var dispensedNotes = CashRepository.BuildClosestDispenseBreakdown(
+                validation.TargetAmount,
+                targetDenominations,
+                out actualTargetAmount);
+            if (dispensedNotes == null || dispensedNotes.Count == 0)
+            {
+                validation.Success = false;
+                validation.Message = LanguageManager.GetString("AtmCannotDispenseRequestedAmount");
+                return validation;
+            }
+
+            validation.Success = true;
+            validation.RequestedTargetAmount = requestedTargetAmount;
+            validation.TargetAmount = actualTargetAmount;
+            validation.IsApproximateAmount = actualTargetAmount < requestedTargetAmount;
+            validation.UnavailableAmount = decimal.Round(requestedTargetAmount - actualTargetAmount, 2);
+            validation.Message = BuildExchangeSummary(validation, dispensedNotes.ToArray());
+            validation.DispensedNotes = dispensedNotes.ToArray();
+            return validation;
+        }
+
         public async Task<GuestExchangeResult> ExecuteExchangeAsync(string fromCurrencyCode, string toCurrencyCode, CashNoteDto[] insertedNotes)
         {
             var preview = PreviewExchange(fromCurrencyCode, toCurrencyCode, insertedNotes);
@@ -147,6 +179,53 @@ namespace Bank_ATM.Services
                 TargetAmount = targetAmount,
                 Rate = decimal.Round(fromCurrency.RateToUzs / toCurrency.RateToUzs, 6),
                 InsertedNotes = normalizedNotes
+            };
+        }
+
+        private GuestExchangeResult ValidateExchangeInput(string fromCurrencyCode, string toCurrencyCode, decimal sourceAmount)
+        {
+            string normalizedFrom = NormalizeCurrencyCode(fromCurrencyCode);
+            string normalizedTo = NormalizeCurrencyCode(toCurrencyCode);
+            if (string.IsNullOrWhiteSpace(normalizedFrom) || string.IsNullOrWhiteSpace(normalizedTo))
+            {
+                return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
+            }
+
+            if (normalizedFrom == normalizedTo)
+            {
+                return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("ExchangeSameCurrency") };
+            }
+
+            var fromCurrency = _currencyRepository.GetCurrencyByCode(normalizedFrom);
+            var toCurrency = _currencyRepository.GetCurrencyByCode(normalizedTo);
+            if (fromCurrency == null || !fromCurrency.IsActive || toCurrency == null || !toCurrency.IsActive)
+            {
+                return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
+            }
+
+            decimal roundedSourceAmount = decimal.Round(sourceAmount, 2);
+            if (roundedSourceAmount <= 0m)
+            {
+                return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("InvalidAmount") };
+            }
+
+            decimal sourceAmountUzs = decimal.Round(roundedSourceAmount * fromCurrency.RateToUzs, 2);
+            decimal targetAmount = decimal.Round(sourceAmountUzs / toCurrency.RateToUzs, 2);
+            if (targetAmount <= 0m)
+            {
+                return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("InvalidAmount") };
+            }
+
+            return new GuestExchangeResult
+            {
+                Success = true,
+                FromCurrencyCode = fromCurrency.Code,
+                ToCurrencyCode = toCurrency.Code,
+                SourceAmount = roundedSourceAmount,
+                SourceAmountUzs = sourceAmountUzs,
+                TargetAmount = targetAmount,
+                Rate = decimal.Round(fromCurrency.RateToUzs / toCurrency.RateToUzs, 6),
+                InsertedNotes = new CashNoteDto[0]
             };
         }
 

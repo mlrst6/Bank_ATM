@@ -24,6 +24,9 @@ namespace Bank_ATM
             this.pnlToCard = new System.Windows.Forms.Panel();
             this.cmbToCurrency = new System.Windows.Forms.ComboBox();
             this.lblToCaption = new System.Windows.Forms.Label();
+            this.pnlAmountCard = new System.Windows.Forms.Panel();
+            this.txtAmount = new System.Windows.Forms.TextBox();
+            this.lblAmountCaption = new System.Windows.Forms.Label();
             this.pnlSummary = new System.Windows.Forms.Panel();
             this.lblBreakdownValue = new System.Windows.Forms.Label();
             this.lblBreakdownCaption = new System.Windows.Forms.Label();
@@ -41,6 +44,7 @@ namespace Bank_ATM
             this.pnlHeader.SuspendLayout();
             this.pnlFromCard.SuspendLayout();
             this.pnlToCard.SuspendLayout();
+            this.pnlAmountCard.SuspendLayout();
             this.pnlSummary.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -141,6 +145,36 @@ namespace Bank_ATM
             this.lblToCaption.TabIndex = 0;
             this.lblToCaption.Text = "To currency";
             // 
+            // pnlAmountCard
+            // 
+            this.pnlAmountCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
+            this.pnlAmountCard.Controls.Add(this.txtAmount);
+            this.pnlAmountCard.Controls.Add(this.lblAmountCaption);
+            this.pnlAmountCard.Location = new System.Drawing.Point(74, 268);
+            this.pnlAmountCard.Name = "pnlAmountCard";
+            this.pnlAmountCard.Size = new System.Drawing.Size(752, 92);
+            this.pnlAmountCard.TabIndex = 4;
+            // 
+            // txtAmount
+            // 
+            this.txtAmount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
+            this.txtAmount.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtAmount.ForeColor = System.Drawing.Color.White;
+            this.txtAmount.Location = new System.Drawing.Point(22, 46);
+            this.txtAmount.Name = "txtAmount";
+            this.txtAmount.Size = new System.Drawing.Size(704, 22);
+            this.txtAmount.TabIndex = 1;
+            this.txtAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // lblAmountCaption
+            // 
+            this.lblAmountCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
+            this.lblAmountCaption.Location = new System.Drawing.Point(19, 18);
+            this.lblAmountCaption.Name = "lblAmountCaption";
+            this.lblAmountCaption.Size = new System.Drawing.Size(200, 20);
+            this.lblAmountCaption.TabIndex = 0;
+            this.lblAmountCaption.Text = "Exchange amount";
+            // 
             // pnlSummary
             // 
             this.pnlSummary.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(32)))), ((int)(((byte)(56)))));
@@ -152,10 +186,10 @@ namespace Bank_ATM
             this.pnlSummary.Controls.Add(this.lblInsertedCaption);
             this.pnlSummary.Controls.Add(this.lblRateValue);
             this.pnlSummary.Controls.Add(this.lblRateCaption);
-            this.pnlSummary.Location = new System.Drawing.Point(74, 278);
+            this.pnlSummary.Location = new System.Drawing.Point(74, 380);
             this.pnlSummary.Name = "pnlSummary";
             this.pnlSummary.Size = new System.Drawing.Size(752, 204);
-            this.pnlSummary.TabIndex = 4;
+            this.pnlSummary.TabIndex = 5;
             // 
             // lblBreakdownValue
             // 
@@ -232,20 +266,21 @@ namespace Bank_ATM
             // lblStatusValue
             // 
             this.lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(113)))), ((int)(((byte)(113)))));
-            this.lblStatusValue.Location = new System.Drawing.Point(74, 493);
+            this.lblStatusValue.Location = new System.Drawing.Point(74, 592);
             this.lblStatusValue.Name = "lblStatusValue";
             this.lblStatusValue.Size = new System.Drawing.Size(752, 30);
-            this.lblStatusValue.TabIndex = 5;
+            this.lblStatusValue.TabIndex = 6;
             this.lblStatusValue.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btnSelectCash
             // 
             this.btnSelectCash.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnSelectCash.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSelectCash.Location = new System.Drawing.Point(74, 545);
+            this.btnSelectCash.Enabled = false;
+            this.btnSelectCash.Location = new System.Drawing.Point(74, 624);
             this.btnSelectCash.Name = "btnSelectCash";
             this.btnSelectCash.Size = new System.Drawing.Size(180, 46);
-            this.btnSelectCash.TabIndex = 6;
+            this.btnSelectCash.TabIndex = 7;
             this.btnSelectCash.TabStop = false;
             this.btnSelectCash.Values.Text = "Select Cash";
             this.btnSelectCash.Click += new System.EventHandler(this.SelectCashButton_Click);
@@ -254,10 +289,10 @@ namespace Bank_ATM
             // 
             this.btnPreview.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnPreview.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnPreview.Location = new System.Drawing.Point(274, 545);
+            this.btnPreview.Location = new System.Drawing.Point(274, 624);
             this.btnPreview.Name = "btnPreview";
             this.btnPreview.Size = new System.Drawing.Size(180, 46);
-            this.btnPreview.TabIndex = 7;
+            this.btnPreview.TabIndex = 8;
             this.btnPreview.TabStop = false;
             this.btnPreview.Values.Text = "Preview";
             this.btnPreview.Click += new System.EventHandler(this.PreviewButton_Click);
@@ -267,10 +302,10 @@ namespace Bank_ATM
             this.btnConfirm.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnConfirm.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnConfirm.Enabled = false;
-            this.btnConfirm.Location = new System.Drawing.Point(474, 545);
+            this.btnConfirm.Location = new System.Drawing.Point(474, 624);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(180, 46);
-            this.btnConfirm.TabIndex = 8;
+            this.btnConfirm.TabIndex = 9;
             this.btnConfirm.TabStop = false;
             this.btnConfirm.Values.Text = "Confirm";
             this.btnConfirm.Click += new System.EventHandler(this.ConfirmButton_Click);
@@ -279,10 +314,10 @@ namespace Bank_ATM
             // 
             this.btnBack.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnBack.Location = new System.Drawing.Point(674, 545);
+            this.btnBack.Location = new System.Drawing.Point(674, 624);
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(152, 46);
-            this.btnBack.TabIndex = 9;
+            this.btnBack.TabIndex = 10;
             this.btnBack.TabStop = false;
             this.btnBack.Values.Text = "Back";
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
@@ -291,7 +326,7 @@ namespace Bank_ATM
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(35)))));
-            this.ClientSize = new System.Drawing.Size(900, 650);
+            this.ClientSize = new System.Drawing.Size(900, 700);
             this.ControlBox = false;
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnConfirm);
@@ -299,6 +334,7 @@ namespace Bank_ATM
             this.Controls.Add(this.btnSelectCash);
             this.Controls.Add(this.lblStatusValue);
             this.Controls.Add(this.pnlSummary);
+            this.Controls.Add(this.pnlAmountCard);
             this.Controls.Add(this.pnlToCard);
             this.Controls.Add(this.pnlFromCard);
             this.Controls.Add(this.lblSubtitle);
@@ -315,6 +351,8 @@ namespace Bank_ATM
             this.pnlHeader.ResumeLayout(false);
             this.pnlFromCard.ResumeLayout(false);
             this.pnlToCard.ResumeLayout(false);
+            this.pnlAmountCard.ResumeLayout(false);
+            this.pnlAmountCard.PerformLayout();
             this.pnlSummary.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -353,6 +391,9 @@ namespace Bank_ATM
         private System.Windows.Forms.Panel pnlToCard;
         private System.Windows.Forms.ComboBox cmbToCurrency;
         private System.Windows.Forms.Label lblToCaption;
+        private System.Windows.Forms.Panel pnlAmountCard;
+        private System.Windows.Forms.TextBox txtAmount;
+        private System.Windows.Forms.Label lblAmountCaption;
         private System.Windows.Forms.Panel pnlSummary;
         private System.Windows.Forms.Label lblBreakdownValue;
         private System.Windows.Forms.Label lblBreakdownCaption;

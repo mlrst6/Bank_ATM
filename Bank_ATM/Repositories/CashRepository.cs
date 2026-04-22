@@ -398,105 +398,75 @@ namespace Bank_ATM.Repositories
                 return null;
             }
 
-            decimal bestAmount = 0m;
-            int[] bestCounts = null;
-            int[] currentCounts = new int[denominationList.Count];
-
-            SearchBestDispense(
-                denominationList,
-                0,
+            decimal cappedRequestedAmount = Math.Min(
                 decimal.Round(requestedAmount, 2),
-                0m,
-                currentCounts,
-                ref bestAmount,
-                ref bestCounts);
+                decimal.Round(denominationList.Sum(d => d.DenominationValue * d.NoteCount), 2));
 
-            if (bestCounts == null || bestAmount <= 0m)
+            var exactBreakdown = BuildDispenseBreakdown(cappedRequestedAmount, denominationList);
+            if (exactBreakdown != null && exactBreakdown.Count > 0)
+            {
+                actualAmount = cappedRequestedAmount;
+                return exactBreakdown;
+            }
+
+            long stepInCents = GetDispenseSearchStepInCents(denominationList);
+            if (stepInCents <= 0)
             {
                 return null;
             }
 
-            var result = new List<CashNoteDto>();
-            for (int i = 0; i < denominationList.Count; i++)
+            long requestedInCents = ToAmountInCents(cappedRequestedAmount);
+            for (long candidateInCents = requestedInCents - stepInCents; candidateInCents > 0; candidateInCents -= stepInCents)
             {
-                if (bestCounts[i] <= 0)
+                decimal candidateAmount = candidateInCents / 100m;
+                var candidateBreakdown = BuildDispenseBreakdown(candidateAmount, denominationList);
+                if (candidateBreakdown != null && candidateBreakdown.Count > 0)
+                {
+                    actualAmount = candidateAmount;
+                    return candidateBreakdown;
+                }
+            }
+
+            actualAmount = 0m;
+            return null;
+        }
+
+        private static long GetDispenseSearchStepInCents(IEnumerable<CashDenominationDto> denominations)
+        {
+            long step = 0L;
+            foreach (var denomination in denominations)
+            {
+                long valueInCents = ToAmountInCents(denomination.DenominationValue);
+                if (valueInCents <= 0)
                 {
                     continue;
                 }
 
-                result.Add(new CashNoteDto
-                {
-                    CurrencyId = denominationList[i].CurrencyId,
-                    CurrencyCode = denominationList[i].CurrencyCode,
-                    DenominationValue = denominationList[i].DenominationValue,
-                    NoteCount = bestCounts[i]
-                });
+                step = step == 0L
+                    ? valueInCents
+                    : GreatestCommonDivisor(step, valueInCents);
             }
 
-            actualAmount = decimal.Round(bestAmount, 2);
-            return result;
+            return step;
         }
 
-        private static void SearchBestDispense(
-            IList<CashDenominationDto> denominations,
-            int index,
-            decimal targetAmount,
-            decimal currentAmount,
-            int[] currentCounts,
-            ref decimal bestAmount,
-            ref int[] bestCounts)
+        private static long ToAmountInCents(decimal amount)
         {
-            currentAmount = decimal.Round(currentAmount, 2);
-            if (currentAmount > bestAmount)
+            return (long)decimal.Round(amount * 100m, 0, MidpointRounding.AwayFromZero);
+        }
+
+        private static long GreatestCommonDivisor(long left, long right)
+        {
+            left = Math.Abs(left);
+            right = Math.Abs(right);
+            while (right != 0)
             {
-                bestAmount = currentAmount;
-                bestCounts = (int[])currentCounts.Clone();
-                if (bestAmount == targetAmount)
-                {
-                    return;
-                }
+                long temp = left % right;
+                left = right;
+                right = temp;
             }
 
-            if (index >= denominations.Count || currentAmount >= targetAmount)
-            {
-                return;
-            }
-
-            decimal remainingCapacity = 0m;
-            for (int i = index; i < denominations.Count; i++)
-            {
-                remainingCapacity += denominations[i].DenominationValue * denominations[i].NoteCount;
-            }
-
-            if (decimal.Round(currentAmount + remainingCapacity, 2) <= bestAmount)
-            {
-                return;
-            }
-
-            var denomination = denominations[index];
-            int maxCount = (int)Math.Min(
-                denomination.NoteCount,
-                Math.Floor((double)((targetAmount - currentAmount) / denomination.DenominationValue)));
-
-            for (int count = maxCount; count >= 0; count--)
-            {
-                currentCounts[index] = count;
-                SearchBestDispense(
-                    denominations,
-                    index + 1,
-                    targetAmount,
-                    currentAmount + (denomination.DenominationValue * count),
-                    currentCounts,
-                    ref bestAmount,
-                    ref bestCounts);
-
-                if (bestAmount == targetAmount)
-                {
-                    return;
-                }
-            }
-
-            currentCounts[index] = 0;
+            return left;
         }
 
         internal static void SyncCashTotals(IDbConnection db, IDbTransaction trans, int currencyId)
