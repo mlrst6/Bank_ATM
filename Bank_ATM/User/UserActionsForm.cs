@@ -107,10 +107,14 @@ namespace Bank_ATM.User
                 if (result.Success)
                 {
                     RefreshAccountSummary();
+                    string receiptMessage = OfferDigitalReceipt(
+                        "Deposit",
+                        result.DebitedAmountUzs,
+                        $"{result.CashAmount:N2} {result.CashCurrencyCode}");
                     ShowStatus(
                         StatusBannerKind.Success,
                         LanguageManager.GetString("Deposit"),
-                        BuildOperationSummary(LanguageManager.GetString("Success"), LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown, null));
+                        BuildOperationSummary(LanguageManager.GetString("Success"), LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown, receiptMessage));
                 }
                 else
                 {
@@ -222,34 +226,20 @@ namespace Bank_ATM.User
 
         private string OfferDigitalReceipt(string transactionType, decimal amount, string description)
         {
-            using (var dialog = new ReceiptChoiceDialog(LanguageManager.GetString("ReceiptChoiceSubtitle")))
-            {
-                if (dialog.ShowDialog(this) != DialogResult.OK || dialog.Choice != ReceiptChoice.SavePdf)
+            return ReceiptWorkflow.OfferPdfReceipt(
+                this,
+                () =>
                 {
-                    return null;
-                }
-            }
+                    var transaction = new TransactionDto
+                    {
+                        Type = transactionType,
+                        Amount = amount,
+                        TransactionDate = DateTime.Now,
+                        Description = description
+                    };
 
-            var transaction = new TransactionDto
-            {
-                Type = transactionType,
-                Amount = amount,
-                TransactionDate = DateTime.Now,
-                Description = description
-            };
-
-            string path = _bankingService.GenerateReceiptForCurrentSession(transaction);
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                using (var savedDialog = new ReceiptSavedDialog(path))
-                {
-                    savedDialog.ShowDialog(this);
-                }
-
-                return LanguageManager.Format("ReceiptSavedTo", path);
-            }
-
-            return null;
+                    return _bankingService.GenerateReceiptForCurrentSession(transaction);
+                });
         }
 
         private string BuildOperationSummary(string message, string cashTitle, CashNoteDto[] notes, string receiptMessage)

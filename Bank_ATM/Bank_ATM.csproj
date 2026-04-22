@@ -195,6 +195,7 @@
     <Compile Include="UI\ReceiptChoiceDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\ReceiptWorkflow.cs" />
     <Compile Include="UI\RoundedButton.cs">
       <SubType>Component</SubType>
     </Compile>

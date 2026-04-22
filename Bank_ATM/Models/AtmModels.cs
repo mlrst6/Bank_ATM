@@ -4,9 +4,9 @@ namespace Bank_ATM.Models
 {
     public enum UserRole 
     { 
-        Guest, 
-        User, 
-        Admin 
+        Guest,
+        User,
+        Admin
     }
 
     public static class CardTypes

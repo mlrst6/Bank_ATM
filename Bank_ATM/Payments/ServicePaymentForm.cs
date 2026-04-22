@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Linq;
 using System.Globalization;
 using System.Windows.Forms;
@@ -15,7 +14,6 @@ namespace Bank_ATM.Payments
         private readonly BankingService _bankingService = new BankingService();
         private readonly bool _chargeCurrentAccount;
         private ServiceDto[] _services = new ServiceDto[0];
-        private StatusBanner _statusBanner;
         private bool _completed;
         private bool _isReviewing;
         private bool _referenceVerified;
@@ -25,6 +23,10 @@ namespace Bank_ATM.Payments
         private decimal _pendingAmount;
         private CashNoteDto[] _pendingNotes;
 
+        public ServicePaymentForm() : this(false)
+        {
+        }
+
         public ServicePaymentForm(bool chargeCurrentAccount)
         {
             InitializeComponent();
@@ -33,8 +35,6 @@ namespace Bank_ATM.Payments
 
         private void ServicePaymentForm_Load(object sender, EventArgs e)
         {
-            EnsureStatusBanner();
-            ApplyTheme();
             LanguageManager.Apply(this);
             lblTitle.Text = _chargeCurrentAccount
                 ? LanguageManager.GetString("PayFromAccount")
@@ -231,9 +231,10 @@ namespace Bank_ATM.Payments
                 return;
             }
 
-            string successMessage = string.IsNullOrWhiteSpace(result.ReceiptPath)
+            string receiptMessage = OfferReceiptForCompletedPayment();
+            string successMessage = string.IsNullOrWhiteSpace(receiptMessage)
                 ? result.Message
-                : LanguageManager.Format("ServicePaymentCompletedWithReceipt", result.ReceiptPath);
+                : result.Message + Environment.NewLine + receiptMessage;
             _completed = true;
             ShowStatus(StatusBannerKind.Success, LanguageManager.GetString("Payment"), successMessage);
             btnPay.Enabled = false;
@@ -290,62 +291,9 @@ namespace Bank_ATM.Payments
             txtAmount.Enabled = !isLoading && !_completed && !_isReviewing;
         }
 
-        private void ApplyTheme()
-        {
-            BackColor = Color.FromArgb(14, 23, 38);
-            ForeColor = Color.White;
-            Font = new Font("Segoe UI", 10F);
-
-            pnlHeader.BackColor = Color.FromArgb(23, 37, 61);
-            lblTitle.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold);
-            lblTitle.ForeColor = Color.White;
-            lblSubtitle.ForeColor = Color.FromArgb(148, 163, 184);
-
-            txtReference.BackColor = Color.FromArgb(30, 41, 59);
-            txtReference.ForeColor = Color.White;
-            txtReference.BorderStyle = BorderStyle.FixedSingle;
-
-            txtAmount.BackColor = Color.FromArgb(30, 41, 59);
-            txtAmount.ForeColor = Color.White;
-            txtAmount.BorderStyle = BorderStyle.FixedSingle;
-
-            cmbServices.BackColor = Color.FromArgb(30, 41, 59);
-            cmbServices.ForeColor = Color.White;
-            cmbServices.FlatStyle = FlatStyle.Flat;
-
-            lblService.ForeColor = Color.FromArgb(148, 163, 184);
-            lblCategory.ForeColor = Color.FromArgb(148, 163, 184);
-            lblCategoryValue.ForeColor = Color.White;
-            lblReference.ForeColor = Color.FromArgb(148, 163, 184);
-            lblAmount.ForeColor = Color.FromArgb(148, 163, 184);
-            lblReferenceHint.ForeColor = Color.FromArgb(148, 163, 184);
-            pnlVerification.BackColor = Color.FromArgb(19, 32, 56);
-            lblCustomerNameCaption.ForeColor = Color.FromArgb(148, 163, 184);
-            lblReferenceStatusCaption.ForeColor = Color.FromArgb(148, 163, 184);
-            lblCustomerNameValue.ForeColor = Color.White;
-            lblReferenceStatusValue.ForeColor = Color.FromArgb(125, 211, 252);
-        }
-
         private void ShowStatus(StatusBannerKind kind, string title, string message)
         {
-            EnsureStatusBanner();
-            _statusBanner.ShowMessage(kind, title, message);
-        }
-
-        private void EnsureStatusBanner()
-        {
-            if (_statusBanner != null)
-            {
-                return;
-            }
-
-            _statusBanner = new StatusBanner
-            {
-                Location = new Point(39, 486),
-                Size = new Size(797, 58),
-                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
-            };
-            Controls.Add(_statusBanner);
+            statusBanner.ShowMessage(kind, title, message);
         }
 
         private void ClearReview()
@@ -361,7 +309,7 @@ namespace Bank_ATM.Payments
             cmbServices.Enabled = true;
             txtReference.Enabled = true;
             txtAmount.Enabled = true;
-            _statusBanner.Clear();
+            statusBanner.Clear();
             ResetVerificationState();
         }
 
@@ -381,6 +329,52 @@ namespace Bank_ATM.Payments
             }
 
             return message;
+        }
+
+        private string OfferReceiptForCompletedPayment()
+        {
+            if (_chargeCurrentAccount)
+            {
+                return ReceiptWorkflow.OfferPdfReceipt(
+                    this,
+                    () =>
+                    {
+                        var transaction = new TransactionDto
+                        {
+                            Type = "BillPayment",
+                            Amount = _pendingAmount,
+                            TransactionDate = DateTime.Now,
+                            Description = BuildServicePaymentDescription()
+                        };
+
+                        return _bankingService.GenerateReceiptForCurrentSession(transaction);
+                    });
+            }
+
+            return ReceiptWorkflow.OfferPdfReceipt(
+                this,
+                () => ReceiptService.GenerateGuestServicePaymentReceipt(
+                    _pendingService,
+                    _verifiedServiceAccount,
+                    _pendingReference,
+                    _pendingAmount,
+                    _pendingNotes));
+        }
+
+        private string BuildServicePaymentDescription()
+        {
+            string customer = _verifiedServiceAccount == null
+                ? string.Empty
+                : (string.IsNullOrWhiteSpace(_verifiedServiceAccount.CustomerName)
+                    ? _verifiedServiceAccount.ReferenceNumber
+                    : _verifiedServiceAccount.CustomerName);
+
+            if (string.IsNullOrWhiteSpace(customer))
+            {
+                return $"{_pendingService.ServiceName}: {_pendingReference}";
+            }
+
+            return $"{_pendingService.ServiceName}: {_pendingReference} ({customer})";
         }
 
         private static bool TryParseAmount(string input, out decimal amount)

@@ -55,7 +55,7 @@ namespace Bank_ATM.UI
                 ForeColor = Color.FromArgb(170, 184, 204)
             };
 
-            var saveButton = CreateButton(LanguageManager.GetString("SavePdfReceipt"), 30, 135, Color.FromArgb(22, 163, 74));
+            var saveButton = CreateButton("Save Receipt File", 30, 135, Color.FromArgb(22, 163, 74));
             saveButton.Click += (s, e) =>
             {
                 Choice = ReceiptChoice.SavePdf;

@@ -403,20 +403,10 @@ namespace Bank_ATM.Services
             }
 
             AuditLogger.LogInfo($"Guest cash service payment: {amount} UZS for {description}");
-            string receiptPath = ReceiptService.GenerateGuestReceipt(
-                LanguageManager.GetString("GuestServicePayment"),
-                new[]
-                {
-                    LanguageManager.Format("ServiceReceiptService", service.ServiceName),
-                    LanguageManager.Format("ServiceReceiptReference", sanitizedReference),
-                    LanguageManager.Format("ServiceReceiptAmount", amount, "UZS"),
-                    LanguageManager.GetString("CashAcceptedBreakdown") + ": " + FormatNotes(noteList)
-                });
             return new ServiceResult
             {
                 Success = true,
-                Message = LanguageManager.GetString("ServicePaymentCompleted"),
-                ReceiptPath = receiptPath
+                Message = LanguageManager.GetString("ServicePaymentCompleted")
             };
         }
 

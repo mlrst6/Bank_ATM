@@ -40,7 +40,6 @@ namespace Bank_ATM
             if (IsInDesignMode)
                 return;
 
-            AppWindow.ApplyMainScreen(this);
             lblTitle.Text = LanguageManager.GetString("Exchange");
             lblSubtitle.Text = LanguageManager.GetString("GuestExchangeSubtitle");
             lblFromCaption.Text = LanguageManager.GetString("ExchangeFromCurrency");
@@ -196,23 +195,18 @@ namespace Bank_ATM
                 return;
             }
 
-            string successMessage = string.IsNullOrWhiteSpace(result.ReceiptPath)
+            string receiptMessage = ReceiptWorkflow.OfferPdfReceipt(
+                this,
+                () => ReceiptService.GenerateGuestExchangeReceipt(result));
+            string successMessage = string.IsNullOrWhiteSpace(receiptMessage)
                 ? result.Message
-                : LanguageManager.Format("ExchangeCompletedWithReceipt", result.ReceiptPath);
+                : result.Message + Environment.NewLine + receiptMessage;
 
             ResetExchangeState();
             SetCurrentStep(ExchangeStep.ChooseSourceCurrency);
             lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(74, 222, 128);
             lblStatusValue.Text = successMessage;
             UpdateRateLabel();
-
-            if (!string.IsNullOrWhiteSpace(result.ReceiptPath))
-            {
-                using (var dialog = new ReceiptSavedDialog(result.ReceiptPath))
-                {
-                    dialog.ShowDialog(this);
-                }
-            }
         }
 
         private void PreviewInsertedCash()

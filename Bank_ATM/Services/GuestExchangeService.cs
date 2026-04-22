@@ -118,9 +118,6 @@ namespace Bank_ATM.Services
             }
 
             preview.DispensedNotes = actualDispensed.ToArray();
-            preview.ReceiptPath = ReceiptService.GenerateGuestReceipt(
-                LanguageManager.GetString("Exchange"),
-                BuildReceiptLines(preview));
             preview.Success = true;
             preview.Message = LanguageManager.GetString("ExchangeCompleted");
             AuditLogger.LogInfo(description);
@@ -254,27 +251,5 @@ namespace Bank_ATM.Services
                 .Select(note => $"{note.DenominationValue:N2} {note.CurrencyCode} x {note.NoteCount}"));
         }
 
-        private static string[] BuildReceiptLines(GuestExchangeResult preview)
-        {
-            var lines = new System.Collections.Generic.List<string>
-            {
-                LanguageManager.Format("ExchangeReceiptFrom", preview.SourceAmount, preview.FromCurrencyCode),
-                LanguageManager.Format("ExchangeReceiptTo", preview.TargetAmount, preview.ToCurrencyCode),
-                LanguageManager.Format("ExchangeReceiptRate", preview.Rate, preview.ToCurrencyCode, preview.FromCurrencyCode)
-            };
-
-            if (preview.IsApproximateAmount)
-            {
-                lines.Add(LanguageManager.Format(
-                    "ExchangeReceiptRequestedAmount",
-                    preview.RequestedTargetAmount,
-                    preview.ToCurrencyCode,
-                    preview.UnavailableAmount));
-            }
-
-            lines.Add(LanguageManager.GetString("CashAcceptedBreakdown") + ": " + FormatNotes(preview.InsertedNotes));
-            lines.Add(LanguageManager.GetString("CashDispensedBreakdown") + ": " + FormatNotes(preview.DispensedNotes));
-            return lines.ToArray();
-        }
     }
 }
