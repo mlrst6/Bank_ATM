@@ -20,12 +20,13 @@ namespace Bank_ATM.Admin
 
         private async void AdminServiceAccountEditForm_Load(object sender, EventArgs e)
         {
-            ApplyTheme();
             lblTitle.Text = "Add user service account";
             lblSubtitle.Text = _service.ServiceName;
             lblReference.Text = _service.AccountHint;
             btnSave.Text = LanguageManager.GetString("Save");
+            btnSave.Values.Text = btnSave.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             NumericInputDialog.Attach(txtReference, _service.AccountHint);
 
             var users = (await _adminService.GetAllUsersAsync())
@@ -67,20 +68,5 @@ namespace Bank_ATM.Admin
             Close();
         }
 
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StyleTitle(lblTitle);
-            AdminTheme.StyleLabel(lblSubtitle, true);
-            AdminTheme.StyleLabel(lblUser, true);
-            AdminTheme.StyleLabel(lblReference, true);
-            cmbUsers.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            cmbUsers.ForeColor = System.Drawing.Color.White;
-            cmbUsers.FlatStyle = FlatStyle.Flat;
-            cmbUsers.DropDownStyle = ComboBoxStyle.DropDownList;
-            AdminTheme.StyleTextBox(txtReference);
-            AdminTheme.StylePrimaryButton(btnSave);
-            AdminTheme.StyleSecondaryButton(btnCancel);
-        }
     }
 }

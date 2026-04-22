@@ -21,13 +21,14 @@ namespace Bank_ATM.Admin
 
         private void AdminUserEditForm_Load(object sender, EventArgs e)
         {
-            ApplyTheme();
             NumericInputDialog.Attach(txtInitialPin, LanguageManager.GetString("InitialPin"));
             cmbInitialCardType.DataSource = CardTypes.All;
             cmbInitialCardType.SelectedItem = CardTypes.Uzcard;
             lblInitialCardType.Text = LanguageManager.GetString("CardType");
             btnSave.Text = LanguageManager.GetString("Save");
+            btnSave.Values.Text = btnSave.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             lblDialogTitle.Text = _isEdit
                 ? LanguageManager.GetString("EditUser")
                 : LanguageManager.GetString("CreateUser");
@@ -125,30 +126,5 @@ namespace Bank_ATM.Admin
             lblPinNote.Text = isUser ? LanguageManager.GetString("CreatesUserAccountCard") : string.Empty;
         }
 
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StylePanel(pnlHeader);
-            AdminTheme.StyleTitle(lblDialogTitle);
-            AdminTheme.StyleLabel(lblDialogSubtitle, true);
-            AdminTheme.StyleLabel(label1, true);
-            AdminTheme.StyleLabel(label2, true);
-            AdminTheme.StyleLabel(label3, true);
-            AdminTheme.StyleLabel(label4, true);
-            AdminTheme.StyleLabel(label5, true);
-            AdminTheme.StyleLabel(lblPassNote, true);
-            AdminTheme.StyleLabel(lblInitialPin, true);
-            AdminTheme.StyleLabel(lblInitialCardType, true);
-            AdminTheme.StyleLabel(lblPinNote, true);
-            AdminTheme.StyleTextBox(txtFullName);
-            AdminTheme.StyleTextBox(txtUsername);
-            AdminTheme.StyleTextBox(txtPassword);
-            AdminTheme.StyleTextBox(txtPhone);
-            AdminTheme.StyleTextBox(txtInitialPin);
-            AdminTheme.StyleComboBox(cmbRole);
-            AdminTheme.StyleComboBox(cmbInitialCardType);
-            AdminTheme.StyleSuccessButton(btnSave);
-            AdminTheme.StyleSecondaryButton(btnCancel);
-        }
     }
 }

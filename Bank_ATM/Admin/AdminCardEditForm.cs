@@ -23,9 +23,10 @@ namespace Bank_ATM.Admin
 
         private async void AdminCardEditForm_Load(object sender, EventArgs e)
         {
-            ApplyTheme();
             btnSave.Text = LanguageManager.GetString("Save");
+            btnSave.Values.Text = btnSave.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             label1.Text = "User:";
             lblCardType.Text = LanguageManager.GetString("CardType");
             lblDialogTitle.Text = _isEdit
@@ -132,28 +133,5 @@ namespace Bank_ATM.Admin
             }
         }
 
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StylePanel(pnlHeader);
-            AdminTheme.StyleTitle(lblDialogTitle);
-            AdminTheme.StyleLabel(lblDialogSubtitle, true);
-            AdminTheme.StyleLabel(label1, true);
-            AdminTheme.StyleLabel(label2, true);
-            AdminTheme.StyleLabel(label3, true);
-            AdminTheme.StyleLabel(label4, true);
-            AdminTheme.StyleLabel(lblCardType, true);
-            AdminTheme.StyleLabel(lblPinNote, true);
-            AdminTheme.StyleComboBox(cmbUsers);
-            AdminTheme.StyleComboBox(cmbCardType);
-            cmbUsers.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbCardType.DropDownStyle = ComboBoxStyle.DropDownList;
-            AdminTheme.StyleTextBox(txtCardNumber);
-            txtCardNumber.BackColor = System.Drawing.Color.FromArgb(40, 52, 70);
-            AdminTheme.StyleTextBox(txtPin);
-            AdminTheme.StyleCheckBox(chkBlocked);
-            AdminTheme.StyleSuccessButton(btnSave);
-            AdminTheme.StyleSecondaryButton(btnCancel);
-        }
     }
 }

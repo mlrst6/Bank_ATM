@@ -1,7 +1,11 @@
 using System;
 using System.IO;
+using iText.IO.Font.Constants;
+using iText.Kernel.Colors;
+using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Layout;
+using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using Bank_ATM.Models;
@@ -83,28 +87,55 @@ namespace Bank_ATM.Core
                     using (PdfDocument pdf = new PdfDocument(writer))
                     {
                         Document document = new Document(pdf);
-                        document.Add(new Paragraph("BANK ATM RECEIPT")
+                        PdfFont monoFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
+                        PdfFont headerFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+                        string receiptNumber = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                        document.SetMargins(28, 32, 28, 32);
+                        document.Add(new Paragraph("BANK ATM")
                             .SetTextAlignment(TextAlignment.CENTER)
-                            .SetFontSize(20));
+                            .SetFontSize(18)
+                            .SetFont(headerFont));
                         document.Add(new Paragraph(receiptType ?? "Guest transaction")
                             .SetTextAlignment(TextAlignment.CENTER)
-                            .SetFontSize(14));
-                        document.Add(new Paragraph("--------------------------------------------------")
-                            .SetTextAlignment(TextAlignment.CENTER));
-                        document.Add(new Paragraph($"Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}"));
-                        document.Add(new Paragraph("Customer: Guest"));
+                            .SetFontSize(12)
+                            .SetFontColor(ColorConstants.DARK_GRAY));
+                        document.Add(new Paragraph("RECEIPT NO: " + receiptNumber)
+                            .SetTextAlignment(TextAlignment.CENTER)
+                            .SetFont(monoFont)
+                            .SetFontSize(10));
+                        document.Add(new Paragraph(new string('-', 42))
+                            .SetTextAlignment(TextAlignment.CENTER)
+                            .SetFont(monoFont)
+                            .SetFontSize(10));
+
+                        var detailsTable = new Table(UnitValue.CreatePercentArray(new float[] { 1f, 2f }))
+                            .UseAllAvailableWidth();
+                        detailsTable.SetBorder(Border.NO_BORDER);
+                        detailsTable.AddCell(CreateReceiptLabelCell("Date"));
+                        detailsTable.AddCell(CreateReceiptValueCell(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), monoFont));
+                        detailsTable.AddCell(CreateReceiptLabelCell("Customer"));
+                        detailsTable.AddCell(CreateReceiptValueCell("Guest", monoFont));
+
+                        document.Add(detailsTable);
+                        document.Add(new Paragraph(" "));
 
                         foreach (string line in lines ?? new string[0])
                         {
                             if (!string.IsNullOrWhiteSpace(line))
                             {
-                                document.Add(new Paragraph(line));
+                                document.Add(new Paragraph(line)
+                                    .SetFont(monoFont)
+                                    .SetFontSize(10)
+                                    .SetMarginBottom(6));
                             }
                         }
 
-                        document.Add(new Paragraph("--------------------------------------------------")
-                            .SetTextAlignment(TextAlignment.CENTER));
-                        document.Add(new Paragraph("\nThank you for choosing our services!")
+                        document.Add(new Paragraph(new string('-', 42))
+                            .SetTextAlignment(TextAlignment.CENTER)
+                            .SetFont(monoFont)
+                            .SetFontSize(10));
+                        document.Add(new Paragraph("Thank you for using BANK ATM")
                             .SetTextAlignment(TextAlignment.CENTER)
                             .SetFontSize(10));
                         document.Close();
@@ -119,6 +150,28 @@ namespace Bank_ATM.Core
                 AuditLogger.LogError("Failed to generate guest receipt", ex);
                 return null;
             }
+        }
+
+        private static Cell CreateReceiptLabelCell(string value)
+        {
+            return new Cell()
+                .Add(new Paragraph(value)
+                    .SetFontSize(10)
+                    .SetFontColor(ColorConstants.GRAY))
+                .SetBorder(Border.NO_BORDER)
+                .SetPadding(0)
+                .SetPaddingBottom(4);
+        }
+
+        private static Cell CreateReceiptValueCell(string value, PdfFont font)
+        {
+            return new Cell()
+                .Add(new Paragraph(value ?? string.Empty)
+                    .SetFont(font)
+                    .SetFontSize(10))
+                .SetBorder(Border.NO_BORDER)
+                .SetPadding(0)
+                .SetPaddingBottom(4);
         }
     }
 }

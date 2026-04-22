@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Services;
@@ -19,11 +18,12 @@ namespace Bank_ATM.Admin
         private void AdminLoginForm_Load(object sender, EventArgs e)
         {
             AppWindow.ApplyMainScreen(this);
-            ApplyTheme();
             LanguageManager.Apply(this);
             lblTitle.Text = LanguageManager.GetString("MainFormAdmin");
             btnLogin.Text = LanguageManager.GetString("btnLogin");
+            btnLogin.Values.Text = btnLogin.Text;
             btnBack.Text = LanguageManager.GetString("btnBack");
+            btnBack.Values.Text = btnBack.Text;
         }
 
         private async void btnLogin_Click(object sender, EventArgs e)
@@ -67,18 +67,6 @@ namespace Bank_ATM.Admin
             this.UseWaitCursor = isLoading;
             btnLogin.Enabled = !isLoading;
             btnBack.Enabled = !isLoading;
-        }
-
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StyleTitle(lblTitle);
-            AdminTheme.StyleLabel(lblUser, true);
-            AdminTheme.StyleLabel(lblPass, true);
-            AdminTheme.StyleTextBox(txtUsername);
-            AdminTheme.StyleTextBox(txtPassword);
-            AdminTheme.StyleSuccessButton(btnLogin);
-            AdminTheme.StyleSecondaryButton(btnBack);
         }
     }
 }

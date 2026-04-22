@@ -4,7 +4,6 @@ using Bank_ATM.Services;
 using Bank_ATM.UI;
 using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -12,11 +11,20 @@ namespace Bank_ATM
 {
     public sealed partial class GuestExchangeForm : Form
     {
+        private enum ExchangeStep
+        {
+            ChooseSourceCurrency,
+            ChooseTargetCurrency,
+            InsertCash,
+            ReviewAndConfirm
+        }
+
         private readonly GuestExchangeService _exchangeService;
         private CurrencyDto[] _currencies = new CurrencyDto[0];
         private CashNoteDto[] _insertedNotes = new CashNoteDto[0];
         private GuestExchangeResult _preview;
-        private decimal _plannedSourceAmount;
+        private ExchangeStep _currentStep;
+        private bool _isLoading;
         private bool IsInDesignMode => LicenseManager.UsageMode == LicenseUsageMode.Designtime || DesignMode;
 
         public GuestExchangeForm()
@@ -37,51 +45,82 @@ namespace Bank_ATM
             lblSubtitle.Text = LanguageManager.GetString("GuestExchangeSubtitle");
             lblFromCaption.Text = LanguageManager.GetString("ExchangeFromCurrency");
             lblToCaption.Text = LanguageManager.GetString("ExchangeToCurrency");
-            lblAmountCaption.Text = LanguageManager.GetString("ExchangeAmountCaption");
+            lblStepCaption.Text = LanguageManager.GetString("GuestExchangeStepCaption");
             lblRateCaption.Text = LanguageManager.GetString("CurrentRateCaption");
             lblInsertedCaption.Text = LanguageManager.GetString("InsertedCashCaption");
             lblReceivedCaption.Text = LanguageManager.GetString("GuestReceivesCaption");
             lblBreakdownCaption.Text = LanguageManager.GetString("DispenseBreakdownCaption");
+            btnPreview.Text = LanguageManager.GetString("Continue");
+            btnPreview.Values.Text = btnPreview.Text;
             btnSelectCash.Text = LanguageManager.GetString("SelectCashNotes");
             btnSelectCash.Values.Text = btnSelectCash.Text;
-            btnPreview.Text = LanguageManager.GetString("PreviewExchange");
-            btnPreview.Values.Text = btnPreview.Text;
             btnConfirm.Text = LanguageManager.GetString("ConfirmExchange");
             btnConfirm.Values.Text = btnConfirm.Text;
             btnBack.Text = LanguageManager.GetString("Back");
             btnBack.Values.Text = btnBack.Text;
-            NumericInputDialog.Attach(txtAmount, LanguageManager.GetString("ExchangeAmountCaption"), true);
-            txtAmount.TextChanged += (s, args) => ResetPlannedExchange();
 
             _currencies = _exchangeService.GetActiveCurrencies();
             cmbFromCurrency.DataSource = _currencies.ToArray();
             cmbFromCurrency.DisplayMember = "Code";
             cmbFromCurrency.ValueMember = "Code";
 
-            cmbToCurrency.DataSource = _currencies.ToArray();
-            cmbToCurrency.DisplayMember = "Code";
-            cmbToCurrency.ValueMember = "Code";
-
             SelectCurrency(cmbFromCurrency, "UZS");
-            SelectDifferentTargetCurrency();
+            RefreshTargetCurrencyOptions();
+            ResetExchangeState();
+            SetCurrentStep(ExchangeStep.ChooseSourceCurrency);
             UpdateRateLabel();
         }
 
         private void CurrencySelectionChanged(object sender, EventArgs e)
         {
-            ResetPlannedExchange();
+            if (sender == cmbFromCurrency)
+            {
+                RefreshTargetCurrencyOptions();
+            }
+
+            if (_currentStep == ExchangeStep.InsertCash || _currentStep == ExchangeStep.ReviewAndConfirm)
+            {
+                ResetExchangeState();
+                SetCurrentStep(ExchangeStep.ChooseTargetCurrency);
+            }
+
             UpdateRateLabel();
+        }
+
+        private void PreviewButton_Click(object sender, EventArgs e)
+        {
+            CurrencyDto from;
+            CurrencyDto to;
+            if (!TryGetSelectedCurrencies(out from, out to))
+            {
+                ShowUnavailableCurrencyMessage();
+                return;
+            }
+
+            if (_currentStep == ExchangeStep.ChooseSourceCurrency)
+            {
+                SetCurrentStep(ExchangeStep.ChooseTargetCurrency);
+                return;
+            }
+
+            if (string.Equals(from.Code, to.Code, StringComparison.OrdinalIgnoreCase))
+            {
+                lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
+                lblStatusValue.Text = LanguageManager.GetString("ExchangeSameCurrency");
+                return;
+            }
+
+            ResetExchangeState();
+            SetCurrentStep(ExchangeStep.InsertCash);
         }
 
         private void SelectCashButton_Click(object sender, EventArgs e)
         {
-            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            if (from == null || _preview == null || !_preview.Success || _plannedSourceAmount <= 0m)
+            CurrencyDto from;
+            CurrencyDto to;
+            if (!TryGetSelectedCurrencies(out from, out to))
             {
-                lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
-                lblStatusValue.Text = from == null
-                    ? LanguageManager.GetString("SelectedCurrencyUnavailable")
-                    : LanguageManager.GetString("ExchangePlanFirst");
+                ShowUnavailableCurrencyMessage();
                 return;
             }
 
@@ -96,52 +135,44 @@ namespace Bank_ATM
                     return;
                 }
 
-                if (decimal.Round(dialog.TotalAmount, 2) != decimal.Round(_plannedSourceAmount, 2))
+                _insertedNotes = dialog.Notes ?? new CashNoteDto[0];
+                if (!_insertedNotes.Any())
                 {
                     lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
-                    lblStatusValue.Text = LanguageManager.Format("ExchangeCashAmountMismatch", _plannedSourceAmount, from.Code);
-                    btnConfirm.Enabled = false;
+                    lblStatusValue.Text = LanguageManager.GetString("InvalidCashNotes");
                     return;
                 }
 
-                _insertedNotes = dialog.Notes;
                 lblInsertedValue.Text = LanguageManager.Format("ExchangeInsertedAmount", dialog.TotalAmount, dialog.CurrencyCode);
-                btnConfirm.Enabled = true;
-                lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(74, 222, 128);
-                lblStatusValue.Text = LanguageManager.GetString("ExchangeReadyToConfirm");
+                PreviewInsertedCash();
             }
-        }
-
-        private void PreviewButton_Click(object sender, EventArgs e)
-        {
-            PreviewExchange();
         }
 
         private async void ConfirmButton_Click(object sender, EventArgs e)
         {
-            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            var to = cmbToCurrency.SelectedItem as CurrencyDto;
-            if (from == null || to == null)
+            CurrencyDto from;
+            CurrencyDto to;
+            if (!TryGetSelectedCurrencies(out from, out to))
             {
-                lblStatusValue.Text = LanguageManager.GetString("SelectedCurrencyUnavailable");
+                ShowUnavailableCurrencyMessage();
                 return;
-            }
-
-            if (_preview == null || !_preview.Success)
-            {
-                PreviewExchange();
-                if (_preview == null || !_preview.Success)
-                {
-                    return;
-                }
             }
 
             if (_insertedNotes == null || !_insertedNotes.Any())
             {
                 lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
-                lblStatusValue.Text = LanguageManager.Format("ExchangeInsertCashPrompt", _plannedSourceAmount, from.Code);
+                lblStatusValue.Text = LanguageManager.GetString("GuestExchangeInsertCashPrompt");
                 btnConfirm.Enabled = false;
                 return;
+            }
+
+            if (_preview == null || !_preview.Success)
+            {
+                PreviewInsertedCash();
+                if (_preview == null || !_preview.Success)
+                {
+                    return;
+                }
             }
 
             if (MessageBox.Show(
@@ -165,57 +196,61 @@ namespace Bank_ATM
                 return;
             }
 
-            lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(74, 222, 128);
             string successMessage = string.IsNullOrWhiteSpace(result.ReceiptPath)
                 ? result.Message
                 : LanguageManager.Format("ExchangeCompletedWithReceipt", result.ReceiptPath);
-            ResetPlannedExchange();
-            txtAmount.Text = string.Empty;
+
+            ResetExchangeState();
+            SetCurrentStep(ExchangeStep.ChooseSourceCurrency);
             lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(74, 222, 128);
             lblStatusValue.Text = successMessage;
             UpdateRateLabel();
+
+            if (!string.IsNullOrWhiteSpace(result.ReceiptPath))
+            {
+                using (var dialog = new ReceiptSavedDialog(result.ReceiptPath))
+                {
+                    dialog.ShowDialog(this);
+                }
+            }
         }
 
-        private void PreviewExchange()
+        private void PreviewInsertedCash()
         {
-            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            var to = cmbToCurrency.SelectedItem as CurrencyDto;
-            if (from == null || to == null)
+            CurrencyDto from;
+            CurrencyDto to;
+            if (!TryGetSelectedCurrencies(out from, out to))
             {
-                lblStatusValue.Text = LanguageManager.GetString("SelectedCurrencyUnavailable");
+                ShowUnavailableCurrencyMessage();
                 return;
             }
 
-            decimal plannedAmount;
-            if (!TryParseAmount(txtAmount.Text, out plannedAmount))
+            if (_insertedNotes == null || !_insertedNotes.Any())
             {
                 lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
-                lblStatusValue.Text = LanguageManager.GetString("InvalidAmount");
-                btnSelectCash.Enabled = false;
+                lblStatusValue.Text = LanguageManager.GetString("GuestExchangeInsertCashPrompt");
                 btnConfirm.Enabled = false;
                 return;
             }
 
-            _plannedSourceAmount = plannedAmount;
-            _preview = _exchangeService.PreviewExchange(from.Code, to.Code, plannedAmount);
-            btnSelectCash.Enabled = _preview.Success;
-            btnConfirm.Enabled = _preview.Success && _insertedNotes.Any();
-            lblStatusValue.ForeColor = _preview.Success ? System.Drawing.Color.FromArgb(74, 222, 128) : System.Drawing.Color.FromArgb(248, 113, 113);
-            lblStatusValue.Text = _preview.Success
-                ? LanguageManager.Format("ExchangeInsertCashPrompt", _plannedSourceAmount, from.Code)
-                : _preview.Message;
+            _preview = _exchangeService.PreviewExchange(from.Code, to.Code, _insertedNotes);
+            lblStatusValue.ForeColor = _preview.Success
+                ? System.Drawing.Color.FromArgb(74, 222, 128)
+                : System.Drawing.Color.FromArgb(248, 113, 113);
+            lblStatusValue.Text = _preview.Message;
 
             if (_preview.Success)
             {
+                lblInsertedValue.Text = LanguageManager.Format("ExchangeInsertedAmount", _preview.SourceAmount, _preview.FromCurrencyCode);
                 lblReceivedValue.Text = LanguageManager.Format("ExchangeReceiveAmount", _preview.TargetAmount, _preview.ToCurrencyCode);
                 lblBreakdownValue.Text = LanguageManager.Format("ExchangeDispenseBreakdown", FormatNotes(_preview.DispensedNotes));
-                lblInsertedValue.Text = LanguageManager.Format("ExchangeExpectedInsertAmount", _plannedSourceAmount, from.Code);
+                SetCurrentStep(ExchangeStep.ReviewAndConfirm);
             }
             else
             {
-                lblInsertedValue.Text = LanguageManager.GetString("NoCashInserted");
                 lblReceivedValue.Text = "-";
                 lblBreakdownValue.Text = "-";
+                SetCurrentStep(ExchangeStep.InsertCash);
             }
         }
 
@@ -235,38 +270,83 @@ namespace Bank_ATM
 
         private void btnBack_Click(object sender, EventArgs e)
         {
+            if (_isLoading)
+            {
+                return;
+            }
+
+            if (_currentStep == ExchangeStep.ReviewAndConfirm)
+            {
+                ResetExchangeState();
+                SetCurrentStep(ExchangeStep.InsertCash);
+                return;
+            }
+
+            if (_currentStep == ExchangeStep.InsertCash)
+            {
+                ResetExchangeState();
+                SetCurrentStep(ExchangeStep.ChooseTargetCurrency);
+                return;
+            }
+
+            if (_currentStep == ExchangeStep.ChooseTargetCurrency)
+            {
+                ResetExchangeState();
+                SetCurrentStep(ExchangeStep.ChooseSourceCurrency);
+                return;
+            }
+
             FormNavigator.GoBack(this, () => new GuestActionsForm());
         }
 
         private void SetLoading(bool loading)
         {
+            _isLoading = loading;
             UseWaitCursor = loading;
-            btnSelectCash.Enabled = !loading && _preview != null && _preview.Success;
-            btnPreview.Enabled = !loading;
-            btnConfirm.Enabled = !loading && _preview != null && _preview.Success && _insertedNotes.Any();
             btnBack.Enabled = !loading;
-            cmbFromCurrency.Enabled = !loading;
-            cmbToCurrency.Enabled = !loading;
-            txtAmount.Enabled = !loading;
+            ApplyStepState();
         }
 
         private void SelectDifferentTargetCurrency()
         {
-            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            if (from == null || cmbToCurrency.Items.Count == 0)
+            if (cmbToCurrency.Items.Count == 0)
             {
                 return;
             }
 
-            foreach (var item in cmbToCurrency.Items)
+            cmbToCurrency.SelectedIndex = 0;
+        }
+
+        private void RefreshTargetCurrencyOptions()
+        {
+            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
+            string selectedToCode = (cmbToCurrency.SelectedItem as CurrencyDto)?.Code;
+            var targetCurrencies = _currencies
+                .Where(currency => from == null || !string.Equals(currency.Code, from.Code, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            cmbToCurrency.DataSource = null;
+            cmbToCurrency.Items.Clear();
+            cmbToCurrency.DataSource = targetCurrencies;
+            cmbToCurrency.DisplayMember = "Code";
+            cmbToCurrency.ValueMember = "Code";
+
+            if (targetCurrencies.Length == 0)
             {
-                var currency = item as CurrencyDto;
-                if (currency != null && currency.Code != from.Code)
+                return;
+            }
+
+            foreach (var currency in targetCurrencies)
+            {
+                if (!string.IsNullOrWhiteSpace(selectedToCode) &&
+                    string.Equals(currency.Code, selectedToCode, StringComparison.OrdinalIgnoreCase))
                 {
-                    cmbToCurrency.SelectedItem = item;
+                    cmbToCurrency.SelectedItem = currency;
                     return;
                 }
             }
+
+            SelectDifferentTargetCurrency();
         }
 
         private static void SelectCurrency(ComboBox comboBox, string currencyCode)
@@ -287,29 +367,93 @@ namespace Bank_ATM
             }
         }
 
-        private void ResetPlannedExchange()
+        private void ResetExchangeState()
         {
             _insertedNotes = new CashNoteDto[0];
             _preview = null;
-            _plannedSourceAmount = 0m;
-            btnSelectCash.Enabled = false;
-            btnConfirm.Enabled = false;
-            lblStatusValue.Text = string.Empty;
             lblInsertedValue.Text = LanguageManager.GetString("NoCashInserted");
             lblReceivedValue.Text = "-";
             lblBreakdownValue.Text = "-";
+            ApplyStepState();
         }
 
-        private static bool TryParseAmount(string input, out decimal amount)
+        private void SetCurrentStep(ExchangeStep step)
         {
-            if (decimal.TryParse(input, NumberStyles.Number, CultureInfo.CurrentCulture, out amount) ||
-                decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out amount))
+            _currentStep = step;
+            ApplyStepState();
+        }
+
+        private void ApplyStepState()
+        {
+            bool hasInsertedCash = _insertedNotes != null && _insertedNotes.Any();
+            bool hasPreview = _preview != null && _preview.Success;
+
+            cmbFromCurrency.Enabled = !_isLoading && _currentStep == ExchangeStep.ChooseSourceCurrency;
+            cmbToCurrency.Enabled = !_isLoading && _currentStep == ExchangeStep.ChooseTargetCurrency && cmbToCurrency.Items.Count > 0;
+
+            btnPreview.Visible = _currentStep == ExchangeStep.ChooseSourceCurrency || _currentStep == ExchangeStep.ChooseTargetCurrency;
+            btnPreview.Enabled = !_isLoading;
+            btnSelectCash.Enabled = !_isLoading && (_currentStep == ExchangeStep.InsertCash || _currentStep == ExchangeStep.ReviewAndConfirm);
+            btnSelectCash.Text = hasInsertedCash
+                ? LanguageManager.GetString("GuestExchangeEditCash")
+                : LanguageManager.GetString("SelectCashNotes");
+            btnSelectCash.Values.Text = btnSelectCash.Text;
+            btnConfirm.Enabled = !_isLoading && _currentStep == ExchangeStep.ReviewAndConfirm && hasPreview;
+
+            if (_currentStep == ExchangeStep.ChooseSourceCurrency)
             {
-                return amount > 0m && decimal.Round(amount, 2) == amount;
+                lblStepValue.Text = LanguageManager.GetString("GuestExchangeStepChooseSource");
+                if (string.IsNullOrWhiteSpace(lblStatusValue.Text) || lblStatusValue.ForeColor != System.Drawing.Color.FromArgb(74, 222, 128))
+                {
+                    lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(125, 211, 252);
+                    lblStatusValue.Text = LanguageManager.GetString("GuestExchangeChooseSourcePrompt");
+                }
+
+                return;
             }
 
-            amount = 0m;
-            return false;
+            if (_currentStep == ExchangeStep.ChooseTargetCurrency)
+            {
+                lblStepValue.Text = LanguageManager.GetString("GuestExchangeStepChooseTarget");
+                if (string.IsNullOrWhiteSpace(lblStatusValue.Text) || lblStatusValue.ForeColor != System.Drawing.Color.FromArgb(74, 222, 128))
+                {
+                    lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(125, 211, 252);
+                    lblStatusValue.Text = LanguageManager.GetString("GuestExchangeChooseTargetPrompt");
+                }
+
+                return;
+            }
+
+            if (_currentStep == ExchangeStep.InsertCash)
+            {
+                lblStepValue.Text = LanguageManager.GetString("GuestExchangeStepInsertCash");
+                if (string.IsNullOrWhiteSpace(lblStatusValue.Text) || lblStatusValue.ForeColor != System.Drawing.Color.FromArgb(74, 222, 128))
+                {
+                    lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(125, 211, 252);
+                    lblStatusValue.Text = LanguageManager.GetString("GuestExchangeInsertCashPrompt");
+                }
+
+                return;
+            }
+
+            lblStepValue.Text = LanguageManager.GetString("GuestExchangeStepReview");
+            if (hasPreview)
+            {
+                btnConfirm.Enabled = !_isLoading;
+            }
+        }
+
+        private bool TryGetSelectedCurrencies(out CurrencyDto from, out CurrencyDto to)
+        {
+            from = cmbFromCurrency.SelectedItem as CurrencyDto;
+            to = cmbToCurrency.SelectedItem as CurrencyDto;
+            return from != null && to != null;
+        }
+
+        private void ShowUnavailableCurrencyMessage()
+        {
+            lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
+            lblStatusValue.Text = LanguageManager.GetString("SelectedCurrencyUnavailable");
         }
 
         private static string FormatNotes(CashNoteDto[] notes)

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Models;
@@ -18,6 +21,7 @@ namespace Bank_ATM.Admin
         private readonly AdminService _adminService = new AdminService();
         private readonly BindingSource _bindingSource = new BindingSource();
         private List<object> _allItems = new List<object>();
+        private List<object> _filteredItems = new List<object>();
 
         public AdminDataViewForm(string title, object dataSource, string mode)
         {
@@ -30,14 +34,18 @@ namespace Bank_ATM.Admin
         private void AdminDataViewForm_Load(object sender, EventArgs e)
         {
             AppWindow.ApplyMainScreen(this);
-            ApplyTheme();
             lblTitle.Text = _title;
             btnAdd.Text = LanguageManager.GetString("Add");
+            btnAdd.Values.Text = btnAdd.Text;
             btnEdit.Text = LanguageManager.GetString("Edit");
+            btnEdit.Values.Text = btnEdit.Text;
             btnBack.Text = LanguageManager.GetString("Back");
+            btnBack.Values.Text = btnBack.Text;
             btnDelete.Text = _mode == "USERS"
                 ? LanguageManager.GetString("DeactivateUser")
                 : LanguageManager.GetString("Delete");
+            btnDelete.Values.Text = btnDelete.Text;
+            ConfigureModeSpecificUi();
             RefreshGrid();
 
             // Disable CRUD for read-only operational data.
@@ -45,6 +53,35 @@ namespace Bank_ATM.Admin
             btnAdd.Visible = !isReadOnly;
             btnEdit.Visible = !isReadOnly;
             btnDelete.Visible = !isReadOnly;
+        }
+
+        private void ConfigureModeSpecificUi()
+        {
+            bool isTransactionMode = _mode == "TRANSACTIONS";
+            lblTransactionType.Visible = isTransactionMode;
+            cmbTransactionType.Visible = isTransactionMode;
+            lblDateFrom.Visible = isTransactionMode;
+            dtpDateFrom.Visible = isTransactionMode;
+            lblDateTo.Visible = isTransactionMode;
+            dtpDateTo.Visible = isTransactionMode;
+            lblAmountMin.Visible = isTransactionMode;
+            txtAmountMin.Visible = isTransactionMode;
+            lblAmountMax.Visible = isTransactionMode;
+            txtAmountMax.Visible = isTransactionMode;
+            btnClearFilters.Visible = isTransactionMode;
+            btnExportCsv.Visible = isTransactionMode;
+            lblTransactionSummary.Visible = isTransactionMode;
+
+            if (!isTransactionMode)
+            {
+                return;
+            }
+
+            dtpDateFrom.Checked = false;
+            dtpDateTo.Checked = false;
+            cmbTransactionType.Items.Clear();
+            cmbTransactionType.Items.Add("All Types");
+            cmbTransactionType.SelectedIndex = 0;
         }
 
         private async void RefreshGrid()
@@ -62,7 +99,39 @@ namespace Bank_ATM.Admin
             else
                 _allItems = ((System.Collections.IEnumerable)_dataSource).Cast<object>().ToList();
 
+            if (_mode == "TRANSACTIONS")
+            {
+                PopulateTransactionTypeFilter();
+            }
+
             ApplyFilter();
+        }
+
+        private void PopulateTransactionTypeFilter()
+        {
+            string selected = cmbTransactionType.SelectedItem as string;
+            var transactionTypes = _allItems
+                .OfType<TransactionDto>()
+                .Select(transaction => transaction.Type)
+                .Where(type => !string.IsNullOrWhiteSpace(type))
+                .Distinct()
+                .OrderBy(type => type)
+                .ToArray();
+
+            cmbTransactionType.BeginUpdate();
+            cmbTransactionType.Items.Clear();
+            cmbTransactionType.Items.Add("All Types");
+            cmbTransactionType.Items.AddRange(transactionTypes);
+            cmbTransactionType.EndUpdate();
+
+            if (!string.IsNullOrWhiteSpace(selected) && cmbTransactionType.Items.Contains(selected))
+            {
+                cmbTransactionType.SelectedItem = selected;
+            }
+            else
+            {
+                cmbTransactionType.SelectedIndex = 0;
+            }
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -189,19 +258,87 @@ namespace Bank_ATM.Admin
             ApplyFilter();
         }
 
-        private void ApplyTheme()
+        private void TransactionFilterChanged(object sender, EventArgs e)
         {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StyleTitle(lblTitle);
-            AdminTheme.StyleLabel(lblSubtitle, true);
-            AdminTheme.StyleLabel(lblSearch, true);
-            AdminTheme.StyleLabel(lblResults, true);
-            AdminTheme.StyleTextBox(txtSearch);
-            AdminTheme.StyleGrid(dataGridView);
-            AdminTheme.StylePrimaryButton(btnAdd);
-            AdminTheme.StyleSecondaryButton(btnEdit);
-            AdminTheme.StyleDangerButton(btnDelete);
-            AdminTheme.StyleSecondaryButton(btnBack);
+            ApplyFilter();
+        }
+
+        private void btnClearFilters_Click(object sender, EventArgs e)
+        {
+            txtSearch.Clear();
+            cmbTransactionType.SelectedIndex = 0;
+            dtpDateFrom.Checked = false;
+            dtpDateTo.Checked = false;
+            txtAmountMin.Clear();
+            txtAmountMax.Clear();
+            ApplyFilter();
+        }
+
+        private void btnExportCsv_Click(object sender, EventArgs e)
+        {
+            if (_mode != "TRANSACTIONS" || _filteredItems.Count == 0)
+            {
+                MessageBox.Show("There are no filtered transactions to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                dialog.FileName = "system-transactions-" + System.DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".csv";
+                dialog.Title = "Export Transactions";
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
+                var transactions = _filteredItems.OfType<TransactionDto>().ToList();
+                var builder = new StringBuilder();
+                builder.AppendLine("Id,TransactionDate,Type,Amount,AccountId,TargetAccountId,CardId,TargetCardId,ServiceId,ServiceAccountId,PaymentReference,Description");
+                foreach (var transaction in transactions)
+                {
+                    builder.AppendLine(string.Join(",",
+                        transaction.Id.ToString(CultureInfo.InvariantCulture),
+                        EscapeCsv(transaction.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)),
+                        EscapeCsv(transaction.Type),
+                        transaction.Amount.ToString("0.00", CultureInfo.InvariantCulture),
+                        NullableToCsv(transaction.AccountId),
+                        NullableToCsv(transaction.TargetAccountId),
+                        NullableToCsv(transaction.CardId),
+                        NullableToCsv(transaction.TargetCardId),
+                        NullableToCsv(transaction.ServiceId),
+                        NullableToCsv(transaction.ServiceAccountId),
+                        EscapeCsv(transaction.PaymentReference),
+                        EscapeCsv(transaction.Description)));
+                }
+
+                File.WriteAllText(dialog.FileName, builder.ToString(), Encoding.UTF8);
+                MessageBox.Show("Transactions exported successfully.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void dataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            ShowSelectedTransactionDetails();
+        }
+
+        private void dataGridView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter)
+            {
+                return;
+            }
+
+            if (ShowSelectedTransactionDetails())
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
         }
 
         private void ApplyFilter()
@@ -215,7 +352,13 @@ namespace Bank_ATM.Admin
                 filtered = _allItems.Where(item => MatchesSearch(item, lowered));
             }
 
+            if (_mode == "TRANSACTIONS")
+            {
+                filtered = filtered.Where(MatchesTransactionFilters);
+            }
+
             var filteredList = filtered.ToList();
+            _filteredItems = filteredList;
             _bindingSource.DataSource = filteredList;
             dataGridView.DataSource = _bindingSource;
             dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -224,6 +367,134 @@ namespace Bank_ATM.Admin
             dataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             ConfigureColumns();
             lblResults.Text = LanguageManager.Format("ResultsCount", filteredList.Count);
+            UpdateTransactionSummary(filteredList);
+        }
+
+        private bool ShowSelectedTransactionDetails()
+        {
+            if (_mode != "TRANSACTIONS" || dataGridView.SelectedRows.Count == 0)
+            {
+                return false;
+            }
+
+            var transaction = dataGridView.SelectedRows[0].DataBoundItem as TransactionDto;
+            if (transaction == null)
+            {
+                return false;
+            }
+
+            using (var form = new AdminTransactionDetailsForm(transaction))
+            {
+                form.ShowDialog(this);
+            }
+
+            return true;
+        }
+
+        private bool MatchesTransactionFilters(object item)
+        {
+            var transaction = item as TransactionDto;
+            if (transaction == null)
+            {
+                return false;
+            }
+
+            string selectedType = cmbTransactionType.SelectedItem as string;
+            if (!string.IsNullOrWhiteSpace(selectedType) &&
+                selectedType != "All Types" &&
+                !string.Equals(transaction.Type, selectedType, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (dtpDateFrom.Checked && transaction.TransactionDate < dtpDateFrom.Value.Date)
+            {
+                return false;
+            }
+
+            if (dtpDateTo.Checked && transaction.TransactionDate >= dtpDateTo.Value.Date.AddDays(1))
+            {
+                return false;
+            }
+
+            decimal minAmount;
+            if (!string.IsNullOrWhiteSpace(txtAmountMin.Text) &&
+                TryParseDecimal(txtAmountMin.Text, out minAmount) &&
+                transaction.Amount < minAmount)
+            {
+                return false;
+            }
+
+            decimal maxAmount;
+            if (!string.IsNullOrWhiteSpace(txtAmountMax.Text) &&
+                TryParseDecimal(txtAmountMax.Text, out maxAmount) &&
+                transaction.Amount > maxAmount)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void UpdateTransactionSummary(List<object> filteredList)
+        {
+            if (_mode != "TRANSACTIONS")
+            {
+                lblTransactionSummary.Text = string.Empty;
+                return;
+            }
+
+            var transactions = filteredList.OfType<TransactionDto>().ToList();
+            if (transactions.Count == 0)
+            {
+                lblTransactionSummary.Text = "No transactions match the current filters.";
+                return;
+            }
+
+            decimal totalAmount = transactions.Sum(transaction => transaction.Amount);
+            int withdrawals = transactions.Count(transaction => string.Equals(transaction.Type, "Withdraw", System.StringComparison.OrdinalIgnoreCase));
+            int deposits = transactions.Count(transaction => string.Equals(transaction.Type, "Deposit", System.StringComparison.OrdinalIgnoreCase));
+            int transfers = transactions.Count(transaction => string.Equals(transaction.Type, "Transfer", System.StringComparison.OrdinalIgnoreCase));
+            int payments = transactions.Count(transaction => string.Equals(transaction.Type, "BillPayment", System.StringComparison.OrdinalIgnoreCase));
+            int exchanges = transactions.Count(transaction => string.Equals(transaction.Type, "Exchange", System.StringComparison.OrdinalIgnoreCase));
+
+            lblTransactionSummary.Text = string.Format(
+                CultureInfo.InvariantCulture,
+                "Filtered total: {0:N0} | Amount sum: {1:N2} | Withdraw: {2} | Deposit: {3} | Transfer: {4} | Bill pay: {5} | Exchange: {6}",
+                transactions.Count,
+                totalAmount,
+                withdrawals,
+                deposits,
+                transfers,
+                payments,
+                exchanges);
+        }
+
+        private static bool TryParseDecimal(string raw, out decimal value)
+        {
+            return decimal.TryParse(raw, NumberStyles.Number, CultureInfo.CurrentCulture, out value) ||
+                   decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
+        }
+
+        private static string NullableToCsv(int? value)
+        {
+            return value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+        }
+
+        private static string EscapeCsv(string value)
+        {
+            string normalized = value ?? string.Empty;
+            if (normalized.Contains("\""))
+            {
+                normalized = normalized.Replace("\"", "\"\"");
+            }
+
+            if (normalized.IndexOfAny(new[] { ',', '"', '\r', '\n' }) >= 0)
+            {
+                normalized = "\"" + normalized + "\"";
+            }
+
+            return normalized;
         }
 
         private bool MatchesSearch(object item, string query)

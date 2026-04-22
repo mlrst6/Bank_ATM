@@ -28,10 +28,13 @@ namespace Bank_ATM.Admin
 
         private void AdminServiceEditForm_Load(object sender, EventArgs e)
         {
-            ApplyTheme();
             btnSave.Text = LanguageManager.GetString("Save");
+            btnSave.Values.Text = btnSave.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             lblValidReferences.Text = LanguageManager.GetString("ValidPaymentReferences");
+            btnAddServiceAccount.Values.Text = btnAddServiceAccount.Text;
+            btnDeactivateServiceAccount.Values.Text = btnDeactivateServiceAccount.Text;
             cmbCategory.Items.Clear();
             cmbCategory.Items.AddRange(ServiceCategories);
 
@@ -94,32 +97,6 @@ namespace Bank_ATM.Admin
         private void btnCancel_Click(object sender, EventArgs e)
         {
             Close();
-        }
-
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StyleTitle(lblTitle);
-            AdminTheme.StyleLabel(lblSubtitle, true);
-            AdminTheme.StyleLabel(lblServiceName, true);
-            AdminTheme.StyleLabel(lblCategory, true);
-            AdminTheme.StyleLabel(lblAccountHint, true);
-            AdminTheme.StyleLabel(lblHint, true);
-            AdminTheme.StyleLabel(lblValidReferences, true);
-            AdminTheme.StyleTextBox(txtServiceName);
-            cmbCategory.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            cmbCategory.ForeColor = System.Drawing.Color.White;
-            cmbCategory.FlatStyle = FlatStyle.Flat;
-            cmbCategory.DropDownStyle = ComboBoxStyle.DropDownList;
-            AdminTheme.StyleTextBox(txtAccountHint);
-            AdminTheme.StyleGrid(dgvServiceAccounts);
-            AdminTheme.StylePrimaryButton(btnAddServiceAccount);
-            AdminTheme.StyleDangerButton(btnDeactivateServiceAccount);
-            AdminTheme.StylePrimaryButton(btnSave);
-            AdminTheme.StyleSecondaryButton(btnCancel);
-
-            chkIsActive.ForeColor = ForeColor;
-            chkIsActive.BackColor = BackColor;
         }
 
         private void SelectCategory(string category)

@@ -25,8 +25,8 @@ namespace Bank_ATM
             this.cmbToCurrency = new System.Windows.Forms.ComboBox();
             this.lblToCaption = new System.Windows.Forms.Label();
             this.pnlAmountCard = new System.Windows.Forms.Panel();
-            this.txtAmount = new System.Windows.Forms.TextBox();
-            this.lblAmountCaption = new System.Windows.Forms.Label();
+            this.lblStepValue = new System.Windows.Forms.Label();
+            this.lblStepCaption = new System.Windows.Forms.Label();
             this.pnlSummary = new System.Windows.Forms.Panel();
             this.lblBreakdownValue = new System.Windows.Forms.Label();
             this.lblBreakdownCaption = new System.Windows.Forms.Label();
@@ -77,8 +77,8 @@ namespace Bank_ATM
             this.lblSubtitle.Name = "lblSubtitle";
             this.lblSubtitle.Size = new System.Drawing.Size(752, 38);
             this.lblSubtitle.TabIndex = 1;
-            this.lblSubtitle.Text = "Insert guest cash, preview the conversion, and confirm only after checking the di" +
-    "spense breakdown.";
+            this.lblSubtitle.Text = "Choose the source currency first, then the target currency, insert cash, and conf" +
+    "irm after checking the dispense breakdown.";
             this.lblSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pnlFromCard
@@ -109,7 +109,7 @@ namespace Bank_ATM
             this.lblFromCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblFromCaption.Location = new System.Drawing.Point(19, 18);
             this.lblFromCaption.Name = "lblFromCaption";
-            this.lblFromCaption.Size = new System.Drawing.Size(200, 20);
+            this.lblFromCaption.Size = new System.Drawing.Size(240, 20);
             this.lblFromCaption.TabIndex = 0;
             this.lblFromCaption.Text = "From currency";
             // 
@@ -141,39 +141,37 @@ namespace Bank_ATM
             this.lblToCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblToCaption.Location = new System.Drawing.Point(19, 18);
             this.lblToCaption.Name = "lblToCaption";
-            this.lblToCaption.Size = new System.Drawing.Size(200, 20);
+            this.lblToCaption.Size = new System.Drawing.Size(240, 20);
             this.lblToCaption.TabIndex = 0;
             this.lblToCaption.Text = "To currency";
             // 
             // pnlAmountCard
             // 
             this.pnlAmountCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
-            this.pnlAmountCard.Controls.Add(this.txtAmount);
-            this.pnlAmountCard.Controls.Add(this.lblAmountCaption);
+            this.pnlAmountCard.Controls.Add(this.lblStepValue);
+            this.pnlAmountCard.Controls.Add(this.lblStepCaption);
             this.pnlAmountCard.Location = new System.Drawing.Point(74, 268);
             this.pnlAmountCard.Name = "pnlAmountCard";
             this.pnlAmountCard.Size = new System.Drawing.Size(752, 92);
             this.pnlAmountCard.TabIndex = 4;
             // 
-            // txtAmount
+            // lblStepValue
             // 
-            this.txtAmount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(65)))));
-            this.txtAmount.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtAmount.ForeColor = System.Drawing.Color.White;
-            this.txtAmount.Location = new System.Drawing.Point(22, 46);
-            this.txtAmount.Name = "txtAmount";
-            this.txtAmount.Size = new System.Drawing.Size(704, 22);
-            this.txtAmount.TabIndex = 1;
-            this.txtAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.lblStepValue.ForeColor = System.Drawing.Color.White;
+            this.lblStepValue.Location = new System.Drawing.Point(22, 46);
+            this.lblStepValue.Name = "lblStepValue";
+            this.lblStepValue.Size = new System.Drawing.Size(704, 24);
+            this.lblStepValue.TabIndex = 1;
+            this.lblStepValue.Text = "Choose the currency you are giving to the ATM.";
             // 
-            // lblAmountCaption
+            // lblStepCaption
             // 
-            this.lblAmountCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblAmountCaption.Location = new System.Drawing.Point(19, 18);
-            this.lblAmountCaption.Name = "lblAmountCaption";
-            this.lblAmountCaption.Size = new System.Drawing.Size(200, 20);
-            this.lblAmountCaption.TabIndex = 0;
-            this.lblAmountCaption.Text = "Exchange amount";
+            this.lblStepCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
+            this.lblStepCaption.Location = new System.Drawing.Point(19, 18);
+            this.lblStepCaption.Name = "lblStepCaption";
+            this.lblStepCaption.Size = new System.Drawing.Size(200, 20);
+            this.lblStepCaption.TabIndex = 0;
+            this.lblStepCaption.Text = "Current step";
             // 
             // pnlSummary
             // 
@@ -232,7 +230,7 @@ namespace Bank_ATM
             this.lblInsertedValue.ForeColor = System.Drawing.Color.White;
             this.lblInsertedValue.Location = new System.Drawing.Point(22, 107);
             this.lblInsertedValue.Name = "lblInsertedValue";
-            this.lblInsertedValue.Size = new System.Drawing.Size(332, 24);
+            this.lblInsertedValue.Size = new System.Drawing.Size(332, 44);
             this.lblInsertedValue.TabIndex = 3;
             this.lblInsertedValue.Text = "No cash inserted";
             // 
@@ -265,7 +263,7 @@ namespace Bank_ATM
             // 
             // lblStatusValue
             // 
-            this.lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(113)))), ((int)(((byte)(113)))));
+            this.lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
             this.lblStatusValue.Location = new System.Drawing.Point(74, 592);
             this.lblStatusValue.Name = "lblStatusValue";
             this.lblStatusValue.Size = new System.Drawing.Size(752, 30);
@@ -294,7 +292,7 @@ namespace Bank_ATM
             this.btnPreview.Size = new System.Drawing.Size(180, 46);
             this.btnPreview.TabIndex = 8;
             this.btnPreview.TabStop = false;
-            this.btnPreview.Values.Text = "Preview";
+            this.btnPreview.Values.Text = "Continue";
             this.btnPreview.Click += new System.EventHandler(this.PreviewButton_Click);
             // 
             // btnConfirm
@@ -352,7 +350,6 @@ namespace Bank_ATM
             this.pnlFromCard.ResumeLayout(false);
             this.pnlToCard.ResumeLayout(false);
             this.pnlAmountCard.ResumeLayout(false);
-            this.pnlAmountCard.PerformLayout();
             this.pnlSummary.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -392,8 +389,8 @@ namespace Bank_ATM
         private System.Windows.Forms.ComboBox cmbToCurrency;
         private System.Windows.Forms.Label lblToCaption;
         private System.Windows.Forms.Panel pnlAmountCard;
-        private System.Windows.Forms.TextBox txtAmount;
-        private System.Windows.Forms.Label lblAmountCaption;
+        private System.Windows.Forms.Label lblStepValue;
+        private System.Windows.Forms.Label lblStepCaption;
         private System.Windows.Forms.Panel pnlSummary;
         private System.Windows.Forms.Label lblBreakdownValue;
         private System.Windows.Forms.Label lblBreakdownCaption;

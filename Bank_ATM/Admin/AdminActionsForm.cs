@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
@@ -22,18 +21,24 @@ namespace Bank_ATM.Admin
         private async void AdminActionsForm_Load(object sender, EventArgs e)
         {
             AppWindow.ApplyMainScreen(this);
-            ApplyTheme();
             LanguageManager.Apply(this);
             lblAdminTitle.Text = LanguageManager.Format("AdminWelcomeTitle", SessionManager.Instance.CurrentUser.FullName);
             lblAdminSubtitle.Text = LanguageManager.GetString("AdminDashboardSubtitle");
-            
+             
             btnManageUsers.Text = LanguageManager.GetString("AdminUsers");
+            btnManageUsers.Values.Text = btnManageUsers.Text;
             btnManageCards.Text = LanguageManager.GetString("AdminCards");
+            btnManageCards.Values.Text = btnManageCards.Text;
             btnManageServices.Text = LanguageManager.GetString("AdminServices");
+            btnManageServices.Values.Text = btnManageServices.Text;
             btnAuditLogs.Text = LanguageManager.GetString("AdminTransactions");
+            btnAuditLogs.Values.Text = btnAuditLogs.Text;
             btnManageCurrencies.Text = LanguageManager.GetString("AdminCurrencies");
+            btnManageCurrencies.Values.Text = btnManageCurrencies.Text;
             btnRefillAtm.Text = LanguageManager.GetString("RefillAtmCash");
+            btnRefillAtm.Values.Text = btnRefillAtm.Text;
             btnLogout.Text = LanguageManager.GetString("Logout");
+            btnLogout.Values.Text = btnLogout.Text;
 
             await RefreshStatsAsync();
         }
@@ -126,51 +131,6 @@ namespace Bank_ATM.Admin
         {
             _authenticationService.Logout();
             FormNavigator.ShowExistingOrNew<MainForm>(this);
-        }
-
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StyleTitle(lblAdminTitle);
-            AdminTheme.StyleLabel(lblAdminSubtitle, true);
-            AdminTheme.StylePanel(pnlUsers);
-            AdminTheme.StylePanel(pnlCards);
-            AdminTheme.StylePanel(pnlServices);
-            AdminTheme.StylePanel(pnlTransactions);
-            pnlTransactions.Cursor = Cursors.Hand;
-            lblTransactionsCount.Cursor = Cursors.Hand;
-            lblTransactionsCaption.Cursor = Cursors.Hand;
-            pnlTransactions.Click += pnlTransactions_Click;
-            lblTransactionsCount.Click += pnlTransactions_Click;
-            lblTransactionsCaption.Click += pnlTransactions_Click;
-            AdminTheme.StyleStatValue(lblUsersCount);
-            AdminTheme.StyleStatValue(lblCardsCount);
-            AdminTheme.StyleStatValue(lblServicesCount);
-            AdminTheme.StyleStatValue(lblTransactionsCount);
-            AdminTheme.StyleStatCaption(lblUsersCaption);
-            AdminTheme.StyleStatCaption(lblCardsCaption);
-            AdminTheme.StyleStatCaption(lblServicesCaption);
-            AdminTheme.StyleStatCaption(lblTransactionsCaption);
-            AdminTheme.StylePrimaryButton(btnManageUsers);
-            AdminTheme.StyleSuccessButton(btnManageCards);
-            AdminTheme.StyleSuccessButton(btnManageServices);
-            AdminTheme.StyleSecondaryButton(btnAuditLogs);
-            AdminTheme.StyleSecondaryButton(btnManageCurrencies);
-            AdminTheme.StylePrimaryButton(btnRefillAtm);
-            AdminTheme.StyleDangerButton(btnLogout);
-
-            btnManageUsers.TextAlign = ContentAlignment.MiddleLeft;
-            btnManageCards.TextAlign = ContentAlignment.MiddleLeft;
-            btnManageServices.TextAlign = ContentAlignment.MiddleLeft;
-            btnAuditLogs.TextAlign = ContentAlignment.MiddleLeft;
-            btnManageCurrencies.TextAlign = ContentAlignment.MiddleLeft;
-            btnRefillAtm.TextAlign = ContentAlignment.MiddleLeft;
-            btnManageUsers.Padding = new Padding(18, 0, 0, 0);
-            btnManageCards.Padding = new Padding(18, 0, 0, 0);
-            btnManageServices.Padding = new Padding(18, 0, 0, 0);
-            btnAuditLogs.Padding = new Padding(18, 0, 0, 0);
-            btnManageCurrencies.Padding = new Padding(18, 0, 0, 0);
-            btnRefillAtm.Padding = new Padding(18, 0, 0, 0);
         }
 
         private async System.Threading.Tasks.Task RefreshStatsAsync()

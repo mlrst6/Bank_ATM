@@ -29,13 +29,14 @@ namespace Bank_ATM.Admin
 
         private void AdminCurrencyEditForm_Load(object sender, EventArgs e)
         {
-            ApplyTheme();
             NumericInputDialog.Attach(txtRateToUzs, lblRateToUzs.Text, true);
             NumericInputDialog.Attach(txtCashAvailable, lblCashAvailable.Text, true);
             NumericInputDialog.Attach(txtDenominations, lblDenominations.Text, true, true);
             lblTitle.Text = _isEdit ? "Edit Currency" : "Create Currency";
             btnSave.Text = LanguageManager.GetString("Save");
+            btnSave.Values.Text = btnSave.Text;
             btnCancel.Text = LanguageManager.GetString("Cancel");
+            btnCancel.Values.Text = btnCancel.Text;
             lblDenominations.Text = LanguageManager.GetString("Denominations");
 
             txtCode.Text = _currency.Code;
@@ -140,23 +141,5 @@ namespace Bank_ATM.Admin
             return values.Length > 0;
         }
 
-        private void ApplyTheme()
-        {
-            AdminTheme.ApplyForm(this);
-            AdminTheme.StyleTitle(lblTitle);
-            AdminTheme.StyleLabel(lblCode, true);
-            AdminTheme.StyleLabel(lblCurrencyName, true);
-            AdminTheme.StyleLabel(lblRateToUzs, true);
-            AdminTheme.StyleLabel(lblCashAvailable, true);
-            AdminTheme.StyleLabel(lblDenominations, true);
-            AdminTheme.StyleTextBox(txtCode);
-            AdminTheme.StyleTextBox(txtCurrencyName);
-            AdminTheme.StyleTextBox(txtRateToUzs);
-            AdminTheme.StyleTextBox(txtCashAvailable);
-            AdminTheme.StyleTextBox(txtDenominations);
-            AdminTheme.StyleCheckBox(chkIsActive);
-            AdminTheme.StylePrimaryButton(btnSave);
-            AdminTheme.StyleSecondaryButton(btnCancel);
-        }
     }
 }

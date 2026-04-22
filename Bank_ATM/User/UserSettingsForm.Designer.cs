@@ -120,7 +120,7 @@ namespace Bank_ATM.User
             // lblAccountStatusValue
             // 
             this.lblAccountStatusValue.ForeColor = System.Drawing.Color.White;
-            this.lblAccountStatusValue.Location = new System.Drawing.Point(24, 286);
+            this.lblAccountStatusValue.Location = new System.Drawing.Point(22, 303);
             this.lblAccountStatusValue.Name = "lblAccountStatusValue";
             this.lblAccountStatusValue.Size = new System.Drawing.Size(352, 24);
             this.lblAccountStatusValue.TabIndex = 12;
@@ -129,7 +129,7 @@ namespace Bank_ATM.User
             // lblAccountStatusCaption
             // 
             this.lblAccountStatusCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblAccountStatusCaption.Location = new System.Drawing.Point(24, 264);
+            this.lblAccountStatusCaption.Location = new System.Drawing.Point(22, 273);
             this.lblAccountStatusCaption.Name = "lblAccountStatusCaption";
             this.lblAccountStatusCaption.Size = new System.Drawing.Size(140, 20);
             this.lblAccountStatusCaption.TabIndex = 11;
@@ -138,7 +138,7 @@ namespace Bank_ATM.User
             // lblBalanceValue
             // 
             this.lblBalanceValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
-            this.lblBalanceValue.Location = new System.Drawing.Point(24, 236);
+            this.lblBalanceValue.Location = new System.Drawing.Point(24, 249);
             this.lblBalanceValue.Name = "lblBalanceValue";
             this.lblBalanceValue.Size = new System.Drawing.Size(352, 24);
             this.lblBalanceValue.TabIndex = 10;
@@ -147,7 +147,7 @@ namespace Bank_ATM.User
             // lblBalanceCaption
             // 
             this.lblBalanceCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblBalanceCaption.Location = new System.Drawing.Point(24, 214);
+            this.lblBalanceCaption.Location = new System.Drawing.Point(22, 229);
             this.lblBalanceCaption.Name = "lblBalanceCaption";
             this.lblBalanceCaption.Size = new System.Drawing.Size(140, 20);
             this.lblBalanceCaption.TabIndex = 9;
@@ -156,7 +156,7 @@ namespace Bank_ATM.User
             // lblAccountValue
             // 
             this.lblAccountValue.ForeColor = System.Drawing.Color.White;
-            this.lblAccountValue.Location = new System.Drawing.Point(24, 186);
+            this.lblAccountValue.Location = new System.Drawing.Point(24, 205);
             this.lblAccountValue.Name = "lblAccountValue";
             this.lblAccountValue.Size = new System.Drawing.Size(352, 24);
             this.lblAccountValue.TabIndex = 8;
@@ -165,7 +165,7 @@ namespace Bank_ATM.User
             // lblAccountCaption
             // 
             this.lblAccountCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblAccountCaption.Location = new System.Drawing.Point(24, 164);
+            this.lblAccountCaption.Location = new System.Drawing.Point(22, 185);
             this.lblAccountCaption.Name = "lblAccountCaption";
             this.lblAccountCaption.Size = new System.Drawing.Size(140, 20);
             this.lblAccountCaption.TabIndex = 7;
@@ -174,7 +174,7 @@ namespace Bank_ATM.User
             // lblPhoneValue
             // 
             this.lblPhoneValue.ForeColor = System.Drawing.Color.White;
-            this.lblPhoneValue.Location = new System.Drawing.Point(24, 136);
+            this.lblPhoneValue.Location = new System.Drawing.Point(22, 151);
             this.lblPhoneValue.Name = "lblPhoneValue";
             this.lblPhoneValue.Size = new System.Drawing.Size(352, 24);
             this.lblPhoneValue.TabIndex = 6;
@@ -183,7 +183,7 @@ namespace Bank_ATM.User
             // lblPhoneCaption
             // 
             this.lblPhoneCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblPhoneCaption.Location = new System.Drawing.Point(24, 114);
+            this.lblPhoneCaption.Location = new System.Drawing.Point(22, 131);
             this.lblPhoneCaption.Name = "lblPhoneCaption";
             this.lblPhoneCaption.Size = new System.Drawing.Size(140, 20);
             this.lblPhoneCaption.TabIndex = 5;
@@ -192,7 +192,7 @@ namespace Bank_ATM.User
             // lblUsernameValue
             // 
             this.lblUsernameValue.ForeColor = System.Drawing.Color.White;
-            this.lblUsernameValue.Location = new System.Drawing.Point(24, 86);
+            this.lblUsernameValue.Location = new System.Drawing.Point(22, 96);
             this.lblUsernameValue.Name = "lblUsernameValue";
             this.lblUsernameValue.Size = new System.Drawing.Size(352, 24);
             this.lblUsernameValue.TabIndex = 4;
@@ -201,7 +201,7 @@ namespace Bank_ATM.User
             // lblUsernameCaption
             // 
             this.lblUsernameCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblUsernameCaption.Location = new System.Drawing.Point(24, 64);
+            this.lblUsernameCaption.Location = new System.Drawing.Point(24, 76);
             this.lblUsernameCaption.Name = "lblUsernameCaption";
             this.lblUsernameCaption.Size = new System.Drawing.Size(140, 20);
             this.lblUsernameCaption.TabIndex = 3;
@@ -210,7 +210,7 @@ namespace Bank_ATM.User
             // lblFullNameValue
             // 
             this.lblFullNameValue.ForeColor = System.Drawing.Color.White;
-            this.lblFullNameValue.Location = new System.Drawing.Point(24, 40);
+            this.lblFullNameValue.Location = new System.Drawing.Point(24, 52);
             this.lblFullNameValue.Name = "lblFullNameValue";
             this.lblFullNameValue.Size = new System.Drawing.Size(352, 24);
             this.lblFullNameValue.TabIndex = 2;
@@ -219,7 +219,7 @@ namespace Bank_ATM.User
             // lblFullNameCaption
             // 
             this.lblFullNameCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblFullNameCaption.Location = new System.Drawing.Point(24, 18);
+            this.lblFullNameCaption.Location = new System.Drawing.Point(22, 32);
             this.lblFullNameCaption.Name = "lblFullNameCaption";
             this.lblFullNameCaption.Size = new System.Drawing.Size(140, 20);
             this.lblFullNameCaption.TabIndex = 1;
@@ -227,10 +227,11 @@ namespace Bank_ATM.User
             // 
             // lblProfileTitle
             // 
+            this.lblProfileTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblProfileTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblProfileTitle.Location = new System.Drawing.Point(22, 0);
+            this.lblProfileTitle.Location = new System.Drawing.Point(24, 0);
             this.lblProfileTitle.Name = "lblProfileTitle";
-            this.lblProfileTitle.Size = new System.Drawing.Size(180, 20);
+            this.lblProfileTitle.Size = new System.Drawing.Size(150, 20);
             this.lblProfileTitle.TabIndex = 0;
             this.lblProfileTitle.Text = "Profile and account";
             // 
@@ -257,7 +258,7 @@ namespace Bank_ATM.User
             // lblSessionTimeoutValue
             // 
             this.lblSessionTimeoutValue.ForeColor = System.Drawing.Color.White;
-            this.lblSessionTimeoutValue.Location = new System.Drawing.Point(24, 236);
+            this.lblSessionTimeoutValue.Location = new System.Drawing.Point(18, 303);
             this.lblSessionTimeoutValue.Name = "lblSessionTimeoutValue";
             this.lblSessionTimeoutValue.Size = new System.Drawing.Size(352, 24);
             this.lblSessionTimeoutValue.TabIndex = 10;
@@ -266,7 +267,7 @@ namespace Bank_ATM.User
             // lblSessionTimeoutCaption
             // 
             this.lblSessionTimeoutCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblSessionTimeoutCaption.Location = new System.Drawing.Point(24, 214);
+            this.lblSessionTimeoutCaption.Location = new System.Drawing.Point(18, 273);
             this.lblSessionTimeoutCaption.Name = "lblSessionTimeoutCaption";
             this.lblSessionTimeoutCaption.Size = new System.Drawing.Size(140, 20);
             this.lblSessionTimeoutCaption.TabIndex = 9;
@@ -275,7 +276,7 @@ namespace Bank_ATM.User
             // lblCardStatusValue
             // 
             this.lblCardStatusValue.ForeColor = System.Drawing.Color.White;
-            this.lblCardStatusValue.Location = new System.Drawing.Point(24, 186);
+            this.lblCardStatusValue.Location = new System.Drawing.Point(18, 240);
             this.lblCardStatusValue.Name = "lblCardStatusValue";
             this.lblCardStatusValue.Size = new System.Drawing.Size(352, 24);
             this.lblCardStatusValue.TabIndex = 8;
@@ -284,7 +285,7 @@ namespace Bank_ATM.User
             // lblCardStatusCaption
             // 
             this.lblCardStatusCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblCardStatusCaption.Location = new System.Drawing.Point(24, 164);
+            this.lblCardStatusCaption.Location = new System.Drawing.Point(18, 205);
             this.lblCardStatusCaption.Name = "lblCardStatusCaption";
             this.lblCardStatusCaption.Size = new System.Drawing.Size(140, 20);
             this.lblCardStatusCaption.TabIndex = 7;
@@ -293,7 +294,7 @@ namespace Bank_ATM.User
             // lblCardExpiryValue
             // 
             this.lblCardExpiryValue.ForeColor = System.Drawing.Color.White;
-            this.lblCardExpiryValue.Location = new System.Drawing.Point(24, 136);
+            this.lblCardExpiryValue.Location = new System.Drawing.Point(18, 181);
             this.lblCardExpiryValue.Name = "lblCardExpiryValue";
             this.lblCardExpiryValue.Size = new System.Drawing.Size(352, 24);
             this.lblCardExpiryValue.TabIndex = 6;
@@ -302,7 +303,7 @@ namespace Bank_ATM.User
             // lblCardExpiryCaption
             // 
             this.lblCardExpiryCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblCardExpiryCaption.Location = new System.Drawing.Point(24, 114);
+            this.lblCardExpiryCaption.Location = new System.Drawing.Point(18, 151);
             this.lblCardExpiryCaption.Name = "lblCardExpiryCaption";
             this.lblCardExpiryCaption.Size = new System.Drawing.Size(140, 20);
             this.lblCardExpiryCaption.TabIndex = 5;
@@ -311,7 +312,7 @@ namespace Bank_ATM.User
             // lblCardTypeValue
             // 
             this.lblCardTypeValue.ForeColor = System.Drawing.Color.White;
-            this.lblCardTypeValue.Location = new System.Drawing.Point(24, 86);
+            this.lblCardTypeValue.Location = new System.Drawing.Point(18, 127);
             this.lblCardTypeValue.Name = "lblCardTypeValue";
             this.lblCardTypeValue.Size = new System.Drawing.Size(352, 24);
             this.lblCardTypeValue.TabIndex = 4;
@@ -320,7 +321,7 @@ namespace Bank_ATM.User
             // lblCardTypeCaption
             // 
             this.lblCardTypeCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblCardTypeCaption.Location = new System.Drawing.Point(24, 64);
+            this.lblCardTypeCaption.Location = new System.Drawing.Point(18, 100);
             this.lblCardTypeCaption.Name = "lblCardTypeCaption";
             this.lblCardTypeCaption.Size = new System.Drawing.Size(140, 20);
             this.lblCardTypeCaption.TabIndex = 3;
@@ -329,7 +330,7 @@ namespace Bank_ATM.User
             // lblCardNumberValue
             // 
             this.lblCardNumberValue.ForeColor = System.Drawing.Color.White;
-            this.lblCardNumberValue.Location = new System.Drawing.Point(24, 40);
+            this.lblCardNumberValue.Location = new System.Drawing.Point(18, 61);
             this.lblCardNumberValue.Name = "lblCardNumberValue";
             this.lblCardNumberValue.Size = new System.Drawing.Size(352, 24);
             this.lblCardNumberValue.TabIndex = 2;
@@ -338,7 +339,7 @@ namespace Bank_ATM.User
             // lblCardNumberCaption
             // 
             this.lblCardNumberCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblCardNumberCaption.Location = new System.Drawing.Point(24, 18);
+            this.lblCardNumberCaption.Location = new System.Drawing.Point(18, 32);
             this.lblCardNumberCaption.Name = "lblCardNumberCaption";
             this.lblCardNumberCaption.Size = new System.Drawing.Size(140, 20);
             this.lblCardNumberCaption.TabIndex = 1;
@@ -346,8 +347,9 @@ namespace Bank_ATM.User
             // 
             // lblCardTitle
             // 
+            this.lblCardTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCardTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblCardTitle.Location = new System.Drawing.Point(22, 0);
+            this.lblCardTitle.Location = new System.Drawing.Point(18, 0);
             this.lblCardTitle.Name = "lblCardTitle";
             this.lblCardTitle.Size = new System.Drawing.Size(180, 20);
             this.lblCardTitle.TabIndex = 0;
@@ -357,7 +359,6 @@ namespace Bank_ATM.User
             // 
             this.pnlSecurityCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(32)))), ((int)(((byte)(56)))));
             this.pnlSecurityCard.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlSecurityCard.Controls.Add(this.pnlPinEditor);
             this.pnlSecurityCard.Controls.Add(this.btnChangePin);
             this.pnlSecurityCard.Controls.Add(this.lblSecuritySubtitle);
             this.pnlSecurityCard.Controls.Add(this.lblSecurityTitle);
@@ -377,9 +378,9 @@ namespace Bank_ATM.User
             this.pnlPinEditor.Controls.Add(this.lblNewPinCaption);
             this.pnlPinEditor.Controls.Add(this.txtCurrentPin);
             this.pnlPinEditor.Controls.Add(this.lblCurrentPinCaption);
-            this.pnlPinEditor.Location = new System.Drawing.Point(14, 22);
+            this.pnlPinEditor.Location = new System.Drawing.Point(28, 486);
             this.pnlPinEditor.Name = "pnlPinEditor";
-            this.pnlPinEditor.Size = new System.Drawing.Size(796, 164);
+            this.pnlPinEditor.Size = new System.Drawing.Size(844, 164);
             this.pnlPinEditor.TabIndex = 3;
             this.pnlPinEditor.Visible = false;
             // 
@@ -510,7 +511,7 @@ namespace Bank_ATM.User
             this.txtCurrentPin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.txtCurrentPin.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtCurrentPin.ForeColor = System.Drawing.Color.White;
-            this.txtCurrentPin.Location = new System.Drawing.Point(0, 34);
+            this.txtCurrentPin.Location = new System.Drawing.Point(4, 34);
             this.txtCurrentPin.MaxLength = 4;
             this.txtCurrentPin.Name = "txtCurrentPin";
             this.txtCurrentPin.PasswordChar = '*';
@@ -521,7 +522,7 @@ namespace Bank_ATM.User
             // lblCurrentPinCaption
             // 
             this.lblCurrentPinCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblCurrentPinCaption.Location = new System.Drawing.Point(0, 10);
+            this.lblCurrentPinCaption.Location = new System.Drawing.Point(1, 10);
             this.lblCurrentPinCaption.Name = "lblCurrentPinCaption";
             this.lblCurrentPinCaption.Size = new System.Drawing.Size(160, 20);
             this.lblCurrentPinCaption.TabIndex = 0;
@@ -620,6 +621,7 @@ namespace Bank_ATM.User
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(14)))), ((int)(((byte)(28)))));
             this.ClientSize = new System.Drawing.Size(900, 748);
+            this.Controls.Add(this.pnlPinEditor);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.pnlSecurityCard);
             this.Controls.Add(this.pnlCardCard);
