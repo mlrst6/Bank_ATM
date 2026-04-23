@@ -45,7 +45,7 @@ namespace Bank_ATM.User
             this.txtCardNumber.Font = new System.Drawing.Font("Segoe UI", 16F);
             this.txtCardNumber.ForeColor = System.Drawing.Color.White;
             this.txtCardNumber.Location = new System.Drawing.Point(272, 98);
-            this.txtCardNumber.MaxLength = 16;
+            this.txtCardNumber.MaxLength = 19;
             this.txtCardNumber.Multiline = true;
             this.txtCardNumber.Name = "txtCardNumber";
             this.txtCardNumber.Size = new System.Drawing.Size(350, 60);

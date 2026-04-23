@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Core;
 using Bank_ATM.Services;
@@ -36,8 +37,7 @@ namespace Bank_ATM.User
                             _isCardPlaceholderActive = false;
                         }
 
-                        if (txtCardNumber.Text.Length < 16)
-                            txtCardNumber.Text += btn.Text;
+                        AppendCardDigit(btn.Text[0]);
                     };
                 }
             }
@@ -124,15 +124,50 @@ namespace Bank_ATM.User
                 return;
             }
 
-            if (txtCardNumber.Text.Length > 0)
+            string digits = GetCardDigits();
+            if (digits.Length > 0)
             {
-                txtCardNumber.Text = txtCardNumber.Text.Substring(0, txtCardNumber.Text.Length - 1);
+                txtCardNumber.Text = FormatCardNumber(digits.Substring(0, digits.Length - 1));
             }
 
-            if (txtCardNumber.Text.Length == 0)
+            if (GetCardDigits().Length == 0)
             {
                 InitializeCardPlaceholder();
             }
+        }
+
+        private void AppendCardDigit(char digit)
+        {
+            string digits = GetCardDigits();
+            if (digits.Length >= 16)
+            {
+                return;
+            }
+
+            txtCardNumber.Text = FormatCardNumber(digits + digit);
+        }
+
+        private string GetCardDigits()
+        {
+            if (_isCardPlaceholderActive)
+            {
+                return string.Empty;
+            }
+
+            return (txtCardNumber.Text ?? string.Empty).Replace(" ", string.Empty).Trim();
+        }
+
+        private static string FormatCardNumber(string digits)
+        {
+            string sanitized = new string((digits ?? string.Empty).Where(char.IsDigit).Take(16).ToArray());
+            if (sanitized.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            var groups = Enumerable.Range(0, (sanitized.Length + 3) / 4)
+                .Select(index => sanitized.Substring(index * 4, Math.Min(4, sanitized.Length - (index * 4))));
+            return string.Join(" ", groups);
         }
     }
 }

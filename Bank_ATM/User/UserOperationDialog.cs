@@ -344,7 +344,7 @@ namespace Bank_ATM.User
             }
             else
             {
-                var selectedCurrency = _currencyComboBox.SelectedItem as CurrencyDto;
+                var selectedCurrency = GetSelectedCurrency();
                 if (selectedCurrency == null)
                 {
                     _validationLabel.Text = LanguageManager.GetString("SelectedCurrencyUnavailable");
@@ -446,6 +446,17 @@ namespace Bank_ATM.User
             {
                 _currencyComboBox.SelectedIndex = 0;
             }
+        }
+
+        private CurrencyDto GetSelectedCurrency()
+        {
+            var selected = _currencyComboBox.SelectedItem as CurrencyDto;
+            if (selected != null)
+            {
+                return selected;
+            }
+
+            return _currencyComboBox.Items.OfType<CurrencyDto>().FirstOrDefault();
         }
 
         private static bool TryParseAmount(string input, out decimal amount)

@@ -260,6 +260,9 @@
     <EmbeddedResource Include="Guest\GuestActionsForm.resx">
       <DependentUpon>GuestActionsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Guest\GuestExchangeForm.resx">
+      <DependentUpon>GuestExchangeForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="User\UserActionsForm.resx">
       <DependentUpon>UserActionsForm.cs</DependentUpon>
     </EmbeddedResource>

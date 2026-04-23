@@ -250,8 +250,8 @@ namespace Bank_ATM
 
         private void UpdateRateLabel()
         {
-            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            var to = cmbToCurrency.SelectedItem as CurrencyDto;
+            var from = GetSelectedCurrency(cmbFromCurrency);
+            var to = GetSelectedCurrency(cmbToCurrency);
             if (from == null || to == null || to.RateToUzs <= 0m)
             {
                 lblRateValue.Text = LanguageManager.GetString("ExchangeRateUnavailable");
@@ -313,8 +313,8 @@ namespace Bank_ATM
 
         private void RefreshTargetCurrencyOptions()
         {
-            var from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            string selectedToCode = (cmbToCurrency.SelectedItem as CurrencyDto)?.Code;
+            var from = GetSelectedCurrency(cmbFromCurrency);
+            string selectedToCode = GetSelectedCurrency(cmbToCurrency)?.Code;
             var targetCurrencies = _currencies
                 .Where(currency => from == null || !string.Equals(currency.Code, from.Code, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
@@ -439,9 +439,25 @@ namespace Bank_ATM
 
         private bool TryGetSelectedCurrencies(out CurrencyDto from, out CurrencyDto to)
         {
-            from = cmbFromCurrency.SelectedItem as CurrencyDto;
-            to = cmbToCurrency.SelectedItem as CurrencyDto;
+            from = GetSelectedCurrency(cmbFromCurrency);
+            to = GetSelectedCurrency(cmbToCurrency);
             return from != null && to != null;
+        }
+
+        private static CurrencyDto GetSelectedCurrency(ComboBox comboBox)
+        {
+            if (comboBox == null)
+            {
+                return null;
+            }
+
+            var selected = comboBox.SelectedItem as CurrencyDto;
+            if (selected != null)
+            {
+                return selected;
+            }
+
+            return comboBox.Items.OfType<CurrencyDto>().FirstOrDefault();
         }
 
         private void ShowUnavailableCurrencyMessage()

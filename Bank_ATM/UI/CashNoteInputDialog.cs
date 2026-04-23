@@ -76,14 +76,18 @@ namespace Bank_ATM.UI
                 Location = new Point(30, 118),
                 Size = new Size(500, 34),
                 DropDownStyle = ComboBoxStyle.DropDownList,
+                FormattingEnabled = true,
                 BackColor = Color.FromArgb(30, 41, 59),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat
             };
-            _currencyComboBox.DataSource = _currencies;
             _currencyComboBox.DisplayMember = "Code";
-            _currencyComboBox.ValueMember = "Id";
             _currencyComboBox.SelectedIndexChanged += (s, e) => LoadDenominations();
+
+            if (_currencies.Length > 0)
+            {
+                _currencyComboBox.Items.AddRange(_currencies.Cast<object>().ToArray());
+            }
 
             _notesPanel = new Panel
             {
@@ -157,9 +161,11 @@ namespace Bank_ATM.UI
             _notesPanel.Controls.Clear();
             _rows.Clear();
 
-            var currency = _currencyComboBox.SelectedItem as CurrencyDto;
+            var currency = GetSelectedCurrency();
             if (currency == null)
             {
+                _validationLabel.Text = LanguageManager.GetString("SelectedCurrencyUnavailable");
+                _confirmButton.Enabled = false;
                 UpdateTotal();
                 return;
             }
@@ -240,7 +246,7 @@ namespace Bank_ATM.UI
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             _validationLabel.Text = string.Empty;
-            var currency = _currencyComboBox.SelectedItem as CurrencyDto;
+            var currency = GetSelectedCurrency();
             if (currency == null)
             {
                 _validationLabel.Text = LanguageManager.GetString("SelectedCurrencyUnavailable");
@@ -285,10 +291,21 @@ namespace Bank_ATM.UI
 
         private void UpdateTotal()
         {
-            var currency = _currencyComboBox.SelectedItem as CurrencyDto;
+            var currency = GetSelectedCurrency();
             decimal total = currency == null ? 0m : ReadNotes(currency).Sum(note => note.TotalValue);
             string code = currency == null ? string.Empty : currency.Code;
             _totalLabel.Text = LanguageManager.Format("CashNotesTotal", total, code);
+        }
+
+        private CurrencyDto GetSelectedCurrency()
+        {
+            var selected = _currencyComboBox.SelectedItem as CurrencyDto;
+            if (selected != null)
+            {
+                return selected;
+            }
+
+            return _currencyComboBox.Items.OfType<CurrencyDto>().FirstOrDefault();
         }
 
         private void CountTextBox_KeyPress(object sender, KeyPressEventArgs e)

@@ -103,6 +103,7 @@ namespace Bank_ATM
             this.cmbFromCurrency.Size = new System.Drawing.Size(304, 24);
             this.cmbFromCurrency.TabIndex = 1;
             this.cmbFromCurrency.SelectedIndexChanged += new System.EventHandler(this.CurrencySelectionChanged);
+            this.cmbFromCurrency.SelectionChangeCommitted += new System.EventHandler(this.PreviewButton_Click);
             // 
             // lblFromCaption
             // 
@@ -300,6 +301,7 @@ namespace Bank_ATM
             this.btnSelectCash.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(119)))), ((int)(((byte)(200)))));
             this.btnSelectCash.TabIndex = 7;
             this.btnSelectCash.TabStop = false;
+            this.btnSelectCash.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnSelectCash.Values.Text = "Select Cash";
             this.btnSelectCash.Click += new System.EventHandler(this.SelectCashButton_Click);
             // 
@@ -332,7 +334,9 @@ namespace Bank_ATM
             this.btnPreview.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(178)))), ((int)(((byte)(210)))));
             this.btnPreview.TabIndex = 8;
             this.btnPreview.TabStop = false;
+            this.btnPreview.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnPreview.Values.Text = "Continue";
+            this.btnPreview.Visible = false;
             this.btnPreview.Click += new System.EventHandler(this.PreviewButton_Click);
             // 
             // btnConfirm
@@ -365,6 +369,7 @@ namespace Bank_ATM
             this.btnConfirm.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(47)))), ((int)(((byte)(197)))), ((int)(((byte)(98)))));
             this.btnConfirm.TabIndex = 9;
             this.btnConfirm.TabStop = false;
+            this.btnConfirm.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnConfirm.Values.Text = "Confirm";
             this.btnConfirm.Click += new System.EventHandler(this.ConfirmButton_Click);
             // 
@@ -397,6 +402,7 @@ namespace Bank_ATM
             this.btnBack.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(110)))), ((int)(((byte)(119)))), ((int)(((byte)(131)))));
             this.btnBack.TabIndex = 10;
             this.btnBack.TabStop = false;
+            this.btnBack.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnBack.Values.Text = "Back";
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
