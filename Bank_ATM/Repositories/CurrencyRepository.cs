@@ -26,6 +26,8 @@ namespace Bank_ATM.Repositories
                         c.code as Code,
                         c.currency_name as CurrencyName,
                         c.rate_to_uzs as RateToUzs,
+                        c.buy_rate_to_uzs as BuyRateToUzs,
+                        c.sell_rate_to_uzs as SellRateToUzs,
                         c.is_active as IsActive,
                         ISNULL(acc.cash_balance, 0) as CashAvailable,
                         c.updated_at as UpdatedAt
@@ -51,6 +53,8 @@ namespace Bank_ATM.Repositories
                         c.code as Code,
                         c.currency_name as CurrencyName,
                         c.rate_to_uzs as RateToUzs,
+                        c.buy_rate_to_uzs as BuyRateToUzs,
+                        c.sell_rate_to_uzs as SellRateToUzs,
                         c.is_active as IsActive,
                         ISNULL(acc.cash_balance, 0) as CashAvailable,
                         c.updated_at as UpdatedAt
@@ -78,6 +82,24 @@ namespace Bank_ATM.Repositories
                     {
                         int id;
                         string code = currency.Code.Trim().ToUpperInvariant();
+                        if (code == "UZS")
+                        {
+                            currency.RateToUzs = 1m;
+                            currency.BuyRateToUzs = 1m;
+                            currency.SellRateToUzs = 1m;
+                        }
+                        else
+                        {
+                            if (currency.BuyRateToUzs <= 0m)
+                            {
+                                currency.BuyRateToUzs = currency.RateToUzs;
+                            }
+
+                            if (currency.SellRateToUzs <= 0m)
+                            {
+                                currency.SellRateToUzs = currency.RateToUzs;
+                            }
+                        }
 
                         if (currency.Id > 0)
                         {
@@ -86,6 +108,8 @@ namespace Bank_ATM.Repositories
                                 SET code = @Code,
                                     currency_name = @CurrencyName,
                                     rate_to_uzs = @RateToUzs,
+                                    buy_rate_to_uzs = @BuyRateToUzs,
+                                    sell_rate_to_uzs = @SellRateToUzs,
                                     is_active = @IsActive,
                                     updated_at = GETDATE()
                                 WHERE id = @Id",
@@ -95,6 +119,8 @@ namespace Bank_ATM.Repositories
                                     Code = code,
                                     currency.CurrencyName,
                                     currency.RateToUzs,
+                                    currency.BuyRateToUzs,
+                                    currency.SellRateToUzs,
                                     currency.IsActive
                                 },
                                 trans);
@@ -103,14 +129,16 @@ namespace Bank_ATM.Repositories
                         else
                         {
                             id = db.QuerySingle<int>(@"
-                                INSERT INTO currencies (code, currency_name, rate_to_uzs, is_active)
-                                VALUES (@Code, @CurrencyName, @RateToUzs, @IsActive);
+                                INSERT INTO currencies (code, currency_name, rate_to_uzs, buy_rate_to_uzs, sell_rate_to_uzs, is_active)
+                                VALUES (@Code, @CurrencyName, @RateToUzs, @BuyRateToUzs, @SellRateToUzs, @IsActive);
                                 SELECT CAST(SCOPE_IDENTITY() as int);",
                                 new
                                 {
                                     Code = code,
                                     currency.CurrencyName,
                                     currency.RateToUzs,
+                                    currency.BuyRateToUzs,
+                                    currency.SellRateToUzs,
                                     currency.IsActive
                                 },
                                 trans);

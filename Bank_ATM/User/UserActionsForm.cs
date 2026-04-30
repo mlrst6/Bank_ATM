@@ -59,6 +59,16 @@ namespace Bank_ATM.User
                     return;
                 }
 
+                var feePreview = _bankingService.PreviewWithdrawFee(dialog.Amount, dialog.CurrencyCode);
+                if (!ConfirmFeeReview(
+                    LanguageManager.GetString("Withdraw"),
+                    $"{dialog.Amount:N2} {dialog.CurrencyCode}",
+                    feePreview,
+                    "Cash value"))
+                {
+                    return;
+                }
+
                 SetLoading(true);
                 var result = await _bankingService.WithdrawAsync(dialog.Amount, dialog.CurrencyCode);
                 SetLoading(false);
@@ -67,11 +77,11 @@ namespace Bank_ATM.User
                 {
                     AuditLogger.LogTransaction("Withdraw", result.DebitedAmountUzs, SessionManager.Instance.CurrentAccount.AccountNumber);
                     RefreshAccountSummary();
-                    string receiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{dialog.Amount:N2} {dialog.CurrencyCode}");
+                    string receiptMessage = OfferDigitalReceipt("Withdraw", result.DebitedAmountUzs, $"{dialog.Amount:N2} {dialog.CurrencyCode}; Fee: {result.FeeAmountUzs:N2} UZS");
                     ShowStatus(
                         StatusBannerKind.Success,
                         LanguageManager.GetString("Withdraw"),
-                        BuildOperationSummary(LanguageManager.GetString("Success"), LanguageManager.GetString("CashDispensedBreakdown"), result.CashBreakdown, receiptMessage));
+                        BuildOperationSummary(BuildFeeSummary(LanguageManager.GetString("Success"), result), LanguageManager.GetString("CashDispensedBreakdown"), result.CashBreakdown, receiptMessage));
                 }
                 else
                 {
@@ -100,6 +110,12 @@ namespace Bank_ATM.User
                     return;
                 }
 
+                var feePreview = _bankingService.PreviewDepositFee(dialog.TotalAmount, dialog.CurrencyCode);
+                if (!ConfirmDepositFeeReview(dialog.TotalAmount, dialog.CurrencyCode, feePreview))
+                {
+                    return;
+                }
+
                 SetLoading(true);
                 var result = await _bankingService.DepositCashNotesAsync(dialog.CurrencyCode, dialog.Notes);
                 SetLoading(false);
@@ -109,12 +125,12 @@ namespace Bank_ATM.User
                     RefreshAccountSummary();
                     string receiptMessage = OfferDigitalReceipt(
                         "Deposit",
-                        result.DebitedAmountUzs,
-                        $"{result.CashAmount:N2} {result.CashCurrencyCode}");
+                        result.NetAmountUzs,
+                        $"{result.CashAmount:N2} {result.CashCurrencyCode}; Fee: {result.FeeAmountUzs:N2} UZS");
                     ShowStatus(
                         StatusBannerKind.Success,
                         LanguageManager.GetString("Deposit"),
-                        BuildOperationSummary(LanguageManager.GetString("Success"), LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown, receiptMessage));
+                        BuildOperationSummary(BuildDepositFeeSummary(LanguageManager.GetString("Success"), result), LanguageManager.GetString("CashAcceptedBreakdown"), result.CashBreakdown, receiptMessage));
                 }
                 else
                 {
@@ -132,6 +148,16 @@ namespace Bank_ATM.User
                     return;
                 }
 
+                var feePreview = _bankingService.PreviewTransferFee(dialog.Amount);
+                if (!ConfirmFeeReview(
+                    LanguageManager.GetString("Transfer"),
+                    $"{dialog.Amount:N2} UZS",
+                    feePreview,
+                    "Recipient receives"))
+                {
+                    return;
+                }
+
                 SetLoading(true);
                 var result = await _bankingService.TransferByCardAsync(dialog.TargetCardNumber, dialog.Amount);
                 SetLoading(false);
@@ -140,11 +166,11 @@ namespace Bank_ATM.User
                 {
                     AuditLogger.LogTransaction("Transfer", dialog.Amount, $"{SessionManager.Instance.CurrentAccount.AccountNumber} -> {result.TargetCard.CardNumber}");
                     RefreshAccountSummary();
-                    string receiptMessage = OfferDigitalReceipt("Transfer", dialog.Amount, LanguageManager.Format("TransferReceiptDescription", result.TargetCard.CardNumber));
+                    string receiptMessage = OfferDigitalReceipt("Transfer", result.DebitedAmountUzs, LanguageManager.Format("TransferReceiptDescription", result.TargetCard.CardNumber) + $"; Fee: {result.FeeAmountUzs:N2} UZS");
                     ShowStatus(
                         StatusBannerKind.Success,
                         LanguageManager.GetString("Transfer"),
-                        BuildOperationSummary(LanguageManager.GetString("Success"), null, null, receiptMessage));
+                        BuildOperationSummary(BuildFeeSummary(LanguageManager.GetString("Success"), result), null, null, receiptMessage));
                 }
                 else
                 {
@@ -267,6 +293,50 @@ namespace Bank_ATM.User
         private void ShowStatus(StatusBannerKind kind, string title, string message)
         {
             statusBanner.ShowMessage(kind, title, message);
+        }
+
+        private bool ConfirmFeeReview(string title, string displayAmount, FeeCalculationResult fee, string netLabel)
+        {
+            string message =
+                $"Amount: {displayAmount}{Environment.NewLine}" +
+                $"{netLabel}: {fee.BaseAmountUzs:N2} UZS{Environment.NewLine}" +
+                $"Fee: {fee.PercentFee:N4}% ({fee.FeeAmountUzs:N2} UZS){Environment.NewLine}" +
+                $"Total debited: {fee.TotalDebitUzs:N2} UZS";
+
+            return MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+        }
+
+        private bool ConfirmDepositFeeReview(decimal cashAmount, string currencyCode, FeeCalculationResult fee)
+        {
+            decimal credited = fee.BaseAmountUzs - fee.FeeAmountUzs;
+            if (credited < 0m)
+            {
+                credited = 0m;
+            }
+
+            string message =
+                $"Cash inserted: {cashAmount:N2} {currencyCode}{Environment.NewLine}" +
+                $"Cash value: {fee.BaseAmountUzs:N2} UZS{Environment.NewLine}" +
+                $"Fee: {fee.PercentFee:N4}% ({fee.FeeAmountUzs:N2} UZS){Environment.NewLine}" +
+                $"Credited: {credited:N2} UZS";
+
+            return MessageBox.Show(message, LanguageManager.GetString("Deposit"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+        }
+
+        private static string BuildFeeSummary(string message, BankingResult result)
+        {
+            return message + Environment.NewLine +
+                   $"Amount: {result.NetAmountUzs:N2} UZS" + Environment.NewLine +
+                   $"Fee: {result.FeePercent:N4}% ({result.FeeAmountUzs:N2} UZS)" + Environment.NewLine +
+                   $"Total debited: {result.DebitedAmountUzs:N2} UZS";
+        }
+
+        private static string BuildDepositFeeSummary(string message, BankingResult result)
+        {
+            return message + Environment.NewLine +
+                   $"Cash value: {result.DebitedAmountUzs:N2} UZS" + Environment.NewLine +
+                   $"Fee: {result.FeePercent:N4}% ({result.FeeAmountUzs:N2} UZS)" + Environment.NewLine +
+                   $"Credited: {result.NetAmountUzs:N2} UZS";
         }
 
         private static string MaskCardNumber(string cardNumber)

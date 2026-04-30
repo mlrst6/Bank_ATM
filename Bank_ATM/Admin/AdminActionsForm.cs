@@ -35,6 +35,8 @@ namespace Bank_ATM.Admin
             btnAuditLogs.Values.Text = btnAuditLogs.Text;
             btnManageCurrencies.Text = LanguageManager.GetString("AdminCurrencies");
             btnManageCurrencies.Values.Text = btnManageCurrencies.Text;
+            btnManageFees.Text = "Fee Rules";
+            btnManageFees.Values.Text = btnManageFees.Text;
             btnRefillAtm.Text = LanguageManager.GetString("RefillAtmCash");
             btnRefillAtm.Values.Text = btnRefillAtm.Text;
             btnLogout.Text = LanguageManager.GetString("Logout");
@@ -77,6 +79,13 @@ namespace Bank_ATM.Admin
             AdminDataViewForm viewForm = new AdminDataViewForm("SYSTEM CURRENCIES", currencies, "CURRENCIES");
             viewForm.ShowDialog();
             await RefreshStatsAsync();
+        }
+
+        private void btnManageFees_Click(object sender, EventArgs e)
+        {
+            var rules = _adminService.GetAllFeeRules();
+            AdminDataViewForm viewForm = new AdminDataViewForm("FEE RULES", rules, "FEES");
+            viewForm.ShowDialog();
         }
 
         private void pnlTransactions_Click(object sender, EventArgs e)

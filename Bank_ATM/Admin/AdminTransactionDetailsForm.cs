@@ -32,7 +32,9 @@ namespace Bank_ATM.Admin
             txtServiceId.Text = NullableToText(_transaction.ServiceId);
             txtServiceAccountId.Text = NullableToText(_transaction.ServiceAccountId);
             txtPaymentReference.Text = _transaction.PaymentReference ?? string.Empty;
-            txtDescription.Text = _transaction.Description ?? string.Empty;
+            txtDescription.Text = _transaction.CashbackAmount > 0m
+                ? (_transaction.Description ?? string.Empty) + Environment.NewLine + $"Cashback: {_transaction.CashbackAmount:N2} UZS"
+                : _transaction.Description ?? string.Empty;
         }
 
         private static string NullableToText(int? value)

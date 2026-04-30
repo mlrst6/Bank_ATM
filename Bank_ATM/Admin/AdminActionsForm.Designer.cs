@@ -37,6 +37,7 @@ namespace Bank_ATM.Admin
             this.btnAuditLogs = new Krypton.Toolkit.KryptonButton();
             this.btnManageCurrencies = new Krypton.Toolkit.KryptonButton();
             this.btnRefillAtm = new Krypton.Toolkit.KryptonButton();
+            this.btnManageFees = new Krypton.Toolkit.KryptonButton();
             this.btnLogout = new Krypton.Toolkit.KryptonButton();
             this.pnlUsers.SuspendLayout();
             this.pnlCards.SuspendLayout();
@@ -414,6 +415,38 @@ namespace Bank_ATM.Admin
             this.btnRefillAtm.Values.Text = "Refill ATM Cash";
             this.btnRefillAtm.Click += new System.EventHandler(this.btnRefillAtm_Click);
             // 
+            // btnManageFees
+            // 
+            this.btnManageFees.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
+            this.btnManageFees.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnManageFees.Location = new System.Drawing.Point(40, 544);
+            this.btnManageFees.Name = "btnManageFees";
+            this.btnManageFees.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
+            this.btnManageFees.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
+            this.btnManageFees.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
+            this.btnManageFees.OverrideDefault.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
+            this.btnManageFees.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
+            this.btnManageFees.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
+            this.btnManageFees.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
+            this.btnManageFees.OverrideFocus.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
+            this.btnManageFees.Size = new System.Drawing.Size(386, 48);
+            this.btnManageFees.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
+            this.btnManageFees.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
+            this.btnManageFees.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
+            this.btnManageFees.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
+            this.btnManageFees.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.All;
+            this.btnManageFees.StateCommon.Border.Rounding = 12F;
+            this.btnManageFees.StateCommon.Border.Width = 2;
+            this.btnManageFees.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnManageFees.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
+            this.btnManageFees.StatePressed.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(109)))), ((int)(((byte)(134)))));
+            this.btnManageFees.StatePressed.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(109)))), ((int)(((byte)(134)))));
+            this.btnManageFees.StateTracking.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(195)))), ((int)(((byte)(226)))));
+            this.btnManageFees.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(195)))), ((int)(((byte)(226)))));
+            this.btnManageFees.TabIndex = 13;
+            this.btnManageFees.Values.Text = "Fee Rules";
+            this.btnManageFees.Click += new System.EventHandler(this.btnManageFees_Click);
+            // 
             // btnLogout
             // 
             this.btnLogout.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
@@ -455,6 +488,7 @@ namespace Bank_ATM.Admin
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(14)))), ((int)(((byte)(28)))));
             this.ClientSize = new System.Drawing.Size(882, 620);
             this.Controls.Add(this.btnLogout);
+            this.Controls.Add(this.btnManageFees);
             this.Controls.Add(this.btnRefillAtm);
             this.Controls.Add(this.btnManageCurrencies);
             this.Controls.Add(this.btnAuditLogs);
@@ -505,6 +539,7 @@ namespace Bank_ATM.Admin
         private Krypton.Toolkit.KryptonButton btnAuditLogs;
         private Krypton.Toolkit.KryptonButton btnManageCurrencies;
         private Krypton.Toolkit.KryptonButton btnRefillAtm;
+        private Krypton.Toolkit.KryptonButton btnManageFees;
         private Krypton.Toolkit.KryptonButton btnLogout;
     }
 }

@@ -83,7 +83,9 @@ namespace Bank_ATM.Core
             {
                 LanguageManager.Format("ExchangeReceiptFrom", exchange.SourceAmount, exchange.FromCurrencyCode),
                 LanguageManager.Format("ExchangeReceiptTo", exchange.TargetAmount, exchange.ToCurrencyCode),
-                LanguageManager.Format("ExchangeReceiptRate", exchange.Rate, exchange.ToCurrencyCode, exchange.FromCurrencyCode)
+                LanguageManager.Format("ExchangeReceiptRate", exchange.Rate, exchange.ToCurrencyCode, exchange.FromCurrencyCode),
+                $"Fee: {exchange.FeePercent:N4}% ({exchange.FeeAmountUzs:N2} UZS)",
+                $"Rate type: {exchange.RateKind}"
             };
 
             if (exchange.IsApproximateAmount)

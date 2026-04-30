@@ -13,6 +13,7 @@ namespace Bank_ATM.UI
         private readonly CurrencyDto[] _currencies;
         private readonly Func<string, CashDenominationDto[]> _denominationProvider;
         private readonly bool _showAvailableNotes;
+        private readonly CashNoteDto[] _initialNotes;
         private readonly List<NoteInputRow> _rows = new List<NoteInputRow>();
 
         private Label _titleLabel;
@@ -34,11 +35,13 @@ namespace Bank_ATM.UI
             string subtitle,
             CurrencyDto[] currencies,
             Func<string, CashDenominationDto[]> denominationProvider,
-            bool showAvailableNotes = false)
+            bool showAvailableNotes = false,
+            CashNoteDto[] initialNotes = null)
         {
             _currencies = currencies ?? new CurrencyDto[0];
             _denominationProvider = denominationProvider ?? (_ => new CashDenominationDto[0]);
             _showAvailableNotes = showAvailableNotes;
+            _initialNotes = initialNotes ?? new CashNoteDto[0];
             InitializeComponent(title, subtitle);
         }
 
@@ -146,7 +149,8 @@ namespace Bank_ATM.UI
 
             if (_currencyComboBox.Items.Count > 0)
             {
-                _currencyComboBox.SelectedIndex = 0;
+                int initialCurrencyIndex = GetInitialCurrencyIndex();
+                _currencyComboBox.SelectedIndex = initialCurrencyIndex >= 0 ? initialCurrencyIndex : 0;
                 LoadDenominations();
             }
             else
@@ -188,47 +192,48 @@ namespace Bank_ATM.UI
             int y = 12;
             foreach (var denomination in denominations)
             {
+                int initialCount = GetInitialCount(currency.Code, denomination.DenominationValue);
                 var valueLabel = new Label
                 {
                     Text = denomination.DenominationValue.ToString("N0", CultureInfo.CurrentCulture) + " " + currency.Code,
                     Location = new Point(16, y + 8),
-                    Size = new Size(_showAvailableNotes ? 220 : 330, 24),
+                    Size = new Size(_showAvailableNotes ? 180 : 275, 24),
                     ForeColor = Color.White
                 };
 
                 var availableLabel = new Label
                 {
                     Text = LanguageManager.Format("AvailableNotes", denomination.NoteCount),
-                    Location = new Point(240, y + 8),
-                    Size = new Size(120, 24),
+                    Location = new Point(205, y + 8),
+                    Size = new Size(110, 24),
                     ForeColor = Color.FromArgb(170, 184, 204)
                 };
 
                  var countTextBox = new TextBox
                  {
-                     Text = "0",
-                     Location = new Point(370, y + 4),
-                     Size = new Size(90, 30),
+                     Text = initialCount.ToString(CultureInfo.InvariantCulture),
+                     Location = new Point(330, y + 4),
+                     Size = new Size(72, 30),
                      MaxLength = 5,
                      BackColor = Color.FromArgb(30, 41, 59),
                      ForeColor = Color.White,
                      BorderStyle = BorderStyle.FixedSingle,
+                     ReadOnly = true,
                      TextAlign = HorizontalAlignment.Right,
                      Tag = denomination
                  };
-                 countTextBox.KeyPress += CountTextBox_KeyPress;
                  countTextBox.TextChanged += (s, e) => UpdateTotal();
-                 countTextBox.Enter += (s, e) => countTextBox.SelectAll();
-                 countTextBox.Leave += (s, e) =>
+                 countTextBox.KeyDown += CountTextBox_KeyDown;
+
+                 var incrementButton = new Button
                  {
-                     if (string.IsNullOrWhiteSpace(countTextBox.Text))
-                     {
-                         countTextBox.Text = "0";
-                     }
+                     Text = "+",
+                     Location = new Point(414, y + 3),
+                     Size = new Size(46, 32),
+                     Tag = countTextBox
                  };
-                 NumericInputDialog.Attach(
-                     countTextBox,
-                     denomination.DenominationValue.ToString("N0", CultureInfo.CurrentCulture) + " " + currency.Code);
+                 StyleButton(incrementButton, Color.FromArgb(37, 99, 235));
+                 incrementButton.Click += (s, e) => IncrementCount(countTextBox);
 
                  _notesPanel.Controls.Add(valueLabel);
                 if (_showAvailableNotes)
@@ -236,6 +241,7 @@ namespace Bank_ATM.UI
                     _notesPanel.Controls.Add(availableLabel);
                 }
                 _notesPanel.Controls.Add(countTextBox);
+                _notesPanel.Controls.Add(incrementButton);
                 _rows.Add(new NoteInputRow(denomination, countTextBox));
                 y += 42;
             }
@@ -297,6 +303,53 @@ namespace Bank_ATM.UI
             _totalLabel.Text = LanguageManager.Format("CashNotesTotal", total, code);
         }
 
+        private int GetInitialCurrencyIndex()
+        {
+            string initialCode = _initialNotes
+                .Select(note => note == null ? null : note.CurrencyCode)
+                .FirstOrDefault(code => !string.IsNullOrWhiteSpace(code));
+            if (string.IsNullOrWhiteSpace(initialCode))
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < _currencyComboBox.Items.Count; i++)
+            {
+                var currency = _currencyComboBox.Items[i] as CurrencyDto;
+                if (currency != null && string.Equals(currency.Code, initialCode, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private int GetInitialCount(string currencyCode, decimal denominationValue)
+        {
+            return _initialNotes
+                .Where(note => note != null &&
+                               string.Equals(note.CurrencyCode, currencyCode, StringComparison.OrdinalIgnoreCase) &&
+                               decimal.Round(note.DenominationValue, 2) == decimal.Round(denominationValue, 2))
+                .Sum(note => note.NoteCount);
+        }
+
+        private static void IncrementCount(TextBox textBox)
+        {
+            int current;
+            if (!int.TryParse(textBox.Text, out current))
+            {
+                current = 0;
+            }
+
+            if (current >= 99999)
+            {
+                return;
+            }
+
+            textBox.Text = (current + 1).ToString(CultureInfo.InvariantCulture);
+        }
+
         private CurrencyDto GetSelectedCurrency()
         {
             var selected = _currencyComboBox.SelectedItem as CurrencyDto;
@@ -308,11 +361,13 @@ namespace Bank_ATM.UI
             return _currencyComboBox.Items.OfType<CurrencyDto>().FirstOrDefault();
         }
 
-        private void CountTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void CountTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Add || e.KeyCode == Keys.Oemplus)
             {
+                IncrementCount((TextBox)sender);
                 e.Handled = true;
+                e.SuppressKeyPress = true;
             }
         }
 

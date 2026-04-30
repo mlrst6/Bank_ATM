@@ -53,10 +53,13 @@ namespace Bank_ATM.Repositories
             int accountId,
             decimal cashAmount,
             decimal debitAmountUzs,
+            decimal feeAmountUzs,
             int currencyId,
             string currencyCode)
         {
             if (!IsValidMoneyAmount(cashAmount) || !IsValidMoneyAmount(debitAmountUzs)) return null;
+            decimal cashValueUzs = decimal.Round(debitAmountUzs - feeAmountUzs, 2);
+            if (cashValueUzs <= 0m || feeAmountUzs < 0m) return null;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -138,14 +141,17 @@ namespace Bank_ATM.Repositories
                         await SyncAccountBalanceAsync(db, trans, accountId);
 
                         await db.ExecuteAsync(@"
-                            INSERT INTO transactions (account_id, card_id, type, amount, description, transaction_date)
-                            VALUES (@AccountId, @CardId, 'Withdraw', @Amount, @Description, GETDATE())",
+                            INSERT INTO transactions (account_id, card_id, type, amount, fee_amount, total_debited, net_amount, description, transaction_date)
+                            VALUES (@AccountId, @CardId, 'Withdraw', @Amount, @FeeAmount, @TotalDebited, @NetAmount, @Description, GETDATE())",
                             new
                             {
                                 AccountId = accountId,
                                 CardId = cardId,
-                                Amount = debitAmountUzs,
-                                Description = $"Cash withdrawal: {cashAmount:N2} {currencyCode}; Notes: {FormatNotes(breakdown)}"
+                                Amount = cashValueUzs,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = debitAmountUzs,
+                                NetAmount = cashValueUzs,
+                                Description = $"Cash withdrawal: {cashAmount:N2} {currencyCode}; Fee: {feeAmountUzs:N2} UZS; Notes: {FormatNotes(breakdown)}"
                             },
                             trans);
 
@@ -166,12 +172,14 @@ namespace Bank_ATM.Repositories
             int cardId,
             int accountId,
             IEnumerable<CashNoteDto> notes,
+            decimal grossAmountUzs,
+            decimal feeAmountUzs,
             decimal creditAmountUzs,
             int currencyId,
             string currencyCode)
         {
             var noteList = CashRepository.NormalizeNotes(notes).ToList();
-            if (!noteList.Any() || !IsValidMoneyAmount(creditAmountUzs)) return null;
+            if (!noteList.Any() || !IsValidMoneyAmount(grossAmountUzs) || feeAmountUzs < 0m || creditAmountUzs < 0m) return null;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -236,14 +244,17 @@ namespace Bank_ATM.Repositories
                         await SyncAccountBalanceAsync(db, trans, accountId);
 
                         await db.ExecuteAsync(@"
-                            INSERT INTO transactions (account_id, card_id, type, amount, description, transaction_date)
-                            VALUES (@AccountId, @CardId, 'Deposit', @Amount, @Description, GETDATE())",
+                            INSERT INTO transactions (account_id, card_id, type, amount, fee_amount, total_debited, net_amount, description, transaction_date)
+                            VALUES (@AccountId, @CardId, 'Deposit', @Amount, @FeeAmount, @TotalDebited, @NetAmount, @Description, GETDATE())",
                             new
                             {
                                 AccountId = accountId,
                                 CardId = cardId,
-                                Amount = creditAmountUzs,
-                                Description = $"Cash deposit: {noteList.Sum(note => note.TotalValue):N2} {currencyCode}; Notes: {FormatNotes(noteList)}"
+                                Amount = grossAmountUzs,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = 0m,
+                                NetAmount = creditAmountUzs,
+                                Description = $"Cash deposit: {noteList.Sum(note => note.TotalValue):N2} {currencyCode}; Fee: {feeAmountUzs:N2} UZS; Notes: {FormatNotes(noteList)}"
                             },
                             trans);
 
@@ -260,9 +271,10 @@ namespace Bank_ATM.Repositories
             }
         }
 
-        public async Task<bool> TransferByCardAsync(int sourceCardId, int targetCardId, decimal amount)
+        public async Task<bool> TransferByCardAsync(int sourceCardId, int targetCardId, decimal amount, decimal feeAmountUzs)
         {
-            if (!IsValidMoneyAmount(amount) || sourceCardId == targetCardId) return false;
+            if (!IsValidMoneyAmount(amount) || feeAmountUzs < 0m || sourceCardId == targetCardId) return false;
+            decimal totalDebit = decimal.Round(amount + feeAmountUzs, 2);
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -277,7 +289,7 @@ namespace Bank_ATM.Repositories
                             WHERE id = @Id",
                             new { Id = sourceCardId },
                             trans);
-                        if (source == null || source.IsBlocked || source.ExpiryDate.Date < DateTime.Today || source.Balance < amount)
+                        if (source == null || source.IsBlocked || source.ExpiryDate.Date < DateTime.Today || source.Balance < totalDebit)
                         {
                             trans.Rollback();
                             return false;
@@ -297,7 +309,7 @@ namespace Bank_ATM.Repositories
 
                         int debitRows = await db.ExecuteAsync(
                             "UPDATE cards SET balance = balance - @Amount WHERE id = @Id AND balance >= @Amount AND is_blocked = 0",
-                            new { Amount = amount, Id = sourceCardId },
+                            new { Amount = totalDebit, Id = sourceCardId },
                             trans);
                         if (debitRows != 1)
                         {
@@ -322,15 +334,18 @@ namespace Bank_ATM.Repositories
                         }
 
                         await db.ExecuteAsync(@"
-                            INSERT INTO transactions (account_id, target_account_id, card_id, target_card_id, type, amount, transaction_date)
-                            VALUES (@SourceAccountId, @TargetAccountId, @SourceCardId, @TargetCardId, 'Transfer', @Amount, GETDATE())",
+                            INSERT INTO transactions (account_id, target_account_id, card_id, target_card_id, type, amount, fee_amount, total_debited, net_amount, transaction_date)
+                            VALUES (@SourceAccountId, @TargetAccountId, @SourceCardId, @TargetCardId, 'Transfer', @Amount, @FeeAmount, @TotalDebited, @NetAmount, GETDATE())",
                             new
                             {
                                 SourceAccountId = source.AccountId,
                                 TargetAccountId = target.AccountId,
                                 SourceCardId = sourceCardId,
                                 TargetCardId = targetCardId,
-                                Amount = amount
+                                Amount = amount,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = totalDebit,
+                                NetAmount = amount
                             },
                             trans);
 
@@ -1073,12 +1088,15 @@ namespace Bank_ATM.Repositories
             int cardId,
             int accountId,
             decimal amount,
+            decimal feeAmountUzs,
+            decimal cashbackAmountUzs,
             string description,
             int serviceId,
             int serviceAccountId,
             string paymentReference)
         {
-            if (!IsValidMoneyAmount(amount)) return false;
+            if (!IsValidMoneyAmount(amount) || feeAmountUzs < 0m || cashbackAmountUzs < 0m) return false;
+            decimal totalDebit = decimal.Round(amount + feeAmountUzs, 2);
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -1093,15 +1111,15 @@ namespace Bank_ATM.Repositories
                             WHERE id = @CardId AND account_id = @AccountId",
                             new { CardId = cardId, AccountId = accountId },
                             trans);
-                        if (card == null || card.IsBlocked || card.ExpiryDate.Date < DateTime.Today || card.Balance < amount)
+                        if (card == null || card.IsBlocked || card.ExpiryDate.Date < DateTime.Today || card.Balance < totalDebit)
                         {
                             trans.Rollback();
                             return false;
                         }
 
                         int updatedRows = await db.ExecuteAsync(
-                            "UPDATE cards SET balance = balance - @Amount WHERE id = @CardId AND account_id = @AccountId AND balance >= @Amount AND is_blocked = 0",
-                            new { Amount = amount, CardId = cardId, AccountId = accountId },
+                            "UPDATE cards SET balance = balance - @TotalDebit + @CashbackAmount WHERE id = @CardId AND account_id = @AccountId AND balance >= @TotalDebit AND is_blocked = 0",
+                            new { TotalDebit = totalDebit, CashbackAmount = cashbackAmountUzs, CardId = cardId, AccountId = accountId },
                             trans);
                         if (updatedRows != 1)
                         {
@@ -1117,6 +1135,10 @@ namespace Bank_ATM.Repositories
                                 card_id,
                                 type,
                                 amount,
+                                fee_amount,
+                                total_debited,
+                                net_amount,
+                                cashback_amount,
                                 description,
                                 service_id,
                                 service_account_id,
@@ -1127,6 +1149,10 @@ namespace Bank_ATM.Repositories
                                 @CardId,
                                 'BillPayment',
                                 @Amount,
+                                @FeeAmount,
+                                @TotalDebited,
+                                @NetAmount,
+                                @CashbackAmount,
                                 @Description,
                                 @ServiceId,
                                 @ServiceAccountId,
@@ -1137,6 +1163,10 @@ namespace Bank_ATM.Repositories
                                 AccountId = accountId,
                                 CardId = cardId,
                                 Amount = amount,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = totalDebit,
+                                NetAmount = amount,
+                                CashbackAmount = cashbackAmountUzs,
                                 Description = description,
                                 ServiceId = serviceId,
                                 ServiceAccountId = serviceAccountId,

@@ -28,6 +28,8 @@ namespace Bank_ATM.Admin
             this.lblAccountHint = new System.Windows.Forms.Label();
             this.txtAccountHint = new System.Windows.Forms.TextBox();
             this.lblHint = new System.Windows.Forms.Label();
+            this.lblCashbackPercent = new System.Windows.Forms.Label();
+            this.txtCashbackPercent = new System.Windows.Forms.TextBox();
             this.lblValidReferences = new System.Windows.Forms.Label();
             this.pnlServiceAccounts = new System.Windows.Forms.Panel();
             this.dgvServiceAccounts = new System.Windows.Forms.DataGridView();
@@ -141,15 +143,37 @@ namespace Bank_ATM.Admin
             this.lblHint.TabIndex = 8;
             this.lblHint.Text = "Example: phone number, subscriber ID, meter.";
             // 
+            // lblCashbackPercent
+            // 
+            this.lblCashbackPercent.AutoSize = true;
+            this.lblCashbackPercent.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblCashbackPercent.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
+            this.lblCashbackPercent.Location = new System.Drawing.Point(30, 344);
+            this.lblCashbackPercent.Name = "lblCashbackPercent";
+            this.lblCashbackPercent.Size = new System.Drawing.Size(153, 23);
+            this.lblCashbackPercent.TabIndex = 9;
+            this.lblCashbackPercent.Text = "Cashback percent";
+            // 
+            // txtCashbackPercent
+            // 
+            this.txtCashbackPercent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.txtCashbackPercent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCashbackPercent.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtCashbackPercent.ForeColor = System.Drawing.Color.White;
+            this.txtCashbackPercent.Location = new System.Drawing.Point(33, 370);
+            this.txtCashbackPercent.Name = "txtCashbackPercent";
+            this.txtCashbackPercent.Size = new System.Drawing.Size(422, 32);
+            this.txtCashbackPercent.TabIndex = 10;
+            // 
             // lblValidReferences
             // 
             this.lblValidReferences.AutoSize = true;
             this.lblValidReferences.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lblValidReferences.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblValidReferences.Location = new System.Drawing.Point(30, 350);
+            this.lblValidReferences.Location = new System.Drawing.Point(30, 416);
             this.lblValidReferences.Name = "lblValidReferences";
             this.lblValidReferences.Size = new System.Drawing.Size(161, 23);
-            this.lblValidReferences.TabIndex = 9;
+            this.lblValidReferences.TabIndex = 11;
             this.lblValidReferences.Text = "User service accounts";
             // 
             // pnlServiceAccounts
@@ -157,10 +181,10 @@ namespace Bank_ATM.Admin
             this.pnlServiceAccounts.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(32)))), ((int)(((byte)(56)))));
             this.pnlServiceAccounts.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlServiceAccounts.Controls.Add(this.dgvServiceAccounts);
-            this.pnlServiceAccounts.Location = new System.Drawing.Point(33, 378);
+            this.pnlServiceAccounts.Location = new System.Drawing.Point(33, 444);
             this.pnlServiceAccounts.Name = "pnlServiceAccounts";
             this.pnlServiceAccounts.Size = new System.Drawing.Size(422, 126);
-            this.pnlServiceAccounts.TabIndex = 10;
+            this.pnlServiceAccounts.TabIndex = 12;
             // 
             // dgvServiceAccounts
             // 
@@ -203,7 +227,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnAddServiceAccount.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnAddServiceAccount.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAddServiceAccount.Location = new System.Drawing.Point(33, 514);
+            this.btnAddServiceAccount.Location = new System.Drawing.Point(33, 580);
             this.btnAddServiceAccount.Name = "btnAddServiceAccount";
             this.btnAddServiceAccount.Size = new System.Drawing.Size(206, 38);
             this.btnAddServiceAccount.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(99)))), ((int)(((byte)(235)))));
@@ -215,7 +239,7 @@ namespace Bank_ATM.Admin
             this.btnAddServiceAccount.StateCommon.Border.Width = 2;
             this.btnAddServiceAccount.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
             this.btnAddServiceAccount.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
-            this.btnAddServiceAccount.TabIndex = 11;
+            this.btnAddServiceAccount.TabIndex = 13;
             this.btnAddServiceAccount.Values.Text = "Add User Account";
             this.btnAddServiceAccount.Click += new System.EventHandler(this.btnAddServiceAccount_Click);
             // 
@@ -223,7 +247,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnDeactivateServiceAccount.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnDeactivateServiceAccount.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnDeactivateServiceAccount.Location = new System.Drawing.Point(249, 514);
+            this.btnDeactivateServiceAccount.Location = new System.Drawing.Point(249, 580);
             this.btnDeactivateServiceAccount.Name = "btnDeactivateServiceAccount";
             this.btnDeactivateServiceAccount.Size = new System.Drawing.Size(206, 38);
             this.btnDeactivateServiceAccount.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
@@ -235,7 +259,7 @@ namespace Bank_ATM.Admin
             this.btnDeactivateServiceAccount.StateCommon.Border.Width = 2;
             this.btnDeactivateServiceAccount.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
             this.btnDeactivateServiceAccount.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
-            this.btnDeactivateServiceAccount.TabIndex = 12;
+            this.btnDeactivateServiceAccount.TabIndex = 14;
             this.btnDeactivateServiceAccount.Values.Text = "Deactivate Account";
             this.btnDeactivateServiceAccount.Click += new System.EventHandler(this.btnDeactivateServiceAccount_Click);
             // 
@@ -244,10 +268,10 @@ namespace Bank_ATM.Admin
             this.chkIsActive.AutoSize = true;
             this.chkIsActive.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.chkIsActive.ForeColor = System.Drawing.Color.White;
-            this.chkIsActive.Location = new System.Drawing.Point(33, 564);
+            this.chkIsActive.Location = new System.Drawing.Point(33, 630);
             this.chkIsActive.Name = "chkIsActive";
             this.chkIsActive.Size = new System.Drawing.Size(123, 27);
-            this.chkIsActive.TabIndex = 13;
+            this.chkIsActive.TabIndex = 15;
             this.chkIsActive.Text = "Active service";
             this.chkIsActive.UseVisualStyleBackColor = true;
             // 
@@ -255,7 +279,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnSave.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSave.Location = new System.Drawing.Point(174, 598);
+            this.btnSave.Location = new System.Drawing.Point(174, 664);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(128, 44);
             this.btnSave.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
@@ -267,7 +291,7 @@ namespace Bank_ATM.Admin
             this.btnSave.StateCommon.Border.Width = 2;
             this.btnSave.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
             this.btnSave.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
-            this.btnSave.TabIndex = 14;
+            this.btnSave.TabIndex = 16;
             this.btnSave.Values.Text = "SAVE";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -275,7 +299,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancel.Location = new System.Drawing.Point(327, 598);
+            this.btnCancel.Location = new System.Drawing.Point(327, 664);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(128, 44);
             this.btnCancel.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
@@ -287,7 +311,7 @@ namespace Bank_ATM.Admin
             this.btnCancel.StateCommon.Border.Width = 2;
             this.btnCancel.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
             this.btnCancel.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
-            this.btnCancel.TabIndex = 15;
+            this.btnCancel.TabIndex = 17;
             this.btnCancel.Values.Text = "CANCEL";
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
@@ -295,7 +319,7 @@ namespace Bank_ATM.Admin
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(14)))), ((int)(((byte)(28)))));
-            this.ClientSize = new System.Drawing.Size(500, 664);
+            this.ClientSize = new System.Drawing.Size(500, 730);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkIsActive);
@@ -303,6 +327,8 @@ namespace Bank_ATM.Admin
             this.Controls.Add(this.btnAddServiceAccount);
             this.Controls.Add(this.pnlServiceAccounts);
             this.Controls.Add(this.lblValidReferences);
+            this.Controls.Add(this.txtCashbackPercent);
+            this.Controls.Add(this.lblCashbackPercent);
             this.Controls.Add(this.lblHint);
             this.Controls.Add(this.txtAccountHint);
             this.Controls.Add(this.lblAccountHint);
@@ -335,6 +361,8 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.Label lblAccountHint;
         private System.Windows.Forms.TextBox txtAccountHint;
         private System.Windows.Forms.Label lblHint;
+        private System.Windows.Forms.Label lblCashbackPercent;
+        private System.Windows.Forms.TextBox txtCashbackPercent;
         private System.Windows.Forms.Label lblValidReferences;
         private System.Windows.Forms.Panel pnlServiceAccounts;
         private System.Windows.Forms.DataGridView dgvServiceAccounts;

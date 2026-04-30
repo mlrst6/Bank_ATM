@@ -17,7 +17,7 @@ namespace Bank_ATM.Admin
         public AdminCurrencyEditForm()
         {
             InitializeComponent();
-            _currency = new CurrencyDto { IsActive = true, RateToUzs = 1m };
+            _currency = new CurrencyDto { IsActive = true, RateToUzs = 1m, BuyRateToUzs = 1m, SellRateToUzs = 1m };
         }
 
         public AdminCurrencyEditForm(CurrencyDto currency)
@@ -30,6 +30,8 @@ namespace Bank_ATM.Admin
         private void AdminCurrencyEditForm_Load(object sender, EventArgs e)
         {
             NumericInputDialog.Attach(txtRateToUzs, lblRateToUzs.Text, true);
+            NumericInputDialog.Attach(txtBuyRateToUzs, lblBuyRateToUzs.Text, true);
+            NumericInputDialog.Attach(txtSellRateToUzs, lblSellRateToUzs.Text, true);
             NumericInputDialog.Attach(txtCashAvailable, lblCashAvailable.Text, true);
             NumericInputDialog.Attach(txtDenominations, lblDenominations.Text, true, true);
             lblTitle.Text = _isEdit ? "Edit Currency" : "Create Currency";
@@ -42,6 +44,8 @@ namespace Bank_ATM.Admin
             txtCode.Text = _currency.Code;
             txtCurrencyName.Text = _currency.CurrencyName;
             txtRateToUzs.Text = _currency.RateToUzs.ToString("0.####", CultureInfo.InvariantCulture);
+            txtBuyRateToUzs.Text = (_currency.BuyRateToUzs <= 0m ? _currency.RateToUzs : _currency.BuyRateToUzs).ToString("0.####", CultureInfo.InvariantCulture);
+            txtSellRateToUzs.Text = (_currency.SellRateToUzs <= 0m ? _currency.RateToUzs : _currency.SellRateToUzs).ToString("0.####", CultureInfo.InvariantCulture);
             txtCashAvailable.Text = _currency.CashAvailable.ToString("0.##", CultureInfo.InvariantCulture);
             txtDenominations.Text = GetDenominationText();
             chkIsActive.Checked = _currency.IsActive;
@@ -50,12 +54,16 @@ namespace Bank_ATM.Admin
             {
                 txtCode.ReadOnly = true;
                 txtRateToUzs.ReadOnly = true;
+                txtBuyRateToUzs.ReadOnly = true;
+                txtSellRateToUzs.ReadOnly = true;
             }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             decimal rateToUzs;
+            decimal buyRateToUzs;
+            decimal sellRateToUzs;
             decimal cashAvailable;
             string code = (txtCode.Text ?? string.Empty).Trim().ToUpperInvariant();
             decimal[] denominations;
@@ -64,6 +72,10 @@ namespace Bank_ATM.Admin
                 string.IsNullOrWhiteSpace(txtCurrencyName.Text) ||
                 !TryParseMoney(txtRateToUzs.Text, out rateToUzs) ||
                 rateToUzs <= 0m ||
+                !TryParseMoney(txtBuyRateToUzs.Text, out buyRateToUzs) ||
+                buyRateToUzs <= 0m ||
+                !TryParseMoney(txtSellRateToUzs.Text, out sellRateToUzs) ||
+                sellRateToUzs <= 0m ||
                 !TryParseMoney(txtCashAvailable.Text, out cashAvailable) ||
                 cashAvailable < 0m ||
                 !TryParseDenominations(txtDenominations.Text, out denominations))
@@ -75,6 +87,8 @@ namespace Bank_ATM.Admin
             _currency.Code = code;
             _currency.CurrencyName = txtCurrencyName.Text.Trim();
             _currency.RateToUzs = code == "UZS" ? 1m : rateToUzs;
+            _currency.BuyRateToUzs = code == "UZS" ? 1m : buyRateToUzs;
+            _currency.SellRateToUzs = code == "UZS" ? 1m : sellRateToUzs;
             _currency.CashAvailable = cashAvailable;
             _currency.IsActive = chkIsActive.Checked;
 

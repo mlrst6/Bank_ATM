@@ -11,6 +11,7 @@ namespace Bank_ATM.Services
     {
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
         private readonly CashRepository _cashRepository = new CashRepository();
+        private readonly FeeCalculationService _feeCalculationService = new FeeCalculationService();
 
         public CurrencyDto[] GetActiveCurrencies()
         {
@@ -100,6 +101,7 @@ namespace Bank_ATM.Services
             var toCurrency = _currencyRepository.GetCurrencyByCode(preview.ToCurrencyCode);
             string description =
                 $"Guest exchange: {preview.SourceAmount:N2} {preview.FromCurrencyCode} -> {preview.TargetAmount:N2} {preview.ToCurrencyCode}; " +
+                $"Rate kind: {preview.RateKind}; Rate: {preview.Rate:N6}; Fee: {preview.FeePercent:N4}% ({preview.FeeAmountUzs:N2} UZS); " +
                 $"Inserted: {FormatNotes(preview.InsertedNotes)}; Dispensed: {FormatNotes(preview.DispensedNotes)}";
 
             var actualDispensed = await _cashRepository.ExchangeGuestCashAsync(
@@ -107,7 +109,10 @@ namespace Bank_ATM.Services
                 toCurrency,
                 preview.InsertedNotes,
                 preview.TargetAmount,
-                preview.SourceAmountUzs,
+                preview.NetSourceAmountUzs,
+                preview.FeeAmountUzs,
+                preview.Rate,
+                preview.RateKind,
                 description);
 
             if (actualDispensed == null || actualDispensed.Count == 0)
@@ -152,13 +157,16 @@ namespace Bank_ATM.Services
                 return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("InvalidCashNotes") };
             }
 
-            decimal sourceAmountUzs = decimal.Round(sourceAmount * fromCurrency.RateToUzs, 2);
-            decimal targetAmount = decimal.Round(sourceAmountUzs / toCurrency.RateToUzs, 2);
+            decimal sourceAmountUzs = decimal.Round(sourceAmount * GetBankBuyRate(fromCurrency), 2);
+            var fee = _feeCalculationService.Calculate(null, "Exchange", sourceAmountUzs);
+            decimal netSourceAmountUzs = decimal.Round(sourceAmountUzs - fee.FeeAmountUzs, 2);
+            decimal targetAmount = decimal.Round(netSourceAmountUzs / GetBankSellRate(toCurrency), 2);
             if (targetAmount <= 0m)
             {
                 return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("InvalidAmount") };
             }
 
+            decimal effectiveRate = decimal.Round(GetBankBuyRate(fromCurrency) / GetBankSellRate(toCurrency), 6);
             return new GuestExchangeResult
             {
                 Success = true,
@@ -166,8 +174,12 @@ namespace Bank_ATM.Services
                 ToCurrencyCode = toCurrency.Code,
                 SourceAmount = sourceAmount,
                 SourceAmountUzs = sourceAmountUzs,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetSourceAmountUzs = netSourceAmountUzs,
                 TargetAmount = targetAmount,
-                Rate = decimal.Round(fromCurrency.RateToUzs / toCurrency.RateToUzs, 6),
+                Rate = effectiveRate,
+                RateKind = GetRateKind(fromCurrency.Code, toCurrency.Code),
                 InsertedNotes = normalizedNotes
             };
         }
@@ -199,13 +211,16 @@ namespace Bank_ATM.Services
                 return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("InvalidAmount") };
             }
 
-            decimal sourceAmountUzs = decimal.Round(roundedSourceAmount * fromCurrency.RateToUzs, 2);
-            decimal targetAmount = decimal.Round(sourceAmountUzs / toCurrency.RateToUzs, 2);
+            decimal sourceAmountUzs = decimal.Round(roundedSourceAmount * GetBankBuyRate(fromCurrency), 2);
+            var fee = _feeCalculationService.Calculate(null, "Exchange", sourceAmountUzs);
+            decimal netSourceAmountUzs = decimal.Round(sourceAmountUzs - fee.FeeAmountUzs, 2);
+            decimal targetAmount = decimal.Round(netSourceAmountUzs / GetBankSellRate(toCurrency), 2);
             if (targetAmount <= 0m)
             {
                 return new GuestExchangeResult { Success = false, Message = LanguageManager.GetString("InvalidAmount") };
             }
 
+            decimal effectiveRate = decimal.Round(GetBankBuyRate(fromCurrency) / GetBankSellRate(toCurrency), 6);
             return new GuestExchangeResult
             {
                 Success = true,
@@ -213,8 +228,12 @@ namespace Bank_ATM.Services
                 ToCurrencyCode = toCurrency.Code,
                 SourceAmount = roundedSourceAmount,
                 SourceAmountUzs = sourceAmountUzs,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetSourceAmountUzs = netSourceAmountUzs,
                 TargetAmount = targetAmount,
-                Rate = decimal.Round(fromCurrency.RateToUzs / toCurrency.RateToUzs, 6),
+                Rate = effectiveRate,
+                RateKind = GetRateKind(fromCurrency.Code, toCurrency.Code),
                 InsertedNotes = new CashNoteDto[0]
             };
         }
@@ -226,6 +245,7 @@ namespace Bank_ATM.Services
 
         private static string BuildExchangeSummary(GuestExchangeResult result, CashNoteDto[] dispensedNotes)
         {
+            string feeLine = $"{Environment.NewLine}Fee: {result.FeePercent:N4}% ({result.FeeAmountUzs:N2} UZS)";
             if (result.IsApproximateAmount)
             {
                 return LanguageManager.Format(
@@ -233,7 +253,7 @@ namespace Bank_ATM.Services
                     result.RequestedTargetAmount,
                     result.ToCurrencyCode,
                     result.TargetAmount,
-                    FormatNotes(dispensedNotes));
+                    FormatNotes(dispensedNotes)) + feeLine;
             }
 
             return LanguageManager.Format(
@@ -242,7 +262,42 @@ namespace Bank_ATM.Services
                 result.FromCurrencyCode,
                 result.TargetAmount,
                 result.ToCurrencyCode,
-                FormatNotes(dispensedNotes));
+                FormatNotes(dispensedNotes)) + feeLine;
+        }
+
+        private static decimal GetBankBuyRate(CurrencyDto currency)
+        {
+            if (currency == null)
+            {
+                return 0m;
+            }
+
+            return currency.BuyRateToUzs > 0m ? currency.BuyRateToUzs : currency.RateToUzs;
+        }
+
+        private static decimal GetBankSellRate(CurrencyDto currency)
+        {
+            if (currency == null)
+            {
+                return 0m;
+            }
+
+            return currency.SellRateToUzs > 0m ? currency.SellRateToUzs : currency.RateToUzs;
+        }
+
+        private static string GetRateKind(string fromCode, string toCode)
+        {
+            if (string.Equals(toCode, "UZS", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Buy";
+            }
+
+            if (string.Equals(fromCode, "UZS", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Sell";
+            }
+
+            return "Buy/Sell";
         }
 
         private static string FormatNotes(CashNoteDto[] notes)

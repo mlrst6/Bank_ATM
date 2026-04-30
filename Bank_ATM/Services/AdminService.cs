@@ -15,6 +15,7 @@ namespace Bank_ATM.Services
         private readonly AtmRepository _atmRepository = new AtmRepository();
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
         private readonly CashRepository _cashRepository = new CashRepository();
+        private readonly FeeRuleRepository _feeRuleRepository = new FeeRuleRepository();
 
         public Task<IEnumerable<UserDto>> GetAllUsersAsync() => _accountRepository.GetAllUsersAsync();
         public IEnumerable<CardDto> GetAllCards() => _cardRepository.GetAllCards();
@@ -22,11 +23,14 @@ namespace Bank_ATM.Services
         public IEnumerable<TransactionDto> GetAllTransactions() => _transactionRepository.GetAllTransactions();
         public IEnumerable<ServiceDto> GetAllServices() => _servicesRepository.GetAllServices();
         public IEnumerable<CurrencyDto> GetAllCurrencies() => _currencyRepository.GetAllCurrencies();
+        public IEnumerable<FeeRuleDto> GetAllFeeRules() => _feeRuleRepository.GetAllRules();
         public IEnumerable<CashDenominationDto> GetAllCashDenominations() => _cashRepository.GetAllDenominations();
         public IEnumerable<CashDenominationDto> GetCashDenominations(string currencyCode) => _cashRepository.GetDenominations(currencyCode);
         public int SaveCurrency(CurrencyDto currency) => _currencyRepository.SaveCurrency(currency);
         public int SaveCurrency(CurrencyDto currency, IEnumerable<decimal> denominationValues) => _currencyRepository.SaveCurrency(currency, denominationValues);
+        public int SaveFeeRule(FeeRuleDto rule) => _feeRuleRepository.SaveRule(rule);
         public void DeactivateCurrency(int currencyId) => _currencyRepository.DeactivateCurrency(currencyId);
+        public void DeactivateFeeRule(int ruleId) => _feeRuleRepository.DeactivateRule(ruleId);
         public IEnumerable<ServiceAccountDto> GetServiceAccounts(int serviceId) => _servicesRepository.GetServiceAccounts(serviceId);
         public AtmDto GetDefaultAtm() => _atmRepository.GetDefaultAtm();
         public void AddAtmCash(decimal amount) => _atmRepository.AddCash(amount);

@@ -26,6 +26,7 @@ namespace Bank_ATM.Repositories
                         service_name as ServiceName,
                         category as Category,
                         account_hint as AccountHint,
+                        cashback_percent as CashbackPercent,
                         is_active as IsActive,
                         (
                             SELECT COUNT(*)
@@ -50,6 +51,7 @@ namespace Bank_ATM.Repositories
                         service_name as ServiceName,
                         category as Category,
                         account_hint as AccountHint,
+                        cashback_percent as CashbackPercent,
                         is_active as IsActive,
                         (
                             SELECT COUNT(*)
@@ -73,6 +75,7 @@ namespace Bank_ATM.Repositories
                         service_name as ServiceName,
                         category as Category,
                         account_hint as AccountHint,
+                        cashback_percent as CashbackPercent,
                         is_active as IsActive,
                         (
                             SELECT COUNT(*)
@@ -91,14 +94,15 @@ namespace Bank_ATM.Repositories
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 int id = db.QuerySingle<int>(@"
-                    INSERT INTO services (service_name, category, account_hint, is_active)
-                    VALUES (@ServiceName, @Category, @AccountHint, @IsActive);
+                    INSERT INTO services (service_name, category, account_hint, cashback_percent, is_active)
+                    VALUES (@ServiceName, @Category, @AccountHint, @CashbackPercent, @IsActive);
                     SELECT CAST(SCOPE_IDENTITY() as int);",
                     new
                     {
                         service.ServiceName,
                         service.Category,
                         service.AccountHint,
+                        service.CashbackPercent,
                         service.IsActive
                     });
                 service.Id = id;
@@ -115,6 +119,7 @@ namespace Bank_ATM.Repositories
                     SET service_name = @ServiceName,
                         category = @Category,
                         account_hint = @AccountHint,
+                        cashback_percent = @CashbackPercent,
                         is_active = @IsActive
                     WHERE id = @Id",
                     new
@@ -123,6 +128,7 @@ namespace Bank_ATM.Repositories
                         service.ServiceName,
                         service.Category,
                         service.AccountHint,
+                        service.CashbackPercent,
                         service.IsActive
                     });
             }

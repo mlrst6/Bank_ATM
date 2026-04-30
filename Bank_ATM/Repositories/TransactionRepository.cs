@@ -24,7 +24,13 @@ namespace Bank_ATM.Repositories
             string description = null,
             int? serviceId = null,
             int? serviceAccountId = null,
-            string paymentReference = null)
+            string paymentReference = null,
+            decimal feeAmount = 0m,
+            decimal totalDebited = 0m,
+            decimal netAmount = 0m,
+            decimal? exchangeRate = null,
+            string rateKind = null,
+            decimal cashbackAmount = 0m)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
@@ -34,20 +40,32 @@ namespace Bank_ATM.Repositories
                         target_account_id,
                         type,
                         amount,
+                        fee_amount,
+                        total_debited,
+                        net_amount,
+                        exchange_rate,
+                        rate_kind,
                         description,
                         service_id,
                         service_account_id,
                         payment_reference,
+                        cashback_amount,
                         transaction_date)
                     VALUES (
                         @AccountId,
                         @TargetAccountId,
                         @Type,
                         @Amount,
+                        @FeeAmount,
+                        @TotalDebited,
+                        @NetAmount,
+                        @ExchangeRate,
+                        @RateKind,
                         @Description,
                         @ServiceId,
                         @ServiceAccountId,
                         @PaymentReference,
+                        @CashbackAmount,
                         @Date)";
                  
                 db.Execute(sql, new { 
@@ -55,10 +73,16 @@ namespace Bank_ATM.Repositories
                     TargetAccountId = destinationAccountId,
                     Type = type, 
                     Amount = amount, 
+                    FeeAmount = feeAmount,
+                    TotalDebited = totalDebited == 0m ? amount + feeAmount : totalDebited,
+                    NetAmount = netAmount == 0m ? amount : netAmount,
+                    ExchangeRate = exchangeRate,
+                    RateKind = rateKind,
                     Description = description,
                     ServiceId = serviceId,
                     ServiceAccountId = serviceAccountId,
                     PaymentReference = paymentReference,
+                    CashbackAmount = cashbackAmount,
                     Date = DateTime.Now 
                 });
             }
@@ -77,10 +101,16 @@ namespace Bank_ATM.Repositories
                         target_card_id as TargetCardId,
                         type,
                         amount,
+                        fee_amount as FeeAmount,
+                        total_debited as TotalDebited,
+                        net_amount as NetAmount,
+                        exchange_rate as ExchangeRate,
+                        rate_kind as RateKind,
                         description,
                         service_id as ServiceId,
                         service_account_id as ServiceAccountId,
                         payment_reference as PaymentReference,
+                        cashback_amount as CashbackAmount,
                         transaction_date as TransactionDate
                     FROM transactions
                     ORDER BY transaction_date DESC";
@@ -101,10 +131,16 @@ namespace Bank_ATM.Repositories
                         target_card_id as TargetCardId,
                         type,
                         amount,
+                        fee_amount as FeeAmount,
+                        total_debited as TotalDebited,
+                        net_amount as NetAmount,
+                        exchange_rate as ExchangeRate,
+                        rate_kind as RateKind,
                         description,
                         service_id as ServiceId,
                         service_account_id as ServiceAccountId,
                         payment_reference as PaymentReference,
+                        cashback_amount as CashbackAmount,
                         transaction_date as TransactionDate
                     FROM transactions
                     WHERE account_id = @AccountId OR target_account_id = @AccountId

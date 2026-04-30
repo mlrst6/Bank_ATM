@@ -147,9 +147,9 @@ namespace Bank_ATM.Core
                         SELECT COUNT(*)
                         FROM sys.columns
                         WHERE object_id = OBJECT_ID('dbo.currencies')
-                          AND name IN ('code', 'rate_to_uzs', 'is_active')");
+                          AND name IN ('code', 'rate_to_uzs', 'buy_rate_to_uzs', 'sell_rate_to_uzs', 'is_active')");
 
-                    if (currencyColumns < 3)
+                    if (currencyColumns < 5)
                     {
                         throw new InvalidOperationException(
                             "Database schema is outdated. Apply the currencies migration before starting the application.");
@@ -183,6 +183,52 @@ namespace Bank_ATM.Core
                     {
                         throw new InvalidOperationException(
                             "Database schema is outdated. Apply the card balance and card type migration before starting the application.");
+                    }
+
+                    int feeSchemaObjects = connection.ExecuteScalar<int>(@"
+                        SELECT
+                            (SELECT COUNT(*) FROM sys.tables WHERE name IN ('fee_rules'))
+                            +
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.transactions')
+                               AND name IN ('fee_amount', 'total_debited', 'net_amount', 'exchange_rate', 'rate_kind'))");
+
+                    if (feeSchemaObjects < 6)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the fees and exchange spread migration before starting the application.");
+                    }
+
+                    int cashbackSchemaObjects = connection.ExecuteScalar<int>(@"
+                        SELECT
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.services')
+                               AND name IN ('cashback_percent'))
+                            +
+                            (SELECT COUNT(*)
+                             FROM sys.columns
+                             WHERE object_id = OBJECT_ID('dbo.transactions')
+                               AND name IN ('cashback_amount'))");
+
+                    if (cashbackSchemaObjects < 2)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the service cashback migration before starting the application.");
+                    }
+
+                    int longDescriptionColumns = connection.ExecuteScalar<int>(@"
+                        SELECT COUNT(*)
+                        FROM sys.columns
+                        WHERE object_id = OBJECT_ID('dbo.transactions')
+                          AND name = 'description'
+                          AND max_length = -1");
+
+                    if (longDescriptionColumns < 1)
+                    {
+                        throw new InvalidOperationException(
+                            "Database schema is outdated. Apply the long transaction descriptions migration before starting the application.");
                     }
                 }
             }

@@ -16,6 +16,7 @@ namespace Bank_ATM.Services
         private readonly AtmRepository _atmRepository = new AtmRepository();
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
         private readonly CashRepository _cashRepository = new CashRepository();
+        private readonly FeeCalculationService _feeCalculationService = new FeeCalculationService();
 
         public async Task<BankingResult> WithdrawAsync(decimal amount)
         {
@@ -46,7 +47,9 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
             }
 
-            decimal debitAmountUzs = decimal.Round(amount * currency.RateToUzs, 2);
+            decimal cashValueUzs = decimal.Round(amount * GetCashOutRate(currency), 2);
+            var fee = _feeCalculationService.Calculate(currentCard.CardType, "Withdraw", cashValueUzs);
+            decimal debitAmountUzs = fee.TotalDebitUzs;
             if (currentCard.Balance < debitAmountUzs)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("InsufficientFunds") };
@@ -62,6 +65,7 @@ namespace Bank_ATM.Services
                 currentAccount.Id,
                 amount,
                 debitAmountUzs,
+                fee.FeeAmountUzs,
                 currency.Id,
                 normalizedCurrency);
             if (breakdown == null || !breakdown.Any())
@@ -75,6 +79,9 @@ namespace Bank_ATM.Services
                 Success = true,
                 Account = account,
                 DebitedAmountUzs = debitAmountUzs,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetAmountUzs = cashValueUzs,
                 CashCurrencyCode = normalizedCurrency,
                 CashAmount = amount,
                 CashBreakdown = breakdown.ToArray()
@@ -89,6 +96,40 @@ namespace Bank_ATM.Services
         public CashDenominationDto[] GetCashDenominations(string currencyCode)
         {
             return _cashRepository.GetDenominations(currencyCode).ToArray();
+        }
+
+        public FeeCalculationResult PreviewWithdrawFee(decimal amount, string currencyCode)
+        {
+            var currentCard = SessionManager.Instance.CurrentCard;
+            string normalizedCurrency = string.IsNullOrWhiteSpace(currencyCode)
+                ? "UZS"
+                : currencyCode.Trim().ToUpperInvariant();
+            var currency = _currencyRepository.GetCurrencyByCode(normalizedCurrency);
+            decimal cashValueUzs = currency == null ? 0m : decimal.Round(amount * GetCashOutRate(currency), 2);
+            return _feeCalculationService.Calculate(currentCard?.CardType, "Withdraw", cashValueUzs);
+        }
+
+        public FeeCalculationResult PreviewDepositFee(decimal cashAmount, string currencyCode)
+        {
+            var currentCard = SessionManager.Instance.CurrentCard;
+            string normalizedCurrency = string.IsNullOrWhiteSpace(currencyCode)
+                ? "UZS"
+                : currencyCode.Trim().ToUpperInvariant();
+            var currency = _currencyRepository.GetCurrencyByCode(normalizedCurrency);
+            decimal cashValueUzs = currency == null ? 0m : decimal.Round(cashAmount * GetCashInRate(currency), 2);
+            return _feeCalculationService.Calculate(currentCard?.CardType, "Deposit", cashValueUzs);
+        }
+
+        public FeeCalculationResult PreviewTransferFee(decimal amount)
+        {
+            var currentCard = SessionManager.Instance.CurrentCard;
+            return _feeCalculationService.Calculate(currentCard?.CardType, "Transfer", amount);
+        }
+
+        public FeeCalculationResult PreviewServicePaymentFee(decimal amount, bool chargeCurrentAccount)
+        {
+            var currentCard = SessionManager.Instance.CurrentCard;
+            return _feeCalculationService.Calculate(chargeCurrentAccount ? currentCard?.CardType : null, "BillPayment", amount);
         }
 
         public async Task<BankingResult> DepositAsync(decimal amount)
@@ -119,10 +160,16 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
             }
 
-            decimal creditAmountUzs = decimal.Round(amount * currency.RateToUzs, 2);
+            decimal grossAmountUzs = decimal.Round(amount * GetCashInRate(currency), 2);
+            var fee = _feeCalculationService.Calculate(SessionManager.Instance.CurrentCard?.CardType, "Deposit", grossAmountUzs);
+            decimal creditAmountUzs = decimal.Round(grossAmountUzs - fee.FeeAmountUzs, 2);
+            if (creditAmountUzs < 0m)
+            {
+                creditAmountUzs = 0m;
+            }
 
             bool success = normalizedCurrency == "UZS"
-                ? await _accountRepository.DepositAsync(currentAccount.Id, amount)
+                ? await _accountRepository.DepositAsync(currentAccount.Id, creditAmountUzs)
                 : await _accountRepository.DepositCurrencyAsync(currentAccount.Id, amount, creditAmountUzs, currency.Id, normalizedCurrency);
             if (!success)
             {
@@ -134,7 +181,10 @@ namespace Bank_ATM.Services
             {
                 Success = true,
                 Account = account,
-                DebitedAmountUzs = creditAmountUzs,
+                DebitedAmountUzs = grossAmountUzs,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetAmountUzs = creditAmountUzs,
                 CashCurrencyCode = normalizedCurrency,
                 CashAmount = amount
             };
@@ -166,11 +216,20 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("InvalidCashNotes") };
             }
 
-            decimal creditAmountUzs = decimal.Round(cashAmount * currency.RateToUzs, 2);
+            decimal grossAmountUzs = decimal.Round(cashAmount * GetCashInRate(currency), 2);
+            var fee = _feeCalculationService.Calculate(currentCard.CardType, "Deposit", grossAmountUzs);
+            decimal creditAmountUzs = decimal.Round(grossAmountUzs - fee.FeeAmountUzs, 2);
+            if (creditAmountUzs < 0m)
+            {
+                creditAmountUzs = 0m;
+            }
+
             var savedNotes = await _accountRepository.DepositCurrencyWithDenominationsByCardAsync(
                 currentCard.Id,
                 currentAccount.Id,
                 noteList,
+                grossAmountUzs,
+                fee.FeeAmountUzs,
                 creditAmountUzs,
                 currency.Id,
                 normalizedCurrency);
@@ -184,7 +243,10 @@ namespace Bank_ATM.Services
             {
                 Success = true,
                 Account = account,
-                DebitedAmountUzs = creditAmountUzs,
+                DebitedAmountUzs = grossAmountUzs,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetAmountUzs = creditAmountUzs,
                 CashCurrencyCode = normalizedCurrency,
                 CashAmount = cashAmount,
                 CashBreakdown = savedNotes.ToArray()
@@ -227,14 +289,29 @@ namespace Bank_ATM.Services
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("TransferSameAccount") };
             }
 
-            bool success = await _accountRepository.TransferByCardAsync(currentCard.Id, targetCard.Id, amount);
+            var fee = _feeCalculationService.Calculate(currentCard.CardType, "Transfer", amount);
+            if (currentCard.Balance < fee.TotalDebitUzs)
+            {
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("InsufficientFunds") };
+            }
+
+            bool success = await _accountRepository.TransferByCardAsync(currentCard.Id, targetCard.Id, amount, fee.FeeAmountUzs);
             if (!success)
             {
                 return new BankingResult { Success = false, Message = LanguageManager.GetString("TransferFailed") };
             }
 
             var account = await RefreshCurrentSessionAsync();
-            return new BankingResult { Success = true, Account = account, TargetCard = targetCard };
+            return new BankingResult
+            {
+                Success = true,
+                Account = account,
+                TargetCard = targetCard,
+                DebitedAmountUzs = fee.TotalDebitUzs,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetAmountUzs = amount
+            };
         }
 
         public ServiceDto[] GetAvailableServices()
@@ -321,11 +398,18 @@ namespace Bank_ATM.Services
                     return new ServiceResult { Success = false, Message = LanguageManager.GetString("NoActiveAccountSession") };
                 }
 
+                decimal cashbackAmount = CalculateCashback(amount, service.CashbackPercent);
+                var fee = _feeCalculationService.Calculate(currentCard.CardType, "BillPayment", amount);
+                string paymentDescription = cashbackAmount > 0m
+                    ? $"{description}; Cashback: {cashbackAmount:N2} UZS ({service.CashbackPercent:N4}%)"
+                    : description;
                 bool success = await _accountRepository.PayServiceByCardAsync(
                     currentCard.Id,
                     currentAccount.Id,
                     amount,
-                    description,
+                    fee.FeeAmountUzs,
+                    cashbackAmount,
+                    paymentDescription,
                     service.Id,
                     serviceAccount.Id,
                     sanitizedReference);
@@ -336,7 +420,16 @@ namespace Bank_ATM.Services
 
                 await RefreshCurrentSessionAsync();
                 AuditLogger.LogInfo($"Account service payment: {amount} UZS for {description}");
-                return new ServiceResult { Success = true, Message = LanguageManager.GetString("ServicePaymentCompleted") };
+                return new ServiceResult
+                {
+                    Success = true,
+                    Message = LanguageManager.GetString("ServicePaymentCompleted"),
+                    FeePercent = fee.PercentFee,
+                    FeeAmountUzs = fee.FeeAmountUzs,
+                    TotalDebitedUzs = fee.TotalDebitUzs,
+                    NetAmountUzs = amount,
+                    CashbackAmountUzs = cashbackAmount
+                };
             }
 
             _transactionRepository.AddTransaction(
@@ -368,6 +461,13 @@ namespace Bank_ATM.Services
                 return new ServiceResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
             }
 
+            var fee = _feeCalculationService.Calculate(null, "BillPayment", amount);
+            decimal netServiceAmount = decimal.Round(amount - fee.FeeAmountUzs, 2);
+            if (netServiceAmount <= 0m)
+            {
+                return new ServiceResult { Success = false, Message = LanguageManager.GetString("InvalidServicePaymentInput") };
+            }
+
             var service = _servicesRepository.GetServiceById(serviceId);
             if (service == null || !service.IsActive)
             {
@@ -385,13 +485,15 @@ namespace Bank_ATM.Services
             }
 
             string description = string.IsNullOrWhiteSpace(serviceAccount.CustomerName)
-                ? $"{service.ServiceName}: {sanitizedReference}; Cash notes: {FormatNotes(noteList)}"
-                : $"{service.ServiceName}: {sanitizedReference} ({serviceAccount.CustomerName}); Cash notes: {FormatNotes(noteList)}";
+                ? $"{service.ServiceName}: {sanitizedReference}; Cash paid: {amount:N2} UZS; Fee: {fee.FeeAmountUzs:N2} UZS; Net service amount: {netServiceAmount:N2} UZS; Cash notes: {FormatNotes(noteList)}"
+                : $"{service.ServiceName}: {sanitizedReference} ({serviceAccount.CustomerName}); Cash paid: {amount:N2} UZS; Fee: {fee.FeeAmountUzs:N2} UZS; Net service amount: {netServiceAmount:N2} UZS; Cash notes: {FormatNotes(noteList)}";
 
             bool success = await _cashRepository.AddGuestCashPaymentAsync(
                 service.Id,
                 serviceAccount.Id,
                 sanitizedReference,
+                netServiceAmount,
+                fee.FeeAmountUzs,
                 amount,
                 description,
                 uzs.Id,
@@ -406,7 +508,11 @@ namespace Bank_ATM.Services
             return new ServiceResult
             {
                 Success = true,
-                Message = LanguageManager.GetString("ServicePaymentCompleted")
+                Message = LanguageManager.GetString("ServicePaymentCompleted"),
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                TotalDebitedUzs = amount,
+                NetAmountUzs = netServiceAmount
             };
         }
 
@@ -485,6 +591,36 @@ namespace Bank_ATM.Services
         private static bool IsFourDigitPin(string pin)
         {
             return pin != null && pin.Length == 4 && pin.All(char.IsDigit);
+        }
+
+        private static decimal GetCashInRate(CurrencyDto currency)
+        {
+            if (currency == null)
+            {
+                return 0m;
+            }
+
+            return currency.BuyRateToUzs > 0m ? currency.BuyRateToUzs : currency.RateToUzs;
+        }
+
+        private static decimal CalculateCashback(decimal amount, decimal cashbackPercent)
+        {
+            if (amount <= 0m || cashbackPercent <= 0m)
+            {
+                return 0m;
+            }
+
+            return decimal.Round(amount * cashbackPercent / 100m, 2);
+        }
+
+        private static decimal GetCashOutRate(CurrencyDto currency)
+        {
+            if (currency == null)
+            {
+                return 0m;
+            }
+
+            return currency.SellRateToUzs > 0m ? currency.SellRateToUzs : currency.RateToUzs;
         }
 
         private static string FormatNotes(CashNoteDto[] notes)

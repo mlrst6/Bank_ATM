@@ -21,6 +21,11 @@ namespace Bank_ATM.Payments
         private ServiceAccountDto _verifiedServiceAccount;
         private string _pendingReference;
         private decimal _pendingAmount;
+        private decimal _completedFeePercent;
+        private decimal _completedFee;
+        private decimal _completedTotalDebited;
+        private decimal _completedNetAmount;
+        private decimal _completedCashback;
         private CashNoteDto[] _pendingNotes;
 
         public ServicePaymentForm() : this(false)
@@ -210,7 +215,9 @@ namespace Bank_ATM.Payments
             txtAmount.Enabled = false;
             btnPay.Text = LanguageManager.GetString("Confirm");
             btnPay.Values.Text = btnPay.Text;
-            btnCancel.Text = LanguageManager.GetString("Back");
+            btnCancel.Text = _chargeCurrentAccount
+                ? LanguageManager.GetString("Back")
+                : LanguageManager.GetString("ReturnCash");
             btnCancel.Values.Text = btnCancel.Text;
 
             ShowStatus(StatusBannerKind.Info, LanguageManager.GetString("Confirm"), BuildReviewMessage());
@@ -231,6 +238,12 @@ namespace Bank_ATM.Payments
                 return;
             }
 
+            _completedFee = result.FeeAmountUzs;
+            _completedFeePercent = result.FeePercent;
+            _completedTotalDebited = result.TotalDebitedUzs;
+            _completedNetAmount = result.NetAmountUzs;
+            _completedCashback = result.CashbackAmountUzs;
+
             string receiptMessage = OfferReceiptForCompletedPayment();
             string successMessage = string.IsNullOrWhiteSpace(receiptMessage)
                 ? result.Message
@@ -249,6 +262,13 @@ namespace Bank_ATM.Payments
         {
             if (_isReviewing && !_completed)
             {
+                if (!_chargeCurrentAccount)
+                {
+                    DialogResult = DialogResult.Cancel;
+                    Close();
+                    return;
+                }
+
                 ClearReview();
                 return;
             }
@@ -322,6 +342,17 @@ namespace Bank_ATM.Payments
                 LanguageManager.Format("ServiceReceiptCustomer", lblCustomerNameValue.Text) + Environment.NewLine +
                 amountLine;
 
+            var fee = _bankingService.PreviewServicePaymentFee(_pendingAmount, _chargeCurrentAccount);
+            decimal netAmount = _chargeCurrentAccount
+                ? _pendingAmount
+                : Math.Max(0m, _pendingAmount - fee.FeeAmountUzs);
+            message += Environment.NewLine +
+                $"Fee: {fee.FeeAmountUzs:N2} UZS" + Environment.NewLine +
+                $"Fee percent: {fee.PercentFee:N4}%" + Environment.NewLine +
+                (_chargeCurrentAccount
+                    ? $"Total debited: {fee.TotalDebitUzs:N2} UZS{Environment.NewLine}Cashback: {CalculateCashback(_pendingAmount, _pendingService.CashbackPercent):N2} UZS"
+                    : $"Net service amount: {netAmount:N2} UZS");
+
             if (_pendingNotes != null && _pendingNotes.Length > 0)
             {
                 message += Environment.NewLine + LanguageManager.GetString("CashAcceptedBreakdown") + ": " +
@@ -342,9 +373,9 @@ namespace Bank_ATM.Payments
                         var transaction = new TransactionDto
                         {
                             Type = "BillPayment",
-                            Amount = _pendingAmount,
+                            Amount = _completedTotalDebited > 0m ? _completedTotalDebited : _pendingAmount,
                             TransactionDate = DateTime.Now,
-                            Description = BuildServicePaymentDescription()
+                            Description = BuildServicePaymentDescription() + $"; Fee: {_completedFeePercent:N4}% ({_completedFee:N2} UZS); Net amount: {_completedNetAmount:N2} UZS; Cashback: {_completedCashback:N2} UZS"
                         };
 
                         return _bankingService.GenerateReceiptForCurrentSession(transaction);
@@ -387,6 +418,16 @@ namespace Bank_ATM.Payments
 
             amount = 0m;
             return false;
+        }
+
+        private static decimal CalculateCashback(decimal amount, decimal cashbackPercent)
+        {
+            if (amount <= 0m || cashbackPercent <= 0m)
+            {
+                return 0m;
+            }
+
+            return decimal.Round(amount * cashbackPercent / 100m, 2);
         }
     }
 }

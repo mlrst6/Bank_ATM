@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using Bank_ATM.Models;
@@ -35,6 +36,7 @@ namespace Bank_ATM.Admin
             lblValidReferences.Text = LanguageManager.GetString("ValidPaymentReferences");
             btnAddServiceAccount.Values.Text = btnAddServiceAccount.Text;
             btnDeactivateServiceAccount.Values.Text = btnDeactivateServiceAccount.Text;
+            lblCashbackPercent.Text = "Cashback percent";
             cmbCategory.Items.Clear();
             cmbCategory.Items.AddRange(ServiceCategories);
 
@@ -49,6 +51,7 @@ namespace Bank_ATM.Admin
             {
                 txtServiceName.Text = _service.ServiceName;
                 txtAccountHint.Text = _service.AccountHint;
+                txtCashbackPercent.Text = _service.CashbackPercent.ToString("0.####", CultureInfo.CurrentCulture);
                 chkIsActive.Checked = _service.IsActive;
                 SelectCategory(_service.Category);
                 RefreshServiceAccounts();
@@ -56,6 +59,7 @@ namespace Bank_ATM.Admin
             else
             {
                 chkIsActive.Checked = true;
+                txtCashbackPercent.Text = "0";
                 if (cmbCategory.Items.Count > 0)
                 {
                     cmbCategory.SelectedIndex = 0;
@@ -77,9 +81,18 @@ namespace Bank_ATM.Admin
                 return;
             }
 
+            decimal cashbackPercent;
+            if (!TryParsePercent(txtCashbackPercent.Text, out cashbackPercent))
+            {
+                MessageBox.Show("Cashback percent must be between 0 and 100.", LanguageManager.GetString("Validation"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCashbackPercent.Focus();
+                return;
+            }
+
             _service.ServiceName = txtServiceName.Text.Trim();
             _service.Category = cmbCategory.SelectedItem.ToString();
             _service.AccountHint = txtAccountHint.Text.Trim();
+            _service.CashbackPercent = cashbackPercent;
             _service.IsActive = chkIsActive.Checked;
 
             try
@@ -116,6 +129,19 @@ namespace Bank_ATM.Admin
 
             cmbCategory.Items.Add(category);
             cmbCategory.SelectedItem = category;
+        }
+
+        private static bool TryParsePercent(string rawValue, out decimal value)
+        {
+            if (decimal.TryParse(rawValue, NumberStyles.Number, CultureInfo.CurrentCulture, out value) ||
+                decimal.TryParse(rawValue, NumberStyles.Number, CultureInfo.InvariantCulture, out value))
+            {
+                value = decimal.Round(value, 4);
+                return value >= 0m && value <= 100m;
+            }
+
+            value = 0m;
+            return false;
         }
 
         private void RefreshServiceAccounts()

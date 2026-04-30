@@ -94,6 +94,8 @@ namespace Bank_ATM.Admin
                 _allItems = _adminService.GetAllServices().Cast<object>().ToList();
             else if (_mode == "CURRENCIES")
                 _allItems = _adminService.GetAllCurrencies().Cast<object>().ToList();
+            else if (_mode == "FEES")
+                _allItems = _adminService.GetAllFeeRules().Cast<object>().ToList();
             else if (_mode == "CASH")
                 _allItems = _adminService.GetAllCashDenominations().Cast<object>().ToList();
             else
@@ -164,6 +166,13 @@ namespace Bank_ATM.Admin
                     if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
                 }
             }
+            else if (_mode == "FEES")
+            {
+                using (var form = new AdminFeeRuleEditForm())
+                {
+                    if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
+                }
+            }
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
@@ -198,6 +207,14 @@ namespace Bank_ATM.Admin
             {
                 var currency = (CurrencyDto)dataGridView.SelectedRows[0].DataBoundItem;
                 using (var form = new AdminCurrencyEditForm(currency))
+                {
+                    if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
+                }
+            }
+            else if (_mode == "FEES")
+            {
+                var rule = (FeeRuleDto)dataGridView.SelectedRows[0].DataBoundItem;
+                using (var form = new AdminFeeRuleEditForm(rule))
                 {
                     if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
                 }
@@ -239,6 +256,11 @@ namespace Bank_ATM.Admin
                 {
                     var currency = (CurrencyDto)dataGridView.SelectedRows[0].DataBoundItem;
                     _adminService.DeactivateCurrency(currency.Id);
+                }
+                else if (_mode == "FEES")
+                {
+                    var rule = (FeeRuleDto)dataGridView.SelectedRows[0].DataBoundItem;
+                    _adminService.DeactivateFeeRule(rule.Id);
                 }
                 RefreshGrid();
             }
@@ -535,6 +557,10 @@ namespace Bank_ATM.Admin
             {
                 HideColumn("Id");
             }
+            else if (_mode == "FEES")
+            {
+                HideColumn("Id");
+            }
             else if (_mode == "CASH")
             {
                 HideColumn("AtmId");
@@ -568,8 +594,22 @@ namespace Bank_ATM.Admin
                 case "ServiceId": return "Service";
                 case "ServiceAccountId": return "Service Account";
                 case "PaymentReference": return "Payment Reference";
+                case "CashbackPercent": return "Cashback %";
+                case "CashbackAmount": return "Cashback";
                 case "CurrencyName": return "Currency Name";
                 case "RateToUzs": return "Rate to UZS";
+                case "BuyRateToUzs": return "Buy rate to UZS";
+                case "SellRateToUzs": return "Sell rate to UZS";
+                case "FeeAmount": return "Fee";
+                case "TotalDebited": return "Total debited";
+                case "NetAmount": return "Net amount";
+                case "ExchangeRate": return "Exchange rate";
+                case "RateKind": return "Rate type";
+                case "PercentFee": return "Percent %";
+                case "FixedFee": return "Fixed fee";
+                case "MinFee": return "Min fee";
+                case "MaxFee": return "Max fee";
+                case "TransactionType": return "Transaction Type";
                 case "CashAvailable": return "ATM Cash";
                 case "CurrencyCode": return "Currency";
                 case "DenominationValue": return "Denomination";

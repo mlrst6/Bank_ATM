@@ -99,10 +99,16 @@ namespace Bank_ATM.Models
         public int? TargetCardId { get; set; }
         public string Type { get; set; } // Withdraw, Deposit, Transfer, BillPayment, Exchange
         public decimal Amount { get; set; }
+        public decimal FeeAmount { get; set; }
+        public decimal TotalDebited { get; set; }
+        public decimal NetAmount { get; set; }
+        public decimal? ExchangeRate { get; set; }
+        public string RateKind { get; set; }
         public string Description { get; set; }
         public int? ServiceId { get; set; }
         public int? ServiceAccountId { get; set; }
         public string PaymentReference { get; set; }
+        public decimal CashbackAmount { get; set; }
         public DateTime TransactionDate { get; set; }
     }
 
@@ -112,6 +118,7 @@ namespace Bank_ATM.Models
         public string ServiceName { get; set; }
         public string Category { get; set; }
         public string AccountHint { get; set; }
+        public decimal CashbackPercent { get; set; }
         public bool IsActive { get; set; }
         public int ValidReferenceCount { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -144,9 +151,23 @@ namespace Bank_ATM.Models
         public string Code { get; set; }
         public string CurrencyName { get; set; }
         public decimal RateToUzs { get; set; }
+        public decimal BuyRateToUzs { get; set; }
+        public decimal SellRateToUzs { get; set; }
         public bool IsActive { get; set; }
         public decimal CashAvailable { get; set; }
         public DateTime UpdatedAt { get; set; }
+    }
+
+    public class FeeRuleDto
+    {
+        public int Id { get; set; }
+        public string CardType { get; set; }
+        public string TransactionType { get; set; }
+        public decimal PercentFee { get; set; }
+        public decimal FixedFee { get; set; }
+        public decimal MinFee { get; set; }
+        public decimal? MaxFee { get; set; }
+        public bool IsActive { get; set; }
     }
 
     public class CashDenominationDto

@@ -53,6 +53,8 @@ namespace Bank_ATM
             btnPreview.Values.Text = btnPreview.Text;
             btnSelectCash.Text = LanguageManager.GetString("SelectCashNotes");
             btnSelectCash.Values.Text = btnSelectCash.Text;
+            btnReturnCash.Text = LanguageManager.GetString("ReturnCash");
+            btnReturnCash.Values.Text = btnReturnCash.Text;
             btnConfirm.Text = LanguageManager.GetString("ConfirmExchange");
             btnConfirm.Values.Text = btnConfirm.Text;
             btnBack.Text = LanguageManager.GetString("Back");
@@ -127,7 +129,9 @@ namespace Bank_ATM
                 LanguageManager.GetString("GuestExchangeCashTitle"),
                 LanguageManager.GetString("GuestExchangeCashSubtitle"),
                 new[] { from },
-                code => _exchangeService.GetCashDenominations(code)))
+                code => _exchangeService.GetCashDenominations(code),
+                false,
+                _insertedNotes))
             {
                 if (dialog.ShowDialog(this) != DialogResult.OK)
                 {
@@ -145,6 +149,19 @@ namespace Bank_ATM
                 lblInsertedValue.Text = LanguageManager.Format("ExchangeInsertedAmount", dialog.TotalAmount, dialog.CurrencyCode);
                 PreviewInsertedCash();
             }
+        }
+
+        private void btnReturnCash_Click(object sender, EventArgs e)
+        {
+            if (_isLoading || _insertedNotes == null || !_insertedNotes.Any())
+            {
+                return;
+            }
+
+            ResetExchangeState();
+            SetCurrentStep(ExchangeStep.InsertCash);
+            lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(125, 211, 252);
+            lblStatusValue.Text = LanguageManager.GetString("GuestExchangeCashReturned");
         }
 
         private async void ConfirmButton_Click(object sender, EventArgs e)
@@ -252,14 +269,15 @@ namespace Bank_ATM
         {
             var from = GetSelectedCurrency(cmbFromCurrency);
             var to = GetSelectedCurrency(cmbToCurrency);
-            if (from == null || to == null || to.RateToUzs <= 0m)
+            if (from == null || to == null || GetBankSellRate(to) <= 0m)
             {
                 lblRateValue.Text = LanguageManager.GetString("ExchangeRateUnavailable");
                 return;
             }
 
-            decimal rate = decimal.Round(from.RateToUzs / to.RateToUzs, 6);
-            lblRateValue.Text = LanguageManager.Format("ExchangeRatePair", 1m, from.Code, rate, to.Code);
+            decimal rate = decimal.Round(GetBankBuyRate(from) / GetBankSellRate(to), 6);
+            lblRateValue.Text = LanguageManager.Format("ExchangeRatePair", 1m, from.Code, rate, to.Code) +
+                $" ({GetRateKind(from.Code, to.Code)})";
         }
 
         private void btnBack_Click(object sender, EventArgs e)
@@ -392,6 +410,8 @@ namespace Bank_ATM
                 ? LanguageManager.GetString("GuestExchangeEditCash")
                 : LanguageManager.GetString("SelectCashNotes");
             btnSelectCash.Values.Text = btnSelectCash.Text;
+            btnReturnCash.Visible = hasInsertedCash && (_currentStep == ExchangeStep.InsertCash || _currentStep == ExchangeStep.ReviewAndConfirm);
+            btnReturnCash.Enabled = !_isLoading && hasInsertedCash;
             btnConfirm.Enabled = !_isLoading && _currentStep == ExchangeStep.ReviewAndConfirm && hasPreview;
 
             if (_currentStep == ExchangeStep.ChooseSourceCurrency)
@@ -471,6 +491,41 @@ namespace Bank_ATM
             return string.Join(", ", (notes ?? new CashNoteDto[0])
                 .Where(note => note != null)
                 .Select(note => $"{note.DenominationValue:N2} {note.CurrencyCode} x {note.NoteCount}"));
+        }
+
+        private static decimal GetBankBuyRate(CurrencyDto currency)
+        {
+            if (currency == null)
+            {
+                return 0m;
+            }
+
+            return currency.BuyRateToUzs > 0m ? currency.BuyRateToUzs : currency.RateToUzs;
+        }
+
+        private static decimal GetBankSellRate(CurrencyDto currency)
+        {
+            if (currency == null)
+            {
+                return 0m;
+            }
+
+            return currency.SellRateToUzs > 0m ? currency.SellRateToUzs : currency.RateToUzs;
+        }
+
+        private static string GetRateKind(string fromCode, string toCode)
+        {
+            if (string.Equals(toCode, "UZS", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Buy";
+            }
+
+            if (string.Equals(fromCode, "UZS", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Sell";
+            }
+
+            return "Buy/Sell";
         }
     }
 }

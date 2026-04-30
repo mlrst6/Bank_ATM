@@ -7,6 +7,11 @@ namespace Bank_ATM.Services
         public bool Success { get; set; }
         public string Message { get; set; }
         public string ReceiptPath { get; set; }
+        public decimal FeePercent { get; set; }
+        public decimal FeeAmountUzs { get; set; }
+        public decimal TotalDebitedUzs { get; set; }
+        public decimal NetAmountUzs { get; set; }
+        public decimal CashbackAmountUzs { get; set; }
     }
 
     public class AuthenticationResult : ServiceResult
@@ -32,9 +37,11 @@ namespace Bank_ATM.Services
         public string ToCurrencyCode { get; set; }
         public decimal SourceAmount { get; set; }
         public decimal SourceAmountUzs { get; set; }
+        public decimal NetSourceAmountUzs { get; set; }
         public decimal RequestedTargetAmount { get; set; }
         public decimal TargetAmount { get; set; }
         public decimal Rate { get; set; }
+        public string RateKind { get; set; }
         public bool IsApproximateAmount { get; set; }
         public decimal UnavailableAmount { get; set; }
         public CashNoteDto[] InsertedNotes { get; set; }

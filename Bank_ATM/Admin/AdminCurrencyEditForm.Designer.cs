@@ -24,6 +24,10 @@ namespace Bank_ATM.Admin
             this.txtCurrencyName = new System.Windows.Forms.TextBox();
             this.lblRateToUzs = new System.Windows.Forms.Label();
             this.txtRateToUzs = new System.Windows.Forms.TextBox();
+            this.lblBuyRateToUzs = new System.Windows.Forms.Label();
+            this.txtBuyRateToUzs = new System.Windows.Forms.TextBox();
+            this.lblSellRateToUzs = new System.Windows.Forms.Label();
+            this.txtSellRateToUzs = new System.Windows.Forms.TextBox();
             this.lblCashAvailable = new System.Windows.Forms.Label();
             this.txtCashAvailable = new System.Windows.Forms.TextBox();
             this.lblDenominations = new System.Windows.Forms.Label();
@@ -97,7 +101,7 @@ namespace Bank_ATM.Admin
             this.lblRateToUzs.Name = "lblRateToUzs";
             this.lblRateToUzs.Size = new System.Drawing.Size(93, 23);
             this.lblRateToUzs.TabIndex = 5;
-            this.lblRateToUzs.Text = "Rate to UZS";
+            this.lblRateToUzs.Text = "Middle rate to UZS";
             // 
             // txtRateToUzs
             // 
@@ -110,12 +114,56 @@ namespace Bank_ATM.Admin
             this.txtRateToUzs.Size = new System.Drawing.Size(422, 32);
             this.txtRateToUzs.TabIndex = 6;
             // 
+            // lblBuyRateToUzs
+            // 
+            this.lblBuyRateToUzs.AutoSize = true;
+            this.lblBuyRateToUzs.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblBuyRateToUzs.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
+            this.lblBuyRateToUzs.Location = new System.Drawing.Point(30, 290);
+            this.lblBuyRateToUzs.Name = "lblBuyRateToUzs";
+            this.lblBuyRateToUzs.Size = new System.Drawing.Size(135, 23);
+            this.lblBuyRateToUzs.TabIndex = 14;
+            this.lblBuyRateToUzs.Text = "Buy rate to UZS";
+            // 
+            // txtBuyRateToUzs
+            // 
+            this.txtBuyRateToUzs.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.txtBuyRateToUzs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtBuyRateToUzs.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtBuyRateToUzs.ForeColor = System.Drawing.Color.White;
+            this.txtBuyRateToUzs.Location = new System.Drawing.Point(33, 314);
+            this.txtBuyRateToUzs.Name = "txtBuyRateToUzs";
+            this.txtBuyRateToUzs.Size = new System.Drawing.Size(422, 32);
+            this.txtBuyRateToUzs.TabIndex = 15;
+            // 
+            // lblSellRateToUzs
+            // 
+            this.lblSellRateToUzs.AutoSize = true;
+            this.lblSellRateToUzs.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblSellRateToUzs.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
+            this.lblSellRateToUzs.Location = new System.Drawing.Point(30, 356);
+            this.lblSellRateToUzs.Name = "lblSellRateToUzs";
+            this.lblSellRateToUzs.Size = new System.Drawing.Size(128, 23);
+            this.lblSellRateToUzs.TabIndex = 16;
+            this.lblSellRateToUzs.Text = "Sell rate to UZS";
+            // 
+            // txtSellRateToUzs
+            // 
+            this.txtSellRateToUzs.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.txtSellRateToUzs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtSellRateToUzs.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtSellRateToUzs.ForeColor = System.Drawing.Color.White;
+            this.txtSellRateToUzs.Location = new System.Drawing.Point(33, 380);
+            this.txtSellRateToUzs.Name = "txtSellRateToUzs";
+            this.txtSellRateToUzs.Size = new System.Drawing.Size(422, 32);
+            this.txtSellRateToUzs.TabIndex = 17;
+            // 
             // lblCashAvailable
             // 
             this.lblCashAvailable.AutoSize = true;
             this.lblCashAvailable.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lblCashAvailable.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblCashAvailable.Location = new System.Drawing.Point(30, 290);
+            this.lblCashAvailable.Location = new System.Drawing.Point(30, 422);
             this.lblCashAvailable.Name = "lblCashAvailable";
             this.lblCashAvailable.Size = new System.Drawing.Size(144, 23);
             this.lblCashAvailable.TabIndex = 7;
@@ -127,7 +175,7 @@ namespace Bank_ATM.Admin
             this.txtCashAvailable.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtCashAvailable.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.txtCashAvailable.ForeColor = System.Drawing.Color.White;
-            this.txtCashAvailable.Location = new System.Drawing.Point(33, 314);
+            this.txtCashAvailable.Location = new System.Drawing.Point(33, 446);
             this.txtCashAvailable.Name = "txtCashAvailable";
             this.txtCashAvailable.Size = new System.Drawing.Size(422, 32);
             this.txtCashAvailable.TabIndex = 8;
@@ -137,7 +185,7 @@ namespace Bank_ATM.Admin
             this.lblDenominations.AutoSize = true;
             this.lblDenominations.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lblDenominations.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblDenominations.Location = new System.Drawing.Point(30, 356);
+            this.lblDenominations.Location = new System.Drawing.Point(30, 488);
             this.lblDenominations.Name = "lblDenominations";
             this.lblDenominations.Size = new System.Drawing.Size(113, 23);
             this.lblDenominations.TabIndex = 9;
@@ -149,7 +197,7 @@ namespace Bank_ATM.Admin
             this.txtDenominations.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtDenominations.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.txtDenominations.ForeColor = System.Drawing.Color.White;
-            this.txtDenominations.Location = new System.Drawing.Point(33, 380);
+            this.txtDenominations.Location = new System.Drawing.Point(33, 512);
             this.txtDenominations.Multiline = true;
             this.txtDenominations.Name = "txtDenominations";
             this.txtDenominations.Size = new System.Drawing.Size(422, 72);
@@ -160,7 +208,7 @@ namespace Bank_ATM.Admin
             this.chkIsActive.AutoSize = true;
             this.chkIsActive.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.chkIsActive.ForeColor = System.Drawing.Color.White;
-            this.chkIsActive.Location = new System.Drawing.Point(33, 470);
+            this.chkIsActive.Location = new System.Drawing.Point(33, 602);
             this.chkIsActive.Name = "chkIsActive";
             this.chkIsActive.Size = new System.Drawing.Size(76, 27);
             this.chkIsActive.TabIndex = 11;
@@ -171,7 +219,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnSave.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSave.Location = new System.Drawing.Point(189, 518);
+            this.btnSave.Location = new System.Drawing.Point(189, 650);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(128, 44);
             this.btnSave.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(99)))), ((int)(((byte)(235)))));
@@ -191,7 +239,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancel.Location = new System.Drawing.Point(327, 518);
+            this.btnCancel.Location = new System.Drawing.Point(327, 650);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(128, 44);
             this.btnCancel.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
@@ -211,7 +259,7 @@ namespace Bank_ATM.Admin
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(14)))), ((int)(((byte)(28)))));
-            this.ClientSize = new System.Drawing.Size(500, 590);
+            this.ClientSize = new System.Drawing.Size(500, 722);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.chkIsActive);
@@ -219,6 +267,10 @@ namespace Bank_ATM.Admin
             this.Controls.Add(this.lblDenominations);
             this.Controls.Add(this.txtCashAvailable);
             this.Controls.Add(this.lblCashAvailable);
+            this.Controls.Add(this.txtSellRateToUzs);
+            this.Controls.Add(this.lblSellRateToUzs);
+            this.Controls.Add(this.txtBuyRateToUzs);
+            this.Controls.Add(this.lblBuyRateToUzs);
             this.Controls.Add(this.txtRateToUzs);
             this.Controls.Add(this.lblRateToUzs);
             this.Controls.Add(this.txtCurrencyName);
@@ -245,6 +297,10 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.TextBox txtCurrencyName;
         private System.Windows.Forms.Label lblRateToUzs;
         private System.Windows.Forms.TextBox txtRateToUzs;
+        private System.Windows.Forms.Label lblBuyRateToUzs;
+        private System.Windows.Forms.TextBox txtBuyRateToUzs;
+        private System.Windows.Forms.Label lblSellRateToUzs;
+        private System.Windows.Forms.TextBox txtSellRateToUzs;
         private System.Windows.Forms.Label lblCashAvailable;
         private System.Windows.Forms.TextBox txtCashAvailable;
         private System.Windows.Forms.Label lblDenominations;

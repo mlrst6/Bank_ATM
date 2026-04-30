@@ -38,6 +38,7 @@ namespace Bank_ATM
             this.lblRateCaption = new System.Windows.Forms.Label();
             this.lblStatusValue = new System.Windows.Forms.Label();
             this.btnSelectCash = new Krypton.Toolkit.KryptonButton();
+            this.btnReturnCash = new Krypton.Toolkit.KryptonButton();
             this.btnPreview = new Krypton.Toolkit.KryptonButton();
             this.btnConfirm = new Krypton.Toolkit.KryptonButton();
             this.btnBack = new Krypton.Toolkit.KryptonButton();
@@ -284,7 +285,7 @@ namespace Bank_ATM
             this.btnSelectCash.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
             this.btnSelectCash.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
             this.btnSelectCash.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
-            this.btnSelectCash.Size = new System.Drawing.Size(180, 46);
+            this.btnSelectCash.Size = new System.Drawing.Size(160, 46);
             this.btnSelectCash.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
             this.btnSelectCash.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
             this.btnSelectCash.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
@@ -305,11 +306,32 @@ namespace Bank_ATM
             this.btnSelectCash.Values.Text = "Select Cash";
             this.btnSelectCash.Click += new System.EventHandler(this.SelectCashButton_Click);
             // 
+            // btnReturnCash
+            // 
+            this.btnReturnCash.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
+            this.btnReturnCash.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnReturnCash.Location = new System.Drawing.Point(244, 624);
+            this.btnReturnCash.Name = "btnReturnCash";
+            this.btnReturnCash.Size = new System.Drawing.Size(150, 46);
+            this.btnReturnCash.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
+            this.btnReturnCash.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
+            this.btnReturnCash.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(113)))), ((int)(((byte)(113)))));
+            this.btnReturnCash.StateCommon.Border.Rounding = 8F;
+            this.btnReturnCash.StateCommon.Border.Width = 2;
+            this.btnReturnCash.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnReturnCash.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnReturnCash.TabIndex = 11;
+            this.btnReturnCash.TabStop = false;
+            this.btnReturnCash.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnReturnCash.Values.Text = "Return Cash";
+            this.btnReturnCash.Visible = false;
+            this.btnReturnCash.Click += new System.EventHandler(this.btnReturnCash_Click);
+            // 
             // btnPreview
             // 
             this.btnPreview.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnPreview.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnPreview.Location = new System.Drawing.Point(274, 624);
+            this.btnPreview.Location = new System.Drawing.Point(414, 624);
             this.btnPreview.Name = "btnPreview";
             this.btnPreview.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
             this.btnPreview.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
@@ -317,7 +339,7 @@ namespace Bank_ATM
             this.btnPreview.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
             this.btnPreview.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
             this.btnPreview.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
-            this.btnPreview.Size = new System.Drawing.Size(180, 46);
+            this.btnPreview.Size = new System.Drawing.Size(130, 46);
             this.btnPreview.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
             this.btnPreview.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(145)))), ((int)(((byte)(178)))));
             this.btnPreview.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(232)))), ((int)(((byte)(249)))));
@@ -344,7 +366,7 @@ namespace Bank_ATM
             this.btnConfirm.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnConfirm.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnConfirm.Enabled = false;
-            this.btnConfirm.Location = new System.Drawing.Point(474, 624);
+            this.btnConfirm.Location = new System.Drawing.Point(564, 624);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnConfirm.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
@@ -352,7 +374,7 @@ namespace Bank_ATM
             this.btnConfirm.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnConfirm.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnConfirm.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(239)))), ((int)(((byte)(172)))));
-            this.btnConfirm.Size = new System.Drawing.Size(180, 46);
+            this.btnConfirm.Size = new System.Drawing.Size(130, 46);
             this.btnConfirm.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnConfirm.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnConfirm.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(239)))), ((int)(((byte)(172)))));
@@ -377,7 +399,7 @@ namespace Bank_ATM
             // 
             this.btnBack.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnBack.Location = new System.Drawing.Point(674, 624);
+            this.btnBack.Location = new System.Drawing.Point(714, 624);
             this.btnBack.Name = "btnBack";
             this.btnBack.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
             this.btnBack.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
@@ -415,6 +437,7 @@ namespace Bank_ATM
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.btnPreview);
+            this.Controls.Add(this.btnReturnCash);
             this.Controls.Add(this.btnSelectCash);
             this.Controls.Add(this.lblStatusValue);
             this.Controls.Add(this.pnlSummary);
@@ -459,6 +482,7 @@ namespace Bank_ATM
         private System.Windows.Forms.Label lblRateCaption;
         private System.Windows.Forms.Label lblStatusValue;
         private Krypton.Toolkit.KryptonButton btnSelectCash;
+        private Krypton.Toolkit.KryptonButton btnReturnCash;
         private Krypton.Toolkit.KryptonButton btnPreview;
         private Krypton.Toolkit.KryptonButton btnConfirm;
         private Krypton.Toolkit.KryptonButton btnBack;

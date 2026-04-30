@@ -119,6 +119,8 @@ namespace Bank_ATM.Repositories
             int serviceAccountId,
             string paymentReference,
             decimal amount,
+            decimal feeAmountUzs,
+            decimal totalPaidUzs,
             string description,
             int currencyId,
             IEnumerable<CashNoteDto> notes)
@@ -172,6 +174,9 @@ namespace Bank_ATM.Repositories
                                 account_id,
                                 type,
                                 amount,
+                                fee_amount,
+                                total_debited,
+                                net_amount,
                                 description,
                                 service_id,
                                 service_account_id,
@@ -181,6 +186,9 @@ namespace Bank_ATM.Repositories
                                 NULL,
                                 'BillPayment',
                                 @Amount,
+                                @FeeAmount,
+                                @TotalDebited,
+                                @NetAmount,
                                 @Description,
                                 @ServiceId,
                                 @ServiceAccountId,
@@ -189,6 +197,9 @@ namespace Bank_ATM.Repositories
                             new
                             {
                                 Amount = amount,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = totalPaidUzs,
+                                NetAmount = amount,
                                 Description = description,
                                 ServiceId = serviceId,
                                 ServiceAccountId = serviceAccountId,
@@ -215,6 +226,9 @@ namespace Bank_ATM.Repositories
             IEnumerable<CashNoteDto> insertedNotes,
             decimal targetCashAmount,
             decimal amountUzs,
+            decimal feeAmountUzs,
+            decimal exchangeRate,
+            string rateKind,
             string description)
         {
             var insertedNoteList = NormalizeNotes(insertedNotes).ToList();
@@ -314,9 +328,18 @@ namespace Bank_ATM.Repositories
                         }
 
                         await db.ExecuteAsync(@"
-                            INSERT INTO transactions (account_id, type, amount, description, transaction_date)
-                            VALUES (NULL, 'Exchange', @Amount, @Description, GETDATE())",
-                            new { Amount = amountUzs, Description = description },
+                            INSERT INTO transactions (account_id, type, amount, fee_amount, total_debited, net_amount, exchange_rate, rate_kind, description, transaction_date)
+                            VALUES (NULL, 'Exchange', @Amount, @FeeAmount, @TotalDebited, @NetAmount, @ExchangeRate, @RateKind, @Description, GETDATE())",
+                            new
+                            {
+                                Amount = amountUzs,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = amountUzs + feeAmountUzs,
+                                NetAmount = amountUzs,
+                                ExchangeRate = exchangeRate,
+                                RateKind = rateKind,
+                                Description = description
+                            },
                             trans);
 
                         await SyncCashTotalsAsync(db, trans, fromCurrency.Id);
