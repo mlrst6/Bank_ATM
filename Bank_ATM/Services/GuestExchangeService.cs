@@ -52,6 +52,8 @@ namespace Bank_ATM.Services
             validation.TargetAmount = actualTargetAmount;
             validation.IsApproximateAmount = actualTargetAmount < requestedTargetAmount;
             validation.UnavailableAmount = decimal.Round(requestedTargetAmount - actualTargetAmount, 2);
+            if (validation.IsApproximateAmount)
+                PopulateShortfallHint(validation, actualTargetAmount, targetDenominations);
             validation.Message = BuildExchangeSummary(validation, dispensedNotes.ToArray());
             validation.DispensedNotes = dispensedNotes.ToArray();
             return validation;
@@ -84,6 +86,8 @@ namespace Bank_ATM.Services
             validation.TargetAmount = actualTargetAmount;
             validation.IsApproximateAmount = actualTargetAmount < requestedTargetAmount;
             validation.UnavailableAmount = decimal.Round(requestedTargetAmount - actualTargetAmount, 2);
+            if (validation.IsApproximateAmount)
+                PopulateShortfallHint(validation, actualTargetAmount, targetDenominations);
             validation.Message = BuildExchangeSummary(validation, dispensedNotes.ToArray());
             validation.DispensedNotes = dispensedNotes.ToArray();
             return validation;
@@ -238,6 +242,34 @@ namespace Bank_ATM.Services
             };
         }
 
+        private void PopulateShortfallHint(GuestExchangeResult result, decimal actualTargetAmount, CashDenominationDto[] targetDenominations)
+        {
+            var nextTarget = CashRepository.FindNextHigherDispensableAmount(actualTargetAmount, targetDenominations);
+            if (!nextTarget.HasValue)
+                return;
+
+            var toCurrency = _currencyRepository.GetCurrencyByCode(result.ToCurrencyCode);
+            var fromCurrency = _currencyRepository.GetCurrencyByCode(result.FromCurrencyCode);
+            if (toCurrency == null || fromCurrency == null)
+                return;
+
+            decimal sellRate = GetBankSellRate(toCurrency);
+            if (sellRate <= 0m)
+                return;
+
+            decimal neededNetUzs = decimal.Round(nextTarget.Value * sellRate, 2);
+            decimal feePercentDecimal = result.FeePercent / 100m;
+            decimal neededSourceUzs = feePercentDecimal < 1m
+                ? decimal.Round(neededNetUzs / (1m - feePercentDecimal), 2)
+                : neededNetUzs;
+            decimal buyRate = GetBankBuyRate(fromCurrency);
+            if (buyRate <= 0m)
+                return;
+
+            result.NextDispensableTargetAmount = nextTarget.Value;
+            result.MinSourceAmountForNextNote = decimal.Round(neededSourceUzs / buyRate, 2);
+        }
+
         private static string NormalizeCurrencyCode(string currencyCode)
         {
             return (currencyCode ?? string.Empty).Trim().ToUpperInvariant();
@@ -248,12 +280,26 @@ namespace Bank_ATM.Services
             string feeLine = $"{Environment.NewLine}Fee: {result.FeePercent:N4}% ({result.FeeAmountUzs:N2} UZS)";
             if (result.IsApproximateAmount)
             {
+                string shortfallHint = string.Empty;
+                if (result.NextDispensableTargetAmount.HasValue && result.MinSourceAmountForNextNote.HasValue)
+                {
+                    decimal extraNeeded = Math.Max(0m, result.MinSourceAmountForNextNote.Value - result.SourceAmount);
+                    if (extraNeeded > 0m)
+                    {
+                        shortfallHint = Environment.NewLine + LanguageManager.Format(
+                            "ExchangeShortfallHint",
+                            result.NextDispensableTargetAmount.Value,
+                            result.ToCurrencyCode,
+                            extraNeeded,
+                            result.FromCurrencyCode);
+                    }
+                }
                 return LanguageManager.Format(
                     "ExchangeApproximatePreviewSummary",
                     result.RequestedTargetAmount,
                     result.ToCurrencyCode,
                     result.TargetAmount,
-                    FormatNotes(dispensedNotes)) + feeLine;
+                    FormatNotes(dispensedNotes)) + feeLine + shortfallHint;
             }
 
             return LanguageManager.Format(

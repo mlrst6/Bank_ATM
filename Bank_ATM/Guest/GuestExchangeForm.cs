@@ -201,7 +201,19 @@ namespace Bank_ATM
             }
 
             SetLoading(true);
-            var result = await _exchangeService.ExecuteExchangeAsync(from.Code, to.Code, _insertedNotes);
+            GuestExchangeResult result;
+            try
+            {
+                result = await _exchangeService.ExecuteExchangeAsync(from.Code, to.Code, _insertedNotes);
+            }
+            catch (Exception ex)
+            {
+                SetLoading(false);
+                AuditLogger.LogError($"Exchange execution failed: {ex.Message}");
+                lblStatusValue.ForeColor = System.Drawing.Color.FromArgb(248, 113, 113);
+                lblStatusValue.Text = LanguageManager.GetString("ExchangeError");
+                return;
+            }
             SetLoading(false);
 
             if (!result.Success)

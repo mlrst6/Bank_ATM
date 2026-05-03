@@ -264,7 +264,8 @@ namespace Bank_ATM.Repositories
                             new { CurrencyId = toCurrency.Id },
                             trans)).ToList();
 
-                        var dispensedNotes = BuildDispenseBreakdown(targetCashAmount, targetDenominations);
+                        decimal actualDispensedAmount;
+                        var dispensedNotes = BuildClosestDispenseBreakdown(targetCashAmount, targetDenominations, out actualDispensedAmount);
                         if (dispensedNotes == null || dispensedNotes.Count == 0)
                         {
                             trans.Rollback();
@@ -451,6 +452,33 @@ namespace Bank_ATM.Repositories
             }
 
             actualAmount = 0m;
+            return null;
+        }
+
+        internal static decimal? FindNextHigherDispensableAmount(decimal fromAmount, IEnumerable<CashDenominationDto> denominations)
+        {
+            var denominationList = (denominations ?? Enumerable.Empty<CashDenominationDto>())
+                .Where(d => d != null && d.NoteCount > 0 && d.DenominationValue > 0m)
+                .OrderByDescending(d => d.DenominationValue)
+                .ToList();
+            if (!denominationList.Any())
+                return null;
+
+            long stepInCents = GetDispenseSearchStepInCents(denominationList);
+            if (stepInCents <= 0)
+                return null;
+
+            long fromInCents = ToAmountInCents(fromAmount);
+            long maxInCents = ToAmountInCents(denominationList.Sum(d => d.DenominationValue * d.NoteCount));
+
+            for (long candidateInCents = fromInCents + stepInCents; candidateInCents <= maxInCents; candidateInCents += stepInCents)
+            {
+                decimal candidate = candidateInCents / 100m;
+                var breakdown = BuildDispenseBreakdown(candidate, denominationList);
+                if (breakdown != null && breakdown.Count > 0)
+                    return candidate;
+            }
+
             return null;
         }
 
