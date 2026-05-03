@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Jahongir\\\\Source\\\\Repos\\\\Bank_ATM\" -Recurse)",
+      "Bash(Select-Object FullName)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(ls *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Jahongir\\\\Source\\\\Repos\\\\Bank_ATM\\\\Bank_ATM\" -Recurse -Directory)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Jahongir\\\\Source\\\\Repos\\\\Bank_ATM\" -Recurse -Force)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "PowerShell(head *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Jahongir\\\\Source\\\\Repos\\\\Bank_ATM\" -Recurse -Force | Where-Object { -not $_.PSIsContainer } | Select-Object FullName | Sort-Object FullName)"
+    ]
+  }
+}

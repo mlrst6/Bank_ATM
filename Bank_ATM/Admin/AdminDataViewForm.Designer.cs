@@ -39,6 +39,8 @@ namespace Bank_ATM.Admin
             this.txtAmountMin = new System.Windows.Forms.TextBox();
             this.lblAmountMax = new System.Windows.Forms.Label();
             this.txtAmountMax = new System.Windows.Forms.TextBox();
+            this.lblCardFilter = new System.Windows.Forms.Label();
+            this.txtCardFilter = new System.Windows.Forms.TextBox();
             this.btnClearFilters = new Krypton.Toolkit.KryptonButton();
             this.btnExportCsv = new Krypton.Toolkit.KryptonButton();
             this.lblTransactionSummary = new System.Windows.Forms.Label();
@@ -70,12 +72,12 @@ namespace Bank_ATM.Admin
             this.dataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView.EnableHeadersVisualStyles = false;
             this.dataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
-            this.dataGridView.Location = new System.Drawing.Point(24, 196);
+            this.dataGridView.Location = new System.Drawing.Point(24, 246);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowHeadersVisible = false;
             this.dataGridView.RowHeadersWidth = 51;
             this.dataGridView.RowTemplate.Height = 28;
-            this.dataGridView.Size = new System.Drawing.Size(1012, 414);
+            this.dataGridView.Size = new System.Drawing.Size(1012, 364);
             this.dataGridView.TabIndex = 0;
             this.dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellDoubleClick);
             this.dataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView_KeyDown);
@@ -253,104 +255,131 @@ namespace Bank_ATM.Admin
             this.lblDateFrom.TabIndex = 12;
             this.lblDateFrom.Text = "Date from";
             this.lblDateFrom.Visible = false;
-            // 
+            //
             // dtpDateFrom
-            // 
+            //
             this.dtpDateFrom.CalendarForeColor = System.Drawing.Color.White;
             this.dtpDateFrom.CalendarMonthBackground = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.dtpDateFrom.Checked = false;
+            this.dtpDateFrom.CustomFormat = "yyyy-MM-dd HH:mm";
             this.dtpDateFrom.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.dtpDateFrom.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtpDateFrom.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpDateFrom.Location = new System.Drawing.Point(190, 166);
             this.dtpDateFrom.Name = "dtpDateFrom";
             this.dtpDateFrom.ShowCheckBox = true;
-            this.dtpDateFrom.Size = new System.Drawing.Size(150, 29);
+            this.dtpDateFrom.Size = new System.Drawing.Size(185, 29);
             this.dtpDateFrom.TabIndex = 13;
             this.dtpDateFrom.Visible = false;
             this.dtpDateFrom.ValueChanged += new System.EventHandler(this.TransactionFilterChanged);
-            // 
+            //
             // lblDateTo
-            // 
+            //
             this.lblDateTo.AutoSize = true;
             this.lblDateTo.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblDateTo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblDateTo.Location = new System.Drawing.Point(356, 142);
+            this.lblDateTo.Location = new System.Drawing.Point(391, 142);
             this.lblDateTo.Name = "lblDateTo";
             this.lblDateTo.Size = new System.Drawing.Size(60, 21);
             this.lblDateTo.TabIndex = 14;
             this.lblDateTo.Text = "Date to";
             this.lblDateTo.Visible = false;
-            // 
+            //
             // dtpDateTo
-            // 
+            //
             this.dtpDateTo.CalendarForeColor = System.Drawing.Color.White;
             this.dtpDateTo.CalendarMonthBackground = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.dtpDateTo.Checked = false;
+            this.dtpDateTo.CustomFormat = "yyyy-MM-dd HH:mm";
             this.dtpDateTo.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.dtpDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpDateTo.Location = new System.Drawing.Point(356, 166);
+            this.dtpDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtpDateTo.Location = new System.Drawing.Point(391, 166);
             this.dtpDateTo.Name = "dtpDateTo";
             this.dtpDateTo.ShowCheckBox = true;
-            this.dtpDateTo.Size = new System.Drawing.Size(150, 29);
+            this.dtpDateTo.Size = new System.Drawing.Size(185, 29);
             this.dtpDateTo.TabIndex = 15;
             this.dtpDateTo.Visible = false;
             this.dtpDateTo.ValueChanged += new System.EventHandler(this.TransactionFilterChanged);
-            // 
+            //
             // lblAmountMin
-            // 
+            //
             this.lblAmountMin.AutoSize = true;
             this.lblAmountMin.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblAmountMin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblAmountMin.Location = new System.Drawing.Point(522, 142);
+            this.lblAmountMin.Location = new System.Drawing.Point(592, 142);
             this.lblAmountMin.Name = "lblAmountMin";
             this.lblAmountMin.Size = new System.Drawing.Size(93, 21);
             this.lblAmountMin.TabIndex = 16;
             this.lblAmountMin.Text = "Min amount";
             this.lblAmountMin.Visible = false;
-            // 
+            //
             // txtAmountMin
-            // 
+            //
             this.txtAmountMin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.txtAmountMin.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAmountMin.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.txtAmountMin.ForeColor = System.Drawing.Color.White;
-            this.txtAmountMin.Location = new System.Drawing.Point(522, 166);
+            this.txtAmountMin.Location = new System.Drawing.Point(592, 166);
             this.txtAmountMin.Name = "txtAmountMin";
-            this.txtAmountMin.Size = new System.Drawing.Size(120, 29);
+            this.txtAmountMin.Size = new System.Drawing.Size(110, 29);
             this.txtAmountMin.TabIndex = 17;
             this.txtAmountMin.Visible = false;
             this.txtAmountMin.TextChanged += new System.EventHandler(this.TransactionFilterChanged);
-            // 
+            //
             // lblAmountMax
-            // 
+            //
             this.lblAmountMax.AutoSize = true;
             this.lblAmountMax.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblAmountMax.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
-            this.lblAmountMax.Location = new System.Drawing.Point(658, 142);
+            this.lblAmountMax.Location = new System.Drawing.Point(718, 142);
             this.lblAmountMax.Name = "lblAmountMax";
             this.lblAmountMax.Size = new System.Drawing.Size(97, 21);
             this.lblAmountMax.TabIndex = 18;
             this.lblAmountMax.Text = "Max amount";
             this.lblAmountMax.Visible = false;
-            // 
+            //
             // txtAmountMax
-            // 
+            //
             this.txtAmountMax.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.txtAmountMax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAmountMax.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.txtAmountMax.ForeColor = System.Drawing.Color.White;
-            this.txtAmountMax.Location = new System.Drawing.Point(658, 166);
+            this.txtAmountMax.Location = new System.Drawing.Point(718, 166);
             this.txtAmountMax.Name = "txtAmountMax";
-            this.txtAmountMax.Size = new System.Drawing.Size(120, 29);
+            this.txtAmountMax.Size = new System.Drawing.Size(110, 29);
             this.txtAmountMax.TabIndex = 19;
             this.txtAmountMax.Visible = false;
             this.txtAmountMax.TextChanged += new System.EventHandler(this.TransactionFilterChanged);
-            // 
+            //
+            // lblCardFilter
+            //
+            this.lblCardFilter.AutoSize = true;
+            this.lblCardFilter.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.lblCardFilter.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(191)))), ((int)(((byte)(219)))), ((int)(((byte)(254)))));
+            this.lblCardFilter.Location = new System.Drawing.Point(844, 142);
+            this.lblCardFilter.Name = "lblCardFilter";
+            this.lblCardFilter.Size = new System.Drawing.Size(97, 21);
+            this.lblCardFilter.TabIndex = 23;
+            this.lblCardFilter.Text = "Card Number";
+            this.lblCardFilter.Visible = false;
+            //
+            // txtCardFilter
+            //
+            this.txtCardFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.txtCardFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCardFilter.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.txtCardFilter.ForeColor = System.Drawing.Color.White;
+            this.txtCardFilter.Location = new System.Drawing.Point(844, 166);
+            this.txtCardFilter.Name = "txtCardFilter";
+            this.txtCardFilter.Size = new System.Drawing.Size(148, 29);
+            this.txtCardFilter.TabIndex = 24;
+            this.txtCardFilter.Visible = false;
+            this.txtCardFilter.TextChanged += new System.EventHandler(this.TransactionFilterChanged);
+            //
             // btnClearFilters
-            // 
+            //
             this.btnClearFilters.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnClearFilters.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClearFilters.Location = new System.Drawing.Point(792, 162);
+            this.btnClearFilters.Location = new System.Drawing.Point(24, 203);
             this.btnClearFilters.Name = "btnClearFilters";
             this.btnClearFilters.Size = new System.Drawing.Size(116, 33);
             this.btnClearFilters.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
@@ -371,7 +400,7 @@ namespace Bank_ATM.Admin
             // 
             this.btnExportCsv.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnExportCsv.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnExportCsv.Location = new System.Drawing.Point(920, 162);
+            this.btnExportCsv.Location = new System.Drawing.Point(152, 203);
             this.btnExportCsv.Name = "btnExportCsv";
             this.btnExportCsv.Size = new System.Drawing.Size(116, 33);
             this.btnExportCsv.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
@@ -408,6 +437,8 @@ namespace Bank_ATM.Admin
             this.Controls.Add(this.lblTransactionSummary);
             this.Controls.Add(this.btnExportCsv);
             this.Controls.Add(this.btnClearFilters);
+            this.Controls.Add(this.txtCardFilter);
+            this.Controls.Add(this.lblCardFilter);
             this.Controls.Add(this.txtAmountMax);
             this.Controls.Add(this.lblAmountMax);
             this.Controls.Add(this.txtAmountMin);
@@ -457,6 +488,8 @@ namespace Bank_ATM.Admin
         private System.Windows.Forms.TextBox txtAmountMin;
         private System.Windows.Forms.Label lblAmountMax;
         private System.Windows.Forms.TextBox txtAmountMax;
+        private System.Windows.Forms.Label lblCardFilter;
+        private System.Windows.Forms.TextBox txtCardFilter;
         private Krypton.Toolkit.KryptonButton btnClearFilters;
         private Krypton.Toolkit.KryptonButton btnExportCsv;
         private System.Windows.Forms.Label lblTransactionSummary;

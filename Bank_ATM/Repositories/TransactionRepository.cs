@@ -94,26 +94,30 @@ namespace Bank_ATM.Repositories
             {
                 string sql = @"
                     SELECT
-                        id,
-                        account_id as AccountId,
-                        target_account_id as TargetAccountId,
-                        card_id as CardId,
-                        target_card_id as TargetCardId,
-                        type,
-                        amount,
-                        fee_amount as FeeAmount,
-                        total_debited as TotalDebited,
-                        net_amount as NetAmount,
-                        exchange_rate as ExchangeRate,
-                        rate_kind as RateKind,
-                        description,
-                        service_id as ServiceId,
-                        service_account_id as ServiceAccountId,
-                        payment_reference as PaymentReference,
-                        cashback_amount as CashbackAmount,
-                        transaction_date as TransactionDate
-                    FROM transactions
-                    ORDER BY transaction_date DESC";
+                        t.id,
+                        t.account_id as AccountId,
+                        t.target_account_id as TargetAccountId,
+                        t.card_id as CardId,
+                        t.target_card_id as TargetCardId,
+                        sc.card_number as SourceCardNumber,
+                        tc.card_number as TargetCardNumber,
+                        t.type,
+                        t.amount,
+                        t.fee_amount as FeeAmount,
+                        t.total_debited as TotalDebited,
+                        t.net_amount as NetAmount,
+                        t.exchange_rate as ExchangeRate,
+                        t.rate_kind as RateKind,
+                        t.description,
+                        t.service_id as ServiceId,
+                        t.service_account_id as ServiceAccountId,
+                        t.payment_reference as PaymentReference,
+                        t.cashback_amount as CashbackAmount,
+                        t.transaction_date as TransactionDate
+                    FROM transactions t
+                    LEFT JOIN cards sc ON sc.id = t.card_id
+                    LEFT JOIN cards tc ON tc.id = t.target_card_id
+                    ORDER BY t.transaction_date DESC";
                 return db.Query<TransactionDto>(sql);
             }
         }
@@ -124,28 +128,67 @@ namespace Bank_ATM.Repositories
             {
                 string sql = @"
                     SELECT
-                        id,
-                        account_id as AccountId,
-                        target_account_id as TargetAccountId,
-                        card_id as CardId,
-                        target_card_id as TargetCardId,
-                        type,
-                        amount,
-                        fee_amount as FeeAmount,
-                        total_debited as TotalDebited,
-                        net_amount as NetAmount,
-                        exchange_rate as ExchangeRate,
-                        rate_kind as RateKind,
-                        description,
-                        service_id as ServiceId,
-                        service_account_id as ServiceAccountId,
-                        payment_reference as PaymentReference,
-                        cashback_amount as CashbackAmount,
-                        transaction_date as TransactionDate
-                    FROM transactions
-                    WHERE account_id = @AccountId OR target_account_id = @AccountId
-                    ORDER BY transaction_date DESC";
+                        t.id,
+                        t.account_id as AccountId,
+                        t.target_account_id as TargetAccountId,
+                        t.card_id as CardId,
+                        t.target_card_id as TargetCardId,
+                        sc.card_number as SourceCardNumber,
+                        tc.card_number as TargetCardNumber,
+                        t.type,
+                        t.amount,
+                        t.fee_amount as FeeAmount,
+                        t.total_debited as TotalDebited,
+                        t.net_amount as NetAmount,
+                        t.exchange_rate as ExchangeRate,
+                        t.rate_kind as RateKind,
+                        t.description,
+                        t.service_id as ServiceId,
+                        t.service_account_id as ServiceAccountId,
+                        t.payment_reference as PaymentReference,
+                        t.cashback_amount as CashbackAmount,
+                        t.transaction_date as TransactionDate
+                    FROM transactions t
+                    LEFT JOIN cards sc ON sc.id = t.card_id
+                    LEFT JOIN cards tc ON tc.id = t.target_card_id
+                    WHERE t.account_id = @AccountId OR t.target_account_id = @AccountId
+                    ORDER BY t.transaction_date DESC";
                 return db.Query<TransactionDto>(sql, new { AccountId = accountId });
+            }
+        }
+
+        public IEnumerable<TransactionDto> GetCardTransactions(int cardId)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                string sql = @"
+                    SELECT
+                        t.id,
+                        t.account_id as AccountId,
+                        t.target_account_id as TargetAccountId,
+                        t.card_id as CardId,
+                        t.target_card_id as TargetCardId,
+                        sc.card_number as SourceCardNumber,
+                        tc.card_number as TargetCardNumber,
+                        t.type,
+                        t.amount,
+                        t.fee_amount as FeeAmount,
+                        t.total_debited as TotalDebited,
+                        t.net_amount as NetAmount,
+                        t.exchange_rate as ExchangeRate,
+                        t.rate_kind as RateKind,
+                        t.description,
+                        t.service_id as ServiceId,
+                        t.service_account_id as ServiceAccountId,
+                        t.payment_reference as PaymentReference,
+                        t.cashback_amount as CashbackAmount,
+                        t.transaction_date as TransactionDate
+                    FROM transactions t
+                    LEFT JOIN cards sc ON sc.id = t.card_id
+                    LEFT JOIN cards tc ON tc.id = t.target_card_id
+                    WHERE t.card_id = @CardId OR t.target_card_id = @CardId
+                    ORDER BY t.transaction_date DESC";
+                return db.Query<TransactionDto>(sql, new { CardId = cardId });
             }
         }
     }

@@ -34,6 +34,7 @@ namespace Bank_ATM.User
             this.btnServices = new Krypton.Toolkit.KryptonButton();
             this.btnBalance = new Krypton.Toolkit.KryptonButton();
             this.btnSettings = new Krypton.Toolkit.KryptonButton();
+            this.btnTransactions = new Krypton.Toolkit.KryptonButton();
             this.btnBack = new Krypton.Toolkit.KryptonButton();
             this.btnLogout = new Krypton.Toolkit.KryptonButton();
             this.pnlHeader.SuspendLayout();
@@ -397,12 +398,50 @@ namespace Bank_ATM.User
             this.btnSettings.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnSettings.Values.Text = "Settings";
             this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
-            // 
+            //
+            // btnTransactions
+            //
+            this.btnTransactions.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
+            this.btnTransactions.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTransactions.Location = new System.Drawing.Point(28, 584);
+            this.btnTransactions.Name = "btnTransactions";
+            this.btnTransactions.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.btnTransactions.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.btnTransactions.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(234)))), ((int)(((byte)(212)))));
+            this.btnTransactions.OverrideDefault.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(234)))), ((int)(((byte)(212)))));
+            this.btnTransactions.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.btnTransactions.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.btnTransactions.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(234)))), ((int)(((byte)(212)))));
+            this.btnTransactions.OverrideFocus.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(234)))), ((int)(((byte)(212)))));
+            this.btnTransactions.Size = new System.Drawing.Size(844, 44);
+            this.btnTransactions.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.btnTransactions.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.btnTransactions.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(234)))), ((int)(((byte)(212)))));
+            this.btnTransactions.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(234)))), ((int)(((byte)(212)))));
+            this.btnTransactions.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom)
+            | Krypton.Toolkit.PaletteDrawBorders.Left)
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnTransactions.StateCommon.Border.Rounding = 12F;
+            this.btnTransactions.StateCommon.Border.Width = 2;
+            this.btnTransactions.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnTransactions.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
+            this.btnTransactions.StateDisabled.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
+            this.btnTransactions.StateDisabled.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
+            this.btnTransactions.StateDisabled.Content.ShortText.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+            this.btnTransactions.StatePressed.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(87)))), ((int)(((byte)(108)))));
+            this.btnTransactions.StatePressed.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(87)))), ((int)(((byte)(108)))));
+            this.btnTransactions.StateTracking.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(158)))), ((int)(((byte)(148)))));
+            this.btnTransactions.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(158)))), ((int)(((byte)(148)))));
+            this.btnTransactions.TabIndex = 11;
+            this.btnTransactions.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnTransactions.Values.Text = "My Transactions";
+            this.btnTransactions.Click += new System.EventHandler(this.btnTransactions_Click);
+            //
             // btnBack
-            // 
+            //
             this.btnBack.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnBack.Location = new System.Drawing.Point(28, 588);
+            this.btnBack.Location = new System.Drawing.Point(28, 642);
             this.btnBack.Name = "btnBack";
             this.btnBack.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
             this.btnBack.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
@@ -440,7 +479,7 @@ namespace Bank_ATM.User
             // 
             this.btnLogout.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnLogout.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnLogout.Location = new System.Drawing.Point(460, 588);
+            this.btnLogout.Location = new System.Drawing.Point(460, 642);
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
             this.btnLogout.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(29)))), ((int)(((byte)(29)))));
@@ -478,9 +517,10 @@ namespace Bank_ATM.User
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(14)))), ((int)(((byte)(28)))));
-            this.ClientSize = new System.Drawing.Size(900, 650);
+            this.ClientSize = new System.Drawing.Size(900, 706);
             this.Controls.Add(this.btnLogout);
             this.Controls.Add(this.btnBack);
+            this.Controls.Add(this.btnTransactions);
             this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.btnBalance);
             this.Controls.Add(this.btnServices);
@@ -520,6 +560,7 @@ namespace Bank_ATM.User
         private Krypton.Toolkit.KryptonButton btnServices;
         private Krypton.Toolkit.KryptonButton btnBalance;
         private Krypton.Toolkit.KryptonButton btnSettings;
+        private Krypton.Toolkit.KryptonButton btnTransactions;
         private Krypton.Toolkit.KryptonButton btnBack;
         private Krypton.Toolkit.KryptonButton btnLogout;
     }

@@ -61,7 +61,7 @@ namespace Bank_ATM.Payments
             }
             else
             {
-                NumericInputDialog.Attach(txtAmount, LanguageManager.GetString("Amount"), true);
+                NumericInputDialog.Attach(txtAmount, LanguageManager.GetString("Amount"));
             }
 
             _services = _bankingService.GetAvailableServices();

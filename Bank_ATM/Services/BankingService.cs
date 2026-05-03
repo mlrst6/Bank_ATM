@@ -1,6 +1,7 @@
-using System.Threading.Tasks;
-using System.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Bank_ATM.Core;
 using Bank_ATM.Models;
 using Bank_ATM.Repositories;
@@ -128,8 +129,13 @@ namespace Bank_ATM.Services
 
         public FeeCalculationResult PreviewServicePaymentFee(decimal amount, bool chargeCurrentAccount)
         {
+            if (chargeCurrentAccount)
+            {
+                return BuildNoFeeResult("BillPayment", amount);
+            }
+
             var currentCard = SessionManager.Instance.CurrentCard;
-            return _feeCalculationService.Calculate(chargeCurrentAccount ? currentCard?.CardType : null, "BillPayment", amount);
+            return _feeCalculationService.Calculate(null, "BillPayment", amount);
         }
 
         public async Task<BankingResult> DepositAsync(decimal amount)
@@ -399,7 +405,7 @@ namespace Bank_ATM.Services
                 }
 
                 decimal cashbackAmount = CalculateCashback(amount, service.CashbackPercent);
-                var fee = _feeCalculationService.Calculate(currentCard.CardType, "BillPayment", amount);
+                var fee = BuildNoFeeResult("BillPayment", amount);
                 string paymentDescription = cashbackAmount > 0m
                     ? $"{description}; Cashback: {cashbackAmount:N2} UZS ({service.CashbackPercent:N4}%)"
                     : description;
@@ -613,6 +619,20 @@ namespace Bank_ATM.Services
             return decimal.Round(amount * cashbackPercent / 100m, 2);
         }
 
+        private static FeeCalculationResult BuildNoFeeResult(string transactionType, decimal amount)
+        {
+            decimal roundedAmount = amount <= 0m ? 0m : decimal.Round(amount, 2);
+            return new FeeCalculationResult
+            {
+                TransactionType = transactionType,
+                BaseAmountUzs = roundedAmount,
+                FeeAmountUzs = 0m,
+                TotalDebitUzs = roundedAmount,
+                PercentFee = 0m,
+                FixedFee = 0m
+            };
+        }
+
         private static decimal GetCashOutRate(CurrencyDto currency)
         {
             if (currency == null)
@@ -626,6 +646,28 @@ namespace Bank_ATM.Services
         private static string FormatNotes(CashNoteDto[] notes)
         {
             return string.Join(", ", notes.Select(note => $"{note.DenominationValue:N2} x {note.NoteCount}"));
+        }
+
+        public IEnumerable<TransactionDto> GetCurrentUserTransactions()
+        {
+            var account = SessionManager.Instance.CurrentAccount;
+            if (account == null)
+            {
+                return Enumerable.Empty<TransactionDto>();
+            }
+
+            return _transactionRepository.GetAccountTransactions(account.Id);
+        }
+
+        public IEnumerable<TransactionDto> GetCurrentCardTransactions()
+        {
+            var card = SessionManager.Instance.CurrentCard;
+            if (card == null)
+            {
+                return Enumerable.Empty<TransactionDto>();
+            }
+
+            return _transactionRepository.GetCardTransactions(card.Id);
         }
 
         private async Task<AccountDto> RefreshCurrentSessionAsync()

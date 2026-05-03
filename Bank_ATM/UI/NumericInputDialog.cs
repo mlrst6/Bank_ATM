@@ -63,7 +63,7 @@ namespace Bank_ATM.UI
 
             string[] buttons = allowSeparators
                 ? new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "<", ",", "CLR", "OK" }
-                : new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", _allowDecimal ? "." : "CLR", "0", "OK" };
+                : new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", _allowDecimal ? "." : "<", "0", "OK" };
 
             foreach (string text in buttons)
             {

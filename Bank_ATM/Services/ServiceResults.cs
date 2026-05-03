@@ -46,6 +46,10 @@ namespace Bank_ATM.Services
         public decimal UnavailableAmount { get; set; }
         public CashNoteDto[] InsertedNotes { get; set; }
         public CashNoteDto[] DispensedNotes { get; set; }
+        // Populated when IsApproximateAmount: the next reachable target denomination and
+        // the minimum source amount the user must insert to reach it.
+        public decimal? NextDispensableTargetAmount { get; set; }
+        public decimal? MinSourceAmountForNextNote { get; set; }
     }
 
     public class ServiceLookupResult : ServiceResult

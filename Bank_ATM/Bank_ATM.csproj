@@ -131,6 +131,12 @@
     <Compile Include="User\UserActionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="User\UserTransactionHistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\UserTransactionHistoryForm.Designer.cs">
+      <DependentUpon>UserTransactionHistoryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="User\UserOperationDialog.cs">
       <SubType>Form</SubType>
     </Compile>

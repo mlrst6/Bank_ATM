@@ -22,6 +22,7 @@ namespace Bank_ATM.Admin
         private readonly BindingSource _bindingSource = new BindingSource();
         private List<object> _allItems = new List<object>();
         private List<object> _filteredItems = new List<object>();
+        private List<CardDto> _allCards = new List<CardDto>();
 
         public AdminDataViewForm(string title, object dataSource, string mode)
         {
@@ -68,6 +69,8 @@ namespace Bank_ATM.Admin
             txtAmountMin.Visible = isTransactionMode;
             lblAmountMax.Visible = isTransactionMode;
             txtAmountMax.Visible = isTransactionMode;
+            lblCardFilter.Visible = isTransactionMode;
+            txtCardFilter.Visible = isTransactionMode;
             btnClearFilters.Visible = isTransactionMode;
             btnExportCsv.Visible = isTransactionMode;
             lblTransactionSummary.Visible = isTransactionMode;
@@ -103,6 +106,7 @@ namespace Bank_ATM.Admin
 
             if (_mode == "TRANSACTIONS")
             {
+                _allCards = _adminService.GetAllCards().ToList();
                 PopulateTransactionTypeFilter();
             }
 
@@ -293,6 +297,7 @@ namespace Bank_ATM.Admin
             dtpDateTo.Checked = false;
             txtAmountMin.Clear();
             txtAmountMax.Clear();
+            txtCardFilter.Clear();
             ApplyFilter();
         }
 
@@ -429,12 +434,12 @@ namespace Bank_ATM.Admin
                 return false;
             }
 
-            if (dtpDateFrom.Checked && transaction.TransactionDate < dtpDateFrom.Value.Date)
+            if (dtpDateFrom.Checked && transaction.TransactionDate < dtpDateFrom.Value)
             {
                 return false;
             }
 
-            if (dtpDateTo.Checked && transaction.TransactionDate >= dtpDateTo.Value.Date.AddDays(1))
+            if (dtpDateTo.Checked && transaction.TransactionDate > dtpDateTo.Value)
             {
                 return false;
             }
@@ -453,6 +458,21 @@ namespace Bank_ATM.Admin
                 transaction.Amount > maxAmount)
             {
                 return false;
+            }
+
+            string cardFilter = txtCardFilter.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(cardFilter))
+            {
+                var matchingCardIds = _allCards
+                    .Where(c => c.CardNumber != null && c.CardNumber.IndexOf(cardFilter, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Select(c => (int?)c.Id)
+                    .ToList();
+
+                if (!matchingCardIds.Contains(transaction.CardId) &&
+                    !matchingCardIds.Contains(transaction.TargetCardId))
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -566,6 +586,11 @@ namespace Bank_ATM.Admin
                 HideColumn("AtmId");
                 HideColumn("CurrencyId");
             }
+            else if (_mode == "TRANSACTIONS")
+            {
+                HideColumn("CardId");
+                HideColumn("TargetCardId");
+            }
         }
 
         private void HideColumn(string name)
@@ -624,6 +649,8 @@ namespace Bank_ATM.Admin
                 case "AccountId": return "Account";
                 case "CardId": return "Card";
                 case "TargetCardId": return "Target Card";
+                case "SourceCardNumber": return "Card Number";
+                case "TargetCardNumber": return "Target Card Number";
                 default:
                     if (string.IsNullOrEmpty(propertyName)) return propertyName;
                     var chars = propertyName.Select((c, i) => i > 0 && char.IsUpper(c) ? " " + c : c.ToString());

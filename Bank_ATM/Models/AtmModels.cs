@@ -97,6 +97,8 @@ namespace Bank_ATM.Models
         public int? TargetAccountId { get; set; }
         public int? CardId { get; set; }
         public int? TargetCardId { get; set; }
+        public string SourceCardNumber { get; set; }
+        public string TargetCardNumber { get; set; }
         public string Type { get; set; } // Withdraw, Deposit, Transfer, BillPayment, Exchange
         public decimal Amount { get; set; }
         public decimal FeeAmount { get; set; }

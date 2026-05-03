@@ -37,6 +37,8 @@ namespace Bank_ATM.User
             btnBalance.Values.Text = btnBalance.Text;
             btnSettings.Text = LanguageManager.GetString("UserSettings");
             btnSettings.Values.Text = btnSettings.Text;
+            btnTransactions.Text = LanguageManager.GetString("MyTransactions");
+            btnTransactions.Values.Text = btnTransactions.Text;
             btnBack.Text = LanguageManager.GetString("Back");
             btnBack.Values.Text = btnBack.Text;
             btnLogout.Text = LanguageManager.GetString("Logout");
@@ -197,6 +199,14 @@ namespace Bank_ATM.User
                     RefreshAccountSummary();
                     ShowStatus(StatusBannerKind.Success, LanguageManager.GetString("Payment"), LanguageManager.GetString("ServicePaymentCompleted"));
                 }
+            }
+        }
+
+        private void btnTransactions_Click(object sender, EventArgs e)
+        {
+            using (var form = new UserTransactionHistoryForm())
+            {
+                form.ShowDialog(this);
             }
         }
 
