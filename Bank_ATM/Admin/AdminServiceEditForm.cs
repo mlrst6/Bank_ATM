@@ -9,7 +9,11 @@ namespace Bank_ATM.Admin
 {
     public partial class AdminServiceEditForm : Form
     {
-        private static readonly string[] ServiceCategories = { "Mobile", "Internet", "Utilities" };
+        private static readonly string[] ServiceCategories =
+        {
+            "Mobile", "Internet", "Utilities", "TV & Streaming",
+            "Taxi", "Government", "Education", "Insurance", "Other"
+        };
         private readonly AdminService _adminService = new AdminService();
         private readonly ServiceDto _service;
         private readonly bool _isEdit;

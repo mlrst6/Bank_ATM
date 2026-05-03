@@ -320,6 +320,75 @@ namespace Bank_ATM.Services
             };
         }
 
+        public CardAccessResult LookupCardByNumber(string cardNumber)
+        {
+            string sanitized = SanitizeCardNumber(cardNumber);
+            if (sanitized.Length != 16 || !long.TryParse(sanitized, out _))
+                return new CardAccessResult { Success = false, Message = LanguageManager.GetString("InvalidTargetCardNumber") };
+
+            var card = _cardRepository.GetCardByNumber(sanitized);
+            if (card == null)
+                return new CardAccessResult { Success = false, Message = LanguageManager.GetString("TargetCardNotFound") };
+            if (card.IsBlocked || card.ExpiryDate.Date < System.DateTime.Today)
+                return new CardAccessResult { Success = false, Message = LanguageManager.GetString("TargetCardUnavailable") };
+
+            return new CardAccessResult { Success = true, Card = card, SanitizedCardNumber = sanitized };
+        }
+
+        public async Task<BankingResult> GuestDepositCashToCardAsync(string targetCardNumber, CashNoteDto[] notes)
+        {
+            string sanitized = SanitizeCardNumber(targetCardNumber);
+            if (sanitized.Length != 16 || !long.TryParse(sanitized, out _))
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("InvalidTargetCardNumber") };
+
+            var card = _cardRepository.GetCardByNumber(sanitized);
+            if (card == null)
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("TargetCardNotFound") };
+            if (card.IsBlocked || card.ExpiryDate.Date < System.DateTime.Today)
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("TargetCardUnavailable") };
+
+            var uzs = _currencyRepository.GetCurrencyByCode("UZS");
+            if (uzs == null || !uzs.IsActive)
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("SelectedCurrencyUnavailable") };
+
+            var noteList = CashRepository.NormalizeNotes(notes).ToArray();
+            decimal cashAmount = noteList.Sum(note => note.TotalValue);
+            if (!IsValidMoneyAmount(cashAmount))
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("InvalidCashNotes") };
+
+            var fee = _feeCalculationService.Calculate(null, "Deposit", cashAmount);
+            decimal creditAmount = Math.Max(0m, decimal.Round(cashAmount - fee.FeeAmountUzs, 2));
+            if (creditAmount <= 0m)
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("InvalidAmount") };
+
+            string description = $"Guest cash deposit to card {sanitized}: {cashAmount:N2} UZS; Fee: {fee.FeeAmountUzs:N2} UZS; Net: {creditAmount:N2} UZS; Notes: {FormatNotes(noteList)}";
+            bool success = await _accountRepository.GuestDepositCashToTargetCardAsync(
+                card.Id,
+                card.AccountId,
+                noteList,
+                cashAmount,
+                fee.FeeAmountUzs,
+                creditAmount,
+                uzs.Id,
+                description);
+
+            if (!success)
+                return new BankingResult { Success = false, Message = LanguageManager.GetString("DepositFailed") };
+
+            AuditLogger.LogInfo($"Guest cash deposit: {cashAmount:N2} UZS to card {sanitized}");
+            return new BankingResult
+            {
+                Success = true,
+                TargetCard = card,
+                DebitedAmountUzs = cashAmount,
+                FeePercent = fee.PercentFee,
+                FeeAmountUzs = fee.FeeAmountUzs,
+                NetAmountUzs = creditAmount,
+                CashAmount = cashAmount,
+                CashCurrencyCode = "UZS"
+            };
+        }
+
         public ServiceDto[] GetAvailableServices()
         {
             return _servicesRepository.GetActiveServices().ToArray();

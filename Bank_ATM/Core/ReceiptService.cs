@@ -103,6 +103,26 @@ namespace Bank_ATM.Core
             return GenerateGuestReceipt(LanguageManager.GetString("Exchange"), lines.ToArray());
         }
 
+        public static string GenerateGuestCardTopUpReceipt(Services.BankingResult result, string cardNumber)
+        {
+            if (result == null) return null;
+
+            var lines = new System.Collections.Generic.List<string>
+            {
+                $"Card: {cardNumber ?? string.Empty}",
+                LanguageManager.Format("ServiceReceiptAmount", result.CashAmount, result.CashCurrencyCode ?? "UZS"),
+                $"Fee: {result.FeePercent:N4}% ({result.FeeAmountUzs:N2} UZS)",
+                LanguageManager.Format("ServiceReceiptAmount", result.NetAmountUzs, "UZS") + " credited"
+            };
+
+            if (result.CashBreakdown != null && result.CashBreakdown.Length > 0)
+            {
+                lines.Add(LanguageManager.GetString("CashAcceptedBreakdown") + ": " + FormatNotes(result.CashBreakdown));
+            }
+
+            return GenerateGuestReceipt(LanguageManager.GetString("GuestCardTopUp"), lines.ToArray());
+        }
+
         public static string GenerateGuestServicePaymentReceipt(
             ServiceDto service,
             ServiceAccountDto serviceAccount,

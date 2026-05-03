@@ -17,6 +17,7 @@ namespace Bank_ATM
         {
             this.btnExchange = new Krypton.Toolkit.KryptonButton();
             this.btnPayServices = new Krypton.Toolkit.KryptonButton();
+            this.btnCardTopUp = new Krypton.Toolkit.KryptonButton();
             this.btnBack = new Krypton.Toolkit.KryptonButton();
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
@@ -27,9 +28,9 @@ namespace Bank_ATM
             // 
             this.btnExchange.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnExchange.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnExchange.Location = new System.Drawing.Point(60, 230);
+            this.btnExchange.Location = new System.Drawing.Point(60, 165);
             this.btnExchange.Name = "btnExchange";
-            this.btnExchange.Size = new System.Drawing.Size(350, 118);
+            this.btnExchange.Size = new System.Drawing.Size(350, 105);
             this.btnExchange.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(92)))), ((int)(((byte)(180)))));
             this.btnExchange.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(64)))), ((int)(((byte)(140)))));
             this.btnExchange.StateCommon.Back.ColorAngle = 30F;
@@ -60,9 +61,9 @@ namespace Bank_ATM
             // 
             this.btnPayServices.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnPayServices.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnPayServices.Location = new System.Drawing.Point(484, 230);
+            this.btnPayServices.Location = new System.Drawing.Point(484, 165);
             this.btnPayServices.Name = "btnPayServices";
-            this.btnPayServices.Size = new System.Drawing.Size(350, 118);
+            this.btnPayServices.Size = new System.Drawing.Size(350, 105);
             this.btnPayServices.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnPayServices.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(128)))), ((int)(((byte)(61)))));
             this.btnPayServices.StateCommon.Back.ColorAngle = 30F;
@@ -93,7 +94,7 @@ namespace Bank_ATM
             // 
             this.btnBack.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnBack.Location = new System.Drawing.Point(269, 412);
+            this.btnBack.Location = new System.Drawing.Point(269, 430);
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(350, 45);
             this.btnBack.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
@@ -121,7 +122,40 @@ namespace Bank_ATM
             this.btnBack.Text = "BACK";
             this.btnBack.Values.Text = "BACK";
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
-            // 
+            //
+            // btnCardTopUp
+            //
+            this.btnCardTopUp.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
+            this.btnCardTopUp.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCardTopUp.Location = new System.Drawing.Point(269, 300);
+            this.btnCardTopUp.Name = "btnCardTopUp";
+            this.btnCardTopUp.Size = new System.Drawing.Size(356, 100);
+            this.btnCardTopUp.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(83)))), ((int)(((byte)(9)))));
+            this.btnCardTopUp.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(146)))), ((int)(((byte)(64)))), ((int)(((byte)(14)))));
+            this.btnCardTopUp.StateCommon.Back.ColorAngle = 30F;
+            this.btnCardTopUp.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(186)))), ((int)(((byte)(116)))));
+            this.btnCardTopUp.StateCommon.Border.Rounding = 8F;
+            this.btnCardTopUp.StateCommon.Border.Width = 2;
+            this.btnCardTopUp.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnCardTopUp.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.btnCardTopUp.StateNormal.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(83)))), ((int)(((byte)(9)))));
+            this.btnCardTopUp.StateNormal.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(146)))), ((int)(((byte)(64)))), ((int)(((byte)(14)))));
+            this.btnCardTopUp.StateTracking.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(234)))), ((int)(((byte)(88)))), ((int)(((byte)(12)))));
+            this.btnCardTopUp.StateTracking.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(194)))), ((int)(((byte)(65)))), ((int)(((byte)(12)))));
+            this.btnCardTopUp.StatePressed.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(154)))), ((int)(((byte)(52)))), ((int)(((byte)(18)))));
+            this.btnCardTopUp.StatePressed.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(124)))), ((int)(((byte)(45)))), ((int)(((byte)(18)))));
+            this.btnCardTopUp.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(83)))), ((int)(((byte)(9)))));
+            this.btnCardTopUp.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(146)))), ((int)(((byte)(64)))), ((int)(((byte)(14)))));
+            this.btnCardTopUp.OverrideDefault.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(186)))), ((int)(((byte)(116)))));
+            this.btnCardTopUp.OverrideFocus.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(83)))), ((int)(((byte)(9)))));
+            this.btnCardTopUp.OverrideFocus.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(146)))), ((int)(((byte)(64)))), ((int)(((byte)(14)))));
+            this.btnCardTopUp.OverrideFocus.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(186)))), ((int)(((byte)(116)))));
+            this.btnCardTopUp.TabIndex = 4;
+            this.btnCardTopUp.TabStop = false;
+            this.btnCardTopUp.Text = "PAY TO CARD";
+            this.btnCardTopUp.Values.Text = "PAY TO CARD";
+            this.btnCardTopUp.Click += new System.EventHandler(this.btnCardTopUp_Click);
+            //
             // pnlHeader
             // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(50)))));
@@ -151,6 +185,7 @@ namespace Bank_ATM
             this.ClientSize = new System.Drawing.Size(900, 650);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.btnBack);
+            this.Controls.Add(this.btnCardTopUp);
             this.Controls.Add(this.btnPayServices);
             this.Controls.Add(this.btnExchange);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -164,6 +199,7 @@ namespace Bank_ATM
 
         private Krypton.Toolkit.KryptonButton btnExchange;
         private Krypton.Toolkit.KryptonButton btnPayServices;
+        private Krypton.Toolkit.KryptonButton btnCardTopUp;
         private Krypton.Toolkit.KryptonButton btnBack;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTitle;

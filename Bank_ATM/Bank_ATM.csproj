@@ -167,6 +167,12 @@
     <Compile Include="Guest\GuestActionsForm.Designer.cs">
       <DependentUpon>GuestActionsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Guest\GuestCardTopUpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guest\GuestCardTopUpForm.Designer.cs">
+      <DependentUpon>GuestCardTopUpForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Payments\ServicePaymentForm.cs">
       <SubType>Form</SubType>
     </Compile>

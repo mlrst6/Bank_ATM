@@ -65,16 +65,22 @@ namespace Bank_ATM.Payments
             }
 
             _services = _bankingService.GetAvailableServices();
-            cmbServices.DataSource = _services;
-            cmbServices.DisplayMember = "ServiceName";
-            cmbServices.ValueMember = "Id";
 
-            if (_services.Any())
-            {
-                cmbServices.SelectedIndex = 0;
-                UpdateHint();
-            }
+            var categories = _services
+                .Where(s => !string.IsNullOrWhiteSpace(s.Category))
+                .Select(s => s.Category)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToArray();
+            cmbCategoryFilter.Items.Clear();
+            cmbCategoryFilter.Items.Add(LanguageManager.GetString("AllCategories"));
+            foreach (var cat in categories)
+                cmbCategoryFilter.Items.Add(cat);
+            cmbCategoryFilter.SelectedIndex = 0;
 
+            FilterServicesByCategory();
+
+            cmbCategoryFilter.SelectedIndexChanged += (s, args) => FilterServicesByCategory();
             cmbServices.SelectedIndexChanged += (s, args) =>
             {
                 UpdateHint();
@@ -277,6 +283,32 @@ namespace Bank_ATM.Payments
             Close();
         }
 
+        private void FilterServicesByCategory()
+        {
+            if (_isReviewing || _completed)
+                return;
+
+            string selected = cmbCategoryFilter.SelectedItem?.ToString();
+            bool isAll = string.IsNullOrWhiteSpace(selected) ||
+                         selected == LanguageManager.GetString("AllCategories");
+
+            var filtered = isAll
+                ? _services
+                : _services.Where(s => s.Category == selected).ToArray();
+
+            cmbServices.DataSource = null;
+            cmbServices.Items.Clear();
+            cmbServices.DataSource = filtered;
+            cmbServices.DisplayMember = "ServiceName";
+            cmbServices.ValueMember = "Id";
+
+            if (filtered.Length > 0)
+                cmbServices.SelectedIndex = 0;
+
+            ResetVerificationState();
+            UpdateHint();
+        }
+
         private void UpdateHint()
         {
             var selected = cmbServices.SelectedItem as ServiceDto;
@@ -306,6 +338,7 @@ namespace Bank_ATM.Payments
             UseWaitCursor = isLoading;
             btnPay.Enabled = !isLoading && !_completed;
             btnCancel.Enabled = !isLoading;
+            cmbCategoryFilter.Enabled = !isLoading && !_completed && !_isReviewing;
             cmbServices.Enabled = !isLoading && !_completed && !_isReviewing;
             txtReference.Enabled = !isLoading && !_completed && !_isReviewing;
             txtAmount.Enabled = !isLoading && !_completed && !_isReviewing;
@@ -326,6 +359,7 @@ namespace Bank_ATM.Payments
             _pendingNotes = null;
             btnCancel.Text = LanguageManager.GetString("Cancel");
             btnCancel.Values.Text = btnCancel.Text;
+            cmbCategoryFilter.Enabled = true;
             cmbServices.Enabled = true;
             txtReference.Enabled = true;
             txtAmount.Enabled = true;

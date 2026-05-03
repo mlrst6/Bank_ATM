@@ -251,7 +251,21 @@
     "EnterUsdAmount": "USD miqdorini kiriting",
     "InvalidAmount": "To'g'ri miqdor kiriting.",
     "ExchangeShortfallHint": "{0:N2} {1} olish uchun kamida {2:N2} {3} ko'proq kiriting.",
-    "ExchangeError": "Ayirboshlashda xatolik yuz berdi. Qaytadan urinib ko'ring."
+    "ExchangeError": "Ayirboshlashda xatolik yuz berdi. Qaytadan urinib ko'ring.",
+    "AllCategories": "Barcha kategoriyalar",
+    "FilterByCategory": "Kategoriya bo'yicha filtr",
+    "GuestCardTopUp": "Kartaga pul o'tkazish",
+    "GuestCardTopUpSubtitle": "Naqd pul qabul qilib, istalgan karta hisobiga o'tkazish xizmati.",
+    "CardNumberInput": "Qabul qiluvchi karta raqami",
+    "CardTopUpVerifyButton": "Tekshirish",
+    "CardHolderLabel": "Karta egasi",
+    "CardStatusLabel": "Karta holati",
+    "CardStatusActive": "Faol",
+    "CardTopUpInsertCashPrompt": "Naqd pul kiriting va summa avtomatik hisoblanadi.",
+    "GuestCardTopUpCashTitle": "Kartaga o'tkazish uchun naqd pul",
+    "GuestCardTopUpCashSubtitle": "Kiritayotgan kupyuralar sonini belgilang.",
+    "CardTopUpReviewMessage": "Karta: {0}\nKiritilgan naqd pul: {1:N2} UZS\nKomissiya: {2:N2} UZS ({3:N4}%)\nKartaga o'tkaziladigan summa: {4:N2} UZS",
+    "CardTopUpCompleted": "Pul muvaffaqiyatli kartaga o'tkazildi."
   },
   "eng": {
     "label1": "Bank ATM",
@@ -505,7 +519,21 @@
     "EnterUsdAmount": "Enter USD amount",
     "InvalidAmount": "Enter a valid amount.",
     "ExchangeShortfallHint": "To receive {0:N2} {1}, insert at least {2:N2} more {3}.",
-    "ExchangeError": "Exchange failed. Please try again."
+    "ExchangeError": "Exchange failed. Please try again.",
+    "AllCategories": "All categories",
+    "FilterByCategory": "Filter by category",
+    "GuestCardTopUp": "Deposit to Card",
+    "GuestCardTopUpSubtitle": "Insert cash and transfer it directly to any card.",
+    "CardNumberInput": "Target Card Number",
+    "CardTopUpVerifyButton": "Verify",
+    "CardHolderLabel": "Card Status",
+    "CardStatusLabel": "Status",
+    "CardStatusActive": "Active",
+    "CardTopUpInsertCashPrompt": "Insert cash notes. The amount will be calculated automatically.",
+    "GuestCardTopUpCashTitle": "Cash for card deposit",
+    "GuestCardTopUpCashSubtitle": "Enter the number of notes you are inserting.",
+    "CardTopUpReviewMessage": "Card: {0}\nCash inserted: {1:N2} UZS\nFee: {2:N2} UZS ({3:N4}%)\nNet amount to credit: {4:N2} UZS",
+    "CardTopUpCompleted": "Cash deposited to card successfully."
   },
   "ru": {
     "label1": "Bank ATM",
@@ -759,6 +787,20 @@
     "EnterUsdAmount": "Введите сумму в USD",
     "InvalidAmount": "Введите корректную сумму.",
     "ExchangeShortfallHint": "Чтобы получить {0:N2} {1}, внесите ещё минимум {2:N2} {3}.",
-    "ExchangeError": "Ошибка обмена. Попробуйте ещё раз."
+    "ExchangeError": "Ошибка обмена. Попробуйте ещё раз.",
+    "AllCategories": "Все категории",
+    "FilterByCategory": "Фильтр по категории",
+    "GuestCardTopUp": "Перевод на карту",
+    "GuestCardTopUpSubtitle": "Внесите наличные и зачислите их на любую карту.",
+    "CardNumberInput": "Номер карты получателя",
+    "CardTopUpVerifyButton": "Проверить",
+    "CardHolderLabel": "Статус карты",
+    "CardStatusLabel": "Статус",
+    "CardStatusActive": "Активна",
+    "CardTopUpInsertCashPrompt": "Внесите купюры. Сумма рассчитывается автоматически.",
+    "GuestCardTopUpCashTitle": "Наличные для зачисления на карту",
+    "GuestCardTopUpCashSubtitle": "Введите количество вносимых купюр.",
+    "CardTopUpReviewMessage": "Карта: {0}\nВнесено наличными: {1:N2} UZS\nКомиссия: {2:N2} UZS ({3:N4}%)\nК зачислению: {4:N2} UZS",
+    "CardTopUpCompleted": "Наличные успешно зачислены на карту."
   }
 }

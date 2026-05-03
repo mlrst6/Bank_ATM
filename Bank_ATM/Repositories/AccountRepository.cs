@@ -271,6 +271,97 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public async Task<bool> GuestDepositCashToTargetCardAsync(
+            int targetCardId,
+            int targetAccountId,
+            IEnumerable<CashNoteDto> notes,
+            decimal grossAmountUzs,
+            decimal feeAmountUzs,
+            decimal creditAmountUzs,
+            int currencyId,
+            string description)
+        {
+            var noteList = CashRepository.NormalizeNotes(notes).ToList();
+            if (!noteList.Any() || !IsValidMoneyAmount(grossAmountUzs) || creditAmountUzs <= 0m)
+                return false;
+
+            using (var db = new SqlConnection(_connectionString))
+            {
+                await db.OpenAsync();
+                using (var trans = db.BeginTransaction())
+                {
+                    try
+                    {
+                        var card = await db.QueryFirstOrDefaultAsync<CardDto>(@"
+                            SELECT id, account_id as AccountId, is_blocked as IsBlocked, expiry_date as ExpiryDate
+                            FROM cards WITH (UPDLOCK, ROWLOCK)
+                            WHERE id = @CardId AND account_id = @AccountId",
+                            new { CardId = targetCardId, AccountId = targetAccountId },
+                            trans);
+                        if (card == null || card.IsBlocked || card.ExpiryDate.Date < DateTime.Today)
+                        {
+                            trans.Rollback();
+                            return false;
+                        }
+
+                        int rows = await db.ExecuteAsync(
+                            "UPDATE cards SET balance = balance + @Amount WHERE id = @Id AND is_blocked = 0",
+                            new { Amount = creditAmountUzs, Id = targetCardId },
+                            trans);
+                        if (rows != 1) { trans.Rollback(); return false; }
+
+                        foreach (var note in noteList)
+                        {
+                            await db.ExecuteAsync(@"
+                                IF EXISTS (SELECT 1 FROM atm_cash_denominations
+                                           WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                             AND currency_id = @CurrencyId
+                                             AND denomination_value = @DenominationValue)
+                                BEGIN
+                                    UPDATE atm_cash_denominations
+                                    SET note_count = note_count + @NoteCount, updated_at = GETDATE()
+                                    WHERE atm_id = (SELECT TOP 1 id FROM atms ORDER BY id)
+                                      AND currency_id = @CurrencyId AND denomination_value = @DenominationValue
+                                END
+                                ELSE
+                                BEGIN
+                                    INSERT INTO atm_cash_denominations (atm_id, currency_id, denomination_value, note_count)
+                                    VALUES ((SELECT TOP 1 id FROM atms ORDER BY id), @CurrencyId, @DenominationValue, @NoteCount)
+                                END",
+                                new { CurrencyId = currencyId, note.DenominationValue, note.NoteCount },
+                                trans);
+                        }
+
+                        await SyncAccountBalanceAsync(db, trans, targetAccountId);
+
+                        await db.ExecuteAsync(@"
+                            INSERT INTO transactions (target_account_id, target_card_id, type, amount, fee_amount, total_debited, net_amount, description, transaction_date)
+                            VALUES (@TargetAccountId, @TargetCardId, 'Deposit', @Amount, @FeeAmount, @TotalDebited, @NetAmount, @Description, GETDATE())",
+                            new
+                            {
+                                TargetAccountId = targetAccountId,
+                                TargetCardId = targetCardId,
+                                Amount = grossAmountUzs,
+                                FeeAmount = feeAmountUzs,
+                                TotalDebited = grossAmountUzs,
+                                NetAmount = creditAmountUzs,
+                                Description = description
+                            },
+                            trans);
+
+                        await CashRepository.SyncCashTotalsAsync(db, trans, currencyId);
+                        trans.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         public async Task<bool> TransferByCardAsync(int sourceCardId, int targetCardId, decimal amount, decimal feeAmountUzs)
         {
             if (!IsValidMoneyAmount(amount) || feeAmountUzs < 0m || sourceCardId == targetCardId) return false;
