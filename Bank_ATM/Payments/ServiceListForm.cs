@@ -116,6 +116,22 @@ namespace Bank_ATM.Payments
             tile.StateCommon.Content.LongText.Font = new Font("Segoe UI", 11F, FontStyle.Bold, GraphicsUnit.Point);
             tile.StateNormal.Back.Color1 = Color.FromArgb(30, 41, 59);
             tile.StateNormal.Back.Color2 = Color.FromArgb(15, 23, 42);
+            tile.OverrideDefault.Back.Color1 = Color.FromArgb(30, 41, 59);
+            tile.OverrideDefault.Back.Color2 = Color.FromArgb(15, 23, 42);
+            tile.OverrideDefault.Border.Color1 = Color.FromArgb(34, 197, 94);
+            tile.OverrideDefault.Border.Color2 = Color.FromArgb(22, 163, 74);
+            tile.OverrideDefault.Border.Rounding = 12F;
+            tile.OverrideDefault.Border.Width = 2;
+            tile.OverrideDefault.Content.ShortText.Color1 = Color.White;
+            tile.OverrideDefault.Content.LongText.Color1 = Color.FromArgb(226, 232, 240);
+            tile.OverrideFocus.Back.Color1 = Color.FromArgb(30, 41, 59);
+            tile.OverrideFocus.Back.Color2 = Color.FromArgb(15, 23, 42);
+            tile.OverrideFocus.Border.Color1 = Color.FromArgb(34, 197, 94);
+            tile.OverrideFocus.Border.Color2 = Color.FromArgb(22, 163, 74);
+            tile.OverrideFocus.Border.Rounding = 12F;
+            tile.OverrideFocus.Border.Width = 2;
+            tile.OverrideFocus.Content.ShortText.Color1 = Color.White;
+            tile.OverrideFocus.Content.LongText.Color1 = Color.FromArgb(226, 232, 240);
             tile.StateTracking.Back.Color1 = Color.FromArgb(22, 163, 74);
             tile.StateTracking.Back.Color2 = Color.FromArgb(21, 128, 61);
             tile.StatePressed.Back.Color1 = Color.FromArgb(21, 128, 61);
@@ -138,6 +154,8 @@ namespace Bank_ATM.Payments
             {
                 paymentForm.ShowDialog(this);
             }
+
+            ActiveControl = btnBack;
         }
 
         private void btnPrev_Click(object sender, EventArgs e)

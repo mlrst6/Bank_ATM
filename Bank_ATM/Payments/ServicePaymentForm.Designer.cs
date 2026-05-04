@@ -48,7 +48,7 @@ namespace Bank_ATM.Payments
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(37)))), ((int)(((byte)(61)))));
             this.pnlHeader.Controls.Add(this.lblSubtitle);
             this.pnlHeader.Controls.Add(this.lblTitle);
-            this.pnlHeader.Location = new System.Drawing.Point(34, 22);
+            this.pnlHeader.Location = new System.Drawing.Point(134, 22);
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(832, 96);
             this.pnlHeader.TabIndex = 0;
@@ -83,7 +83,7 @@ namespace Bank_ATM.Payments
             this.pnlSelectedService.Controls.Add(this.lblCategoryValue);
             this.pnlSelectedService.Controls.Add(this.lblCashback);
             this.pnlSelectedService.Controls.Add(this.lblCashbackValue);
-            this.pnlSelectedService.Location = new System.Drawing.Point(34, 134);
+            this.pnlSelectedService.Location = new System.Drawing.Point(134, 134);
             this.pnlSelectedService.Name = "pnlSelectedService";
             this.pnlSelectedService.Size = new System.Drawing.Size(832, 100);
             this.pnlSelectedService.TabIndex = 1;
@@ -155,7 +155,7 @@ namespace Bank_ATM.Payments
             //
             this.lblReference.AutoSize = true;
             this.lblReference.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblReference.Location = new System.Drawing.Point(58, 252);
+            this.lblReference.Location = new System.Drawing.Point(158, 252);
             this.lblReference.Name = "lblReference";
             this.lblReference.Size = new System.Drawing.Size(104, 23);
             this.lblReference.TabIndex = 2;
@@ -167,7 +167,7 @@ namespace Bank_ATM.Payments
             this.txtReference.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtReference.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtReference.ForeColor = System.Drawing.Color.White;
-            this.txtReference.Location = new System.Drawing.Point(58, 278);
+            this.txtReference.Location = new System.Drawing.Point(158, 278);
             this.txtReference.Name = "txtReference";
             this.txtReference.Size = new System.Drawing.Size(778, 32);
             this.txtReference.TabIndex = 3;
@@ -176,7 +176,7 @@ namespace Bank_ATM.Payments
             //
             this.lblReferenceHint.AutoSize = true;
             this.lblReferenceHint.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblReferenceHint.Location = new System.Drawing.Point(58, 314);
+            this.lblReferenceHint.Location = new System.Drawing.Point(158, 314);
             this.lblReferenceHint.Name = "lblReferenceHint";
             this.lblReferenceHint.Size = new System.Drawing.Size(0, 23);
             this.lblReferenceHint.TabIndex = 4;
@@ -188,7 +188,7 @@ namespace Bank_ATM.Payments
             this.pnlVerification.Controls.Add(this.lblReferenceStatusCaption);
             this.pnlVerification.Controls.Add(this.lblCustomerNameValue);
             this.pnlVerification.Controls.Add(this.lblCustomerNameCaption);
-            this.pnlVerification.Location = new System.Drawing.Point(58, 342);
+            this.pnlVerification.Location = new System.Drawing.Point(158, 342);
             this.pnlVerification.Name = "pnlVerification";
             this.pnlVerification.Size = new System.Drawing.Size(778, 68);
             this.pnlVerification.TabIndex = 5;
@@ -237,7 +237,7 @@ namespace Bank_ATM.Payments
             //
             this.lblAmount.AutoSize = true;
             this.lblAmount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
-            this.lblAmount.Location = new System.Drawing.Point(58, 426);
+            this.lblAmount.Location = new System.Drawing.Point(158, 426);
             this.lblAmount.Name = "lblAmount";
             this.lblAmount.Size = new System.Drawing.Size(108, 23);
             this.lblAmount.TabIndex = 6;
@@ -249,7 +249,7 @@ namespace Bank_ATM.Payments
             this.txtAmount.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAmount.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtAmount.ForeColor = System.Drawing.Color.White;
-            this.txtAmount.Location = new System.Drawing.Point(58, 452);
+            this.txtAmount.Location = new System.Drawing.Point(158, 452);
             this.txtAmount.Name = "txtAmount";
             this.txtAmount.Size = new System.Drawing.Size(778, 32);
             this.txtAmount.TabIndex = 7;
@@ -258,7 +258,7 @@ namespace Bank_ATM.Payments
             //
             this.btnPay.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnPay.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnPay.Location = new System.Drawing.Point(456, 626);
+            this.btnPay.Location = new System.Drawing.Point(556, 626);
             this.btnPay.Name = "btnPay";
             this.btnPay.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnPay.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(128)))), ((int)(((byte)(61)))));
@@ -294,7 +294,7 @@ namespace Bank_ATM.Payments
             //
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancel.Location = new System.Drawing.Point(656, 626);
+            this.btnCancel.Location = new System.Drawing.Point(756, 626);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.OverrideDefault.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
             this.btnCancel.OverrideDefault.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
@@ -331,7 +331,7 @@ namespace Bank_ATM.Payments
             this.statusBanner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.statusBanner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.statusBanner.Location = new System.Drawing.Point(58, 514);
+            this.statusBanner.Location = new System.Drawing.Point(158, 514);
             this.statusBanner.Name = "statusBanner";
             this.statusBanner.Padding = new System.Windows.Forms.Padding(18, 10, 42, 10);
             this.statusBanner.Size = new System.Drawing.Size(778, 96);
@@ -342,7 +342,7 @@ namespace Bank_ATM.Payments
             //
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(23)))), ((int)(((byte)(38)))));
-            this.ClientSize = new System.Drawing.Size(900, 712);
+            this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.statusBanner);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnPay);
@@ -356,8 +356,9 @@ namespace Bank_ATM.Payments
             this.Controls.Add(this.pnlHeader);
             this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.White;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "ServicePaymentForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Service Payment";
             this.Load += new System.EventHandler(this.ServicePaymentForm_Load);
             this.pnlHeader.ResumeLayout(false);
