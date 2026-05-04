@@ -9,14 +9,10 @@ namespace Bank_ATM.Admin
 {
     public partial class AdminServiceEditForm : Form
     {
-        private static readonly string[] ServiceCategories =
-        {
-            "Mobile", "Internet", "Utilities", "TV & Streaming",
-            "Taxi", "Government", "Education", "Insurance", "Other"
-        };
         private readonly AdminService _adminService = new AdminService();
         private readonly ServiceDto _service;
         private readonly bool _isEdit;
+        private ServiceCategoryDto[] _categories = new ServiceCategoryDto[0];
 
         public AdminServiceEditForm()
         {
@@ -41,8 +37,7 @@ namespace Bank_ATM.Admin
             btnAddServiceAccount.Values.Text = btnAddServiceAccount.Text;
             btnDeactivateServiceAccount.Values.Text = btnDeactivateServiceAccount.Text;
             lblCashbackPercent.Text = "Cashback percent";
-            cmbCategory.Items.Clear();
-            cmbCategory.Items.AddRange(ServiceCategories);
+            LoadCategories();
 
             lblTitle.Text = _isEdit
                 ? LanguageManager.GetString("EditService")
@@ -93,8 +88,14 @@ namespace Bank_ATM.Admin
                 return;
             }
 
+            var selectedCategory = cmbCategory.SelectedItem as ServiceCategoryDto;
             _service.ServiceName = txtServiceName.Text.Trim();
-            _service.Category = cmbCategory.SelectedItem.ToString();
+            _service.Category = selectedCategory != null ? selectedCategory.Name : cmbCategory.SelectedItem.ToString();
+            _service.CategoryId = selectedCategory?.Id;
+            if (string.IsNullOrWhiteSpace(_service.IconEmoji) && selectedCategory != null)
+            {
+                _service.IconEmoji = selectedCategory.IconEmoji;
+            }
             _service.AccountHint = txtAccountHint.Text.Trim();
             _service.CashbackPercent = cashbackPercent;
             _service.IsActive = chkIsActive.Checked;
@@ -116,23 +117,44 @@ namespace Bank_ATM.Admin
             Close();
         }
 
+        private void LoadCategories()
+        {
+            _categories = _adminService.GetActiveServiceCategories().ToArray();
+            cmbCategory.DisplayMember = "DisplayName";
+            cmbCategory.ValueMember = "Id";
+            cmbCategory.DataSource = _categories;
+            if (cmbCategory.Items.Count > 0)
+            {
+                cmbCategory.SelectedIndex = 0;
+            }
+        }
+
         private void SelectCategory(string category)
         {
-            if (string.IsNullOrWhiteSpace(category))
+            if (_service.CategoryId.HasValue)
             {
-                if (cmbCategory.Items.Count > 0) cmbCategory.SelectedIndex = 0;
-                return;
+                var byId = _categories.FirstOrDefault(c => c.Id == _service.CategoryId.Value);
+                if (byId != null)
+                {
+                    cmbCategory.SelectedItem = byId;
+                    return;
+                }
             }
 
-            int index = cmbCategory.FindStringExact(category);
-            if (index >= 0)
+            if (!string.IsNullOrWhiteSpace(category))
             {
-                cmbCategory.SelectedIndex = index;
-                return;
+                var byName = _categories.FirstOrDefault(c => string.Equals(c.Name, category, StringComparison.OrdinalIgnoreCase));
+                if (byName != null)
+                {
+                    cmbCategory.SelectedItem = byName;
+                    return;
+                }
             }
 
-            cmbCategory.Items.Add(category);
-            cmbCategory.SelectedItem = category;
+            if (cmbCategory.Items.Count > 0)
+            {
+                cmbCategory.SelectedIndex = 0;
+            }
         }
 
         private static bool TryParsePercent(string rawValue, out decimal value)

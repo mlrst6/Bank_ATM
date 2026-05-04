@@ -14,6 +14,7 @@ namespace Bank_ATM.Services
         private readonly CardRepository _cardRepository = new CardRepository();
         private readonly TransactionRepository _transactionRepository = new TransactionRepository();
         private readonly ServicesRepository _servicesRepository = new ServicesRepository();
+        private readonly ServiceCategoryRepository _serviceCategoryRepository = new ServiceCategoryRepository();
         private readonly AtmRepository _atmRepository = new AtmRepository();
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
         private readonly CashRepository _cashRepository = new CashRepository();
@@ -392,6 +393,16 @@ namespace Bank_ATM.Services
         public ServiceDto[] GetAvailableServices()
         {
             return _servicesRepository.GetActiveServices().ToArray();
+        }
+
+        public ServiceCategoryDto[] GetActiveServiceCategories()
+        {
+            return _serviceCategoryRepository.GetActiveCategories().ToArray();
+        }
+
+        public ServiceDto[] GetServicesByCategory(int categoryId)
+        {
+            return _servicesRepository.GetActiveServicesByCategoryId(categoryId).ToArray();
         }
 
         public ServiceLookupResult VerifyServiceAccount(int serviceId, string accountReference)

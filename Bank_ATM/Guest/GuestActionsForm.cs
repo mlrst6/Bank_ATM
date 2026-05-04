@@ -34,7 +34,7 @@ namespace Bank_ATM
 
         private void btnPayServices_Click(object sender, EventArgs e)
         {
-            using (var form = new ServicePaymentForm(false))
+            using (var form = new ServiceCategoryForm(false))
             {
                 form.ShowDialog(this);
             }

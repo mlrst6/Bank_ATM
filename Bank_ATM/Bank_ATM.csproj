@@ -110,6 +110,12 @@
     <Compile Include="Admin\AdminServiceAccountEditForm.Designer.cs">
       <DependentUpon>AdminServiceAccountEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Admin\AdminCategoryEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\AdminCategoryEditForm.Designer.cs">
+      <DependentUpon>AdminCategoryEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Admin\AdminCurrencyEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -179,6 +185,18 @@
     <Compile Include="Payments\ServicePaymentForm.Designer.cs">
       <DependentUpon>ServicePaymentForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Payments\ServiceCategoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\ServiceCategoryForm.Designer.cs">
+      <DependentUpon>ServiceCategoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payments\ServiceListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payments\ServiceListForm.Designer.cs">
+      <DependentUpon>ServiceListForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LanguageForm1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -242,6 +260,7 @@
     <Compile Include="Repositories\CurrencyRepository.cs" />
     <Compile Include="Repositories\CashRepository.cs" />
     <Compile Include="Repositories\FeeRuleRepository.cs" />
+    <Compile Include="Repositories\ServiceCategoryRepository.cs" />
     <Compile Include="Repositories\ServicesRepository.cs" />
     <Compile Include="Repositories\TransactionRepository.cs" />
     <Compile Include="Program.cs" />

@@ -1,0 +1,29 @@
+﻿I am building a Bankomat ATM application in C# .NET WinForms. The project uses a SQL Server database. Currently there is a single dialog called GuestServicePaymentForm that shows a category filter dropdown, a service dropdown, an account/ref input, and a Pay/Cancel button — but it looks like a basic admin form, not an ATM.
+I need you to refactor this into a 3-form ATM-style payment flow:
+Form 1 — Category Selection Screen
+
+Show all service categories as large tiles/buttons with icons (e.g., 💡 Utilities, 🌐 Internet, 📱 Mobile, 🏠 Housing, 🚗 Transport, 🏦 Bank, 🎮 Entertainment, etc.)
+If there are more than 8–9 categories, add pagination (Previous / Next buttons)
+Full screen, dark ATM-style theme, large touch-friendly buttons
+On click → open Form 2 with the selected category
+
+Form 2 — Service Selection Screen
+
+Show services belonging to the selected category as large tiles
+Each tile shows the service name and logo/icon
+Back button to return to Form 1
+On click → open Form 3 with selected service
+
+Form 3 — Payment Form
+
+Show selected service name and category
+Input field for Account/Ref (with label showing required field type, e.g. "Subscriber ID")
+After entering the account, show a verification status and customer name lookup
+Amount input in UZS
+Large Pay (green) and Cancel (red) buttons
+On Pay → process payment, show confirmation screen
+
+Database:
+The existing database has tables: (Read migrations folder)
+Keep the dark navy ATM theme (#1a2235 background, white text, blue accents) consistent across all 3 forms. MPlease also write SQL INSERT statements to populate the database with at least 10 categories and 3–10 services per category, including a field for icon_emoji or icon_name.
+ake buttons large (minimum 120x80px) for touch/ATM use.

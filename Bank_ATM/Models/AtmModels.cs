@@ -119,11 +119,27 @@ namespace Bank_ATM.Models
         public int Id { get; set; }
         public string ServiceName { get; set; }
         public string Category { get; set; }
+        public int? CategoryId { get; set; }
+        public string IconEmoji { get; set; }
         public string AccountHint { get; set; }
         public decimal CashbackPercent { get; set; }
         public bool IsActive { get; set; }
         public int ValidReferenceCount { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class ServiceCategoryDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string IconEmoji { get; set; }
+        public int SortOrder { get; set; }
+        public bool IsActive { get; set; }
+        public int ServiceCount { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string DisplayName => string.IsNullOrWhiteSpace(IconEmoji)
+            ? Name
+            : IconEmoji + "  " + Name;
     }
 
     public class ServiceAccountDto

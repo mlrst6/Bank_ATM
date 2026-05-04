@@ -12,6 +12,7 @@ namespace Bank_ATM.Services
         private readonly CardRepository _cardRepository = new CardRepository();
         private readonly TransactionRepository _transactionRepository = new TransactionRepository();
         private readonly ServicesRepository _servicesRepository = new ServicesRepository();
+        private readonly ServiceCategoryRepository _serviceCategoryRepository = new ServiceCategoryRepository();
         private readonly AtmRepository _atmRepository = new AtmRepository();
         private readonly CurrencyRepository _currencyRepository = new CurrencyRepository();
         private readonly CashRepository _cashRepository = new CashRepository();
@@ -22,6 +23,8 @@ namespace Bank_ATM.Services
         public string GenerateCardNumber(string cardType = null) => _cardRepository.GenerateUniqueCardNumber(cardType);
         public IEnumerable<TransactionDto> GetAllTransactions() => _transactionRepository.GetAllTransactions();
         public IEnumerable<ServiceDto> GetAllServices() => _servicesRepository.GetAllServices();
+        public IEnumerable<ServiceCategoryDto> GetAllServiceCategories() => _serviceCategoryRepository.GetAllCategories();
+        public IEnumerable<ServiceCategoryDto> GetActiveServiceCategories() => _serviceCategoryRepository.GetActiveCategories();
         public IEnumerable<CurrencyDto> GetAllCurrencies() => _currencyRepository.GetAllCurrencies();
         public IEnumerable<FeeRuleDto> GetAllFeeRules() => _feeRuleRepository.GetAllRules();
         public IEnumerable<CashDenominationDto> GetAllCashDenominations() => _cashRepository.GetAllDenominations();
@@ -98,5 +101,21 @@ namespace Bank_ATM.Services
 
         public void DeleteCard(int cardId) => _cardRepository.DeleteCard(cardId);
         public void DeleteService(int serviceId) => _servicesRepository.DeleteService(serviceId);
+
+        public ServiceResult SaveServiceCategory(ServiceCategoryDto category, bool isEdit)
+        {
+            if (isEdit)
+            {
+                _serviceCategoryRepository.UpdateCategory(category);
+            }
+            else
+            {
+                _serviceCategoryRepository.CreateCategory(category);
+            }
+
+            return new ServiceResult { Success = true };
+        }
+
+        public void DeleteServiceCategory(int categoryId) => _serviceCategoryRepository.DeleteCategory(categoryId);
     }
 }

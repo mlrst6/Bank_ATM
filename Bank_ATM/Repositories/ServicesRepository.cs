@@ -25,6 +25,8 @@ namespace Bank_ATM.Repositories
                         id,
                         service_name as ServiceName,
                         category as Category,
+                        category_id as CategoryId,
+                        icon_emoji as IconEmoji,
                         account_hint as AccountHint,
                         cashback_percent as CashbackPercent,
                         is_active as IsActive,
@@ -50,6 +52,8 @@ namespace Bank_ATM.Repositories
                         id,
                         service_name as ServiceName,
                         category as Category,
+                        category_id as CategoryId,
+                        icon_emoji as IconEmoji,
                         account_hint as AccountHint,
                         cashback_percent as CashbackPercent,
                         is_active as IsActive,
@@ -65,6 +69,34 @@ namespace Bank_ATM.Repositories
             }
         }
 
+        public IEnumerable<ServiceDto> GetActiveServicesByCategoryId(int categoryId)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                return db.Query<ServiceDto>(@"
+                    SELECT
+                        id,
+                        service_name as ServiceName,
+                        category as Category,
+                        category_id as CategoryId,
+                        icon_emoji as IconEmoji,
+                        account_hint as AccountHint,
+                        cashback_percent as CashbackPercent,
+                        is_active as IsActive,
+                        (
+                            SELECT COUNT(*)
+                            FROM service_accounts sa
+                            WHERE sa.service_id = services.id
+                              AND sa.is_active = 1
+                        ) as ValidReferenceCount,
+                        created_at as CreatedAt
+                    FROM services
+                    WHERE is_active = 1 AND category_id = @CategoryId
+                    ORDER BY service_name",
+                    new { CategoryId = categoryId }).ToList();
+            }
+        }
+
         public ServiceDto GetServiceById(int id)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
@@ -74,6 +106,8 @@ namespace Bank_ATM.Repositories
                         id,
                         service_name as ServiceName,
                         category as Category,
+                        category_id as CategoryId,
+                        icon_emoji as IconEmoji,
                         account_hint as AccountHint,
                         cashback_percent as CashbackPercent,
                         is_active as IsActive,
@@ -94,13 +128,15 @@ namespace Bank_ATM.Repositories
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 int id = db.QuerySingle<int>(@"
-                    INSERT INTO services (service_name, category, account_hint, cashback_percent, is_active)
-                    VALUES (@ServiceName, @Category, @AccountHint, @CashbackPercent, @IsActive);
+                    INSERT INTO services (service_name, category, category_id, icon_emoji, account_hint, cashback_percent, is_active)
+                    VALUES (@ServiceName, @Category, @CategoryId, @IconEmoji, @AccountHint, @CashbackPercent, @IsActive);
                     SELECT CAST(SCOPE_IDENTITY() as int);",
                     new
                     {
                         service.ServiceName,
                         service.Category,
+                        service.CategoryId,
+                        IconEmoji = service.IconEmoji ?? string.Empty,
                         service.AccountHint,
                         service.CashbackPercent,
                         service.IsActive
@@ -118,6 +154,8 @@ namespace Bank_ATM.Repositories
                     UPDATE services
                     SET service_name = @ServiceName,
                         category = @Category,
+                        category_id = @CategoryId,
+                        icon_emoji = @IconEmoji,
                         account_hint = @AccountHint,
                         cashback_percent = @CashbackPercent,
                         is_active = @IsActive
@@ -127,6 +165,8 @@ namespace Bank_ATM.Repositories
                         service.Id,
                         service.ServiceName,
                         service.Category,
+                        service.CategoryId,
+                        IconEmoji = service.IconEmoji ?? string.Empty,
                         service.AccountHint,
                         service.CashbackPercent,
                         service.IsActive

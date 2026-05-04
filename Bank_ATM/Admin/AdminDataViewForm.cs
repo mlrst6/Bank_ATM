@@ -101,6 +101,8 @@ namespace Bank_ATM.Admin
                 _allItems = _adminService.GetAllFeeRules().Cast<object>().ToList();
             else if (_mode == "CASH")
                 _allItems = _adminService.GetAllCashDenominations().Cast<object>().ToList();
+            else if (_mode == "CATEGORIES")
+                _allItems = _adminService.GetAllServiceCategories().Cast<object>().ToList();
             else
                 _allItems = ((System.Collections.IEnumerable)_dataSource).Cast<object>().ToList();
 
@@ -177,6 +179,13 @@ namespace Bank_ATM.Admin
                     if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
                 }
             }
+            else if (_mode == "CATEGORIES")
+            {
+                using (var form = new AdminCategoryEditForm())
+                {
+                    if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
+                }
+            }
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
@@ -223,6 +232,14 @@ namespace Bank_ATM.Admin
                     if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
                 }
             }
+            else if (_mode == "CATEGORIES")
+            {
+                var category = (ServiceCategoryDto)dataGridView.SelectedRows[0].DataBoundItem;
+                using (var form = new AdminCategoryEditForm(category))
+                {
+                    if (form.ShowDialog() == DialogResult.OK) RefreshGrid();
+                }
+            }
         }
 
         private async void btnDelete_Click(object sender, EventArgs e)
@@ -265,6 +282,11 @@ namespace Bank_ATM.Admin
                 {
                     var rule = (FeeRuleDto)dataGridView.SelectedRows[0].DataBoundItem;
                     _adminService.DeactivateFeeRule(rule.Id);
+                }
+                else if (_mode == "CATEGORIES")
+                {
+                    var category = (ServiceCategoryDto)dataGridView.SelectedRows[0].DataBoundItem;
+                    _adminService.DeleteServiceCategory(category.Id);
                 }
                 RefreshGrid();
             }
@@ -578,6 +600,10 @@ namespace Bank_ATM.Admin
                 HideColumn("Id");
             }
             else if (_mode == "FEES")
+            {
+                HideColumn("Id");
+            }
+            else if (_mode == "CATEGORIES")
             {
                 HideColumn("Id");
             }

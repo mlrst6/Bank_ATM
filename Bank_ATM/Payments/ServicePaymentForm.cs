@@ -13,11 +13,10 @@ namespace Bank_ATM.Payments
     {
         private readonly BankingService _bankingService = new BankingService();
         private readonly bool _chargeCurrentAccount;
-        private ServiceDto[] _services = new ServiceDto[0];
+        private readonly ServiceDto _service;
         private bool _completed;
         private bool _isReviewing;
         private bool _referenceVerified;
-        private ServiceDto _pendingService;
         private ServiceAccountDto _verifiedServiceAccount;
         private string _pendingReference;
         private decimal _pendingAmount;
@@ -28,13 +27,15 @@ namespace Bank_ATM.Payments
         private decimal _completedCashback;
         private CashNoteDto[] _pendingNotes;
 
-        public ServicePaymentForm() : this(false)
+        public ServicePaymentForm(ServiceDto service, bool chargeCurrentAccount)
         {
-        }
+            if (service == null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
 
-        public ServicePaymentForm(bool chargeCurrentAccount)
-        {
             InitializeComponent();
+            _service = service;
             _chargeCurrentAccount = chargeCurrentAccount;
         }
 
@@ -53,6 +54,19 @@ namespace Bank_ATM.Payments
             btnCancel.Values.Text = btnCancel.Text;
             lblCustomerNameValue.Text = "-";
             lblReferenceStatusValue.Text = LanguageManager.GetString("WaitingForVerification");
+            lblCategory.Text = LanguageManager.GetString("Category");
+            lblCashback.Text = LanguageManager.GetString("Cashback");
+            lblReference.Text = LanguageManager.GetString("AccountNumber");
+            lblAmount.Text = LanguageManager.GetString("Amount") + " UZS";
+
+            lblServiceIcon.Text = string.IsNullOrWhiteSpace(_service.IconEmoji) ? "•" : _service.IconEmoji;
+            lblServiceName.Text = _service.ServiceName;
+            lblCategoryValue.Text = string.IsNullOrWhiteSpace(_service.Category) ? "-" : _service.Category;
+            lblCashbackValue.Text = _service.CashbackPercent.ToString("0.##", CultureInfo.CurrentCulture) + " %";
+            lblReferenceHint.Text = string.IsNullOrWhiteSpace(_service.AccountHint)
+                ? string.Empty
+                : LanguageManager.Format("RequiredFieldHint", _service.AccountHint);
+
             NumericInputDialog.Attach(txtReference, LanguageManager.GetString("AccountNumber"));
             if (!_chargeCurrentAccount)
             {
@@ -64,28 +78,6 @@ namespace Bank_ATM.Payments
                 NumericInputDialog.Attach(txtAmount, LanguageManager.GetString("Amount"));
             }
 
-            _services = _bankingService.GetAvailableServices();
-
-            var categories = _services
-                .Where(s => !string.IsNullOrWhiteSpace(s.Category))
-                .Select(s => s.Category)
-                .Distinct()
-                .OrderBy(c => c)
-                .ToArray();
-            cmbCategoryFilter.Items.Clear();
-            cmbCategoryFilter.Items.Add(LanguageManager.GetString("AllCategories"));
-            foreach (var cat in categories)
-                cmbCategoryFilter.Items.Add(cat);
-            cmbCategoryFilter.SelectedIndex = 0;
-
-            FilterServicesByCategory();
-
-            cmbCategoryFilter.SelectedIndexChanged += (s, args) => FilterServicesByCategory();
-            cmbServices.SelectedIndexChanged += (s, args) =>
-            {
-                UpdateHint();
-                ResetVerificationState();
-            };
             txtReference.TextChanged += (s, args) => ResetVerificationState();
         }
 
@@ -113,12 +105,6 @@ namespace Bank_ATM.Payments
 
         private void VerifyReference()
         {
-            if (cmbServices.SelectedItem == null)
-            {
-                ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Validation"), LanguageManager.GetString("PleaseSelectService"));
-                return;
-            }
-
             if (string.IsNullOrWhiteSpace(txtReference.Text))
             {
                 ShowStatus(StatusBannerKind.Warning, LanguageManager.GetString("Validation"), LanguageManager.GetString("InvalidServicePaymentInput"));
@@ -126,8 +112,7 @@ namespace Bank_ATM.Payments
                 return;
             }
 
-            var service = (ServiceDto)cmbServices.SelectedItem;
-            var lookup = _bankingService.VerifyServiceAccount(service.Id, txtReference.Text);
+            var lookup = _bankingService.VerifyServiceAccount(_service.Id, txtReference.Text);
             if (!lookup.Success)
             {
                 ResetVerificationState();
@@ -156,7 +141,7 @@ namespace Bank_ATM.Payments
 
         private void PreparePaymentReview()
         {
-            if (!_referenceVerified || _verifiedServiceAccount == null || cmbServices.SelectedItem == null)
+            if (!_referenceVerified || _verifiedServiceAccount == null)
             {
                 ShowStatus(
                     StatusBannerKind.Warning,
@@ -179,7 +164,6 @@ namespace Bank_ATM.Payments
                 return;
             }
 
-            var service = (ServiceDto)cmbServices.SelectedItem;
             string reference = _verifiedServiceAccount.ReferenceNumber;
             CashNoteDto[] notes = null;
             if (!_chargeCurrentAccount)
@@ -210,13 +194,11 @@ namespace Bank_ATM.Payments
                 }
             }
 
-            _pendingService = service;
             _pendingReference = reference;
             _pendingAmount = amount;
             _pendingNotes = notes;
             _isReviewing = true;
 
-            cmbServices.Enabled = false;
             txtReference.Enabled = false;
             txtAmount.Enabled = false;
             btnPay.Text = LanguageManager.GetString("Confirm");
@@ -233,8 +215,8 @@ namespace Bank_ATM.Payments
         {
             SetLoading(true);
             ServiceResult result = _chargeCurrentAccount
-                ? await _bankingService.PayServiceAsync(_pendingService.Id, _pendingReference, _pendingAmount, true)
-                : await _bankingService.PayServiceWithCashNotesAsync(_pendingService.Id, _pendingReference, _pendingNotes);
+                ? await _bankingService.PayServiceAsync(_service.Id, _pendingReference, _pendingAmount, true)
+                : await _bankingService.PayServiceWithCashNotesAsync(_service.Id, _pendingReference, _pendingNotes);
 
             SetLoading(false);
 
@@ -259,7 +241,6 @@ namespace Bank_ATM.Payments
             btnPay.Enabled = false;
             btnCancel.Text = LanguageManager.GetString("Close");
             btnCancel.Values.Text = btnCancel.Text;
-            cmbServices.Enabled = false;
             txtReference.Enabled = false;
             txtAmount.Enabled = false;
         }
@@ -283,41 +264,6 @@ namespace Bank_ATM.Payments
             Close();
         }
 
-        private void FilterServicesByCategory()
-        {
-            if (_isReviewing || _completed)
-                return;
-
-            string selected = cmbCategoryFilter.SelectedItem?.ToString();
-            bool isAll = string.IsNullOrWhiteSpace(selected) ||
-                         selected == LanguageManager.GetString("AllCategories");
-
-            var filtered = isAll
-                ? _services
-                : _services.Where(s => s.Category == selected).ToArray();
-
-            cmbServices.DataSource = null;
-            cmbServices.Items.Clear();
-            cmbServices.DataSource = filtered;
-            cmbServices.DisplayMember = "ServiceName";
-            cmbServices.ValueMember = "Id";
-
-            if (filtered.Length > 0)
-                cmbServices.SelectedIndex = 0;
-
-            ResetVerificationState();
-            UpdateHint();
-        }
-
-        private void UpdateHint()
-        {
-            var selected = cmbServices.SelectedItem as ServiceDto;
-            lblCategoryValue.Text = selected == null ? "-" : selected.Category;
-            lblReferenceHint.Text = selected == null
-                ? string.Empty
-                : LanguageManager.Format("RequiredFieldHint", selected.AccountHint);
-        }
-
         private void ResetVerificationState()
         {
             if (_isReviewing || _completed)
@@ -338,8 +284,6 @@ namespace Bank_ATM.Payments
             UseWaitCursor = isLoading;
             btnPay.Enabled = !isLoading && !_completed;
             btnCancel.Enabled = !isLoading;
-            cmbCategoryFilter.Enabled = !isLoading && !_completed && !_isReviewing;
-            cmbServices.Enabled = !isLoading && !_completed && !_isReviewing;
             txtReference.Enabled = !isLoading && !_completed && !_isReviewing;
             txtAmount.Enabled = !isLoading && !_completed && !_isReviewing;
         }
@@ -352,15 +296,12 @@ namespace Bank_ATM.Payments
         private void ClearReview()
         {
             _isReviewing = false;
-            _pendingService = null;
             _verifiedServiceAccount = null;
             _pendingReference = null;
             _pendingAmount = 0m;
             _pendingNotes = null;
             btnCancel.Text = LanguageManager.GetString("Cancel");
             btnCancel.Values.Text = btnCancel.Text;
-            cmbCategoryFilter.Enabled = true;
-            cmbServices.Enabled = true;
             txtReference.Enabled = true;
             txtAmount.Enabled = true;
             statusBanner.Clear();
@@ -371,7 +312,7 @@ namespace Bank_ATM.Payments
         {
             string amountLine = LanguageManager.Format("ServiceReceiptAmount", _pendingAmount, "UZS");
             string message =
-                LanguageManager.Format("ServiceReceiptService", _pendingService.ServiceName) + Environment.NewLine +
+                LanguageManager.Format("ServiceReceiptService", _service.ServiceName) + Environment.NewLine +
                 LanguageManager.Format("ServiceReceiptReference", _pendingReference) + Environment.NewLine +
                 LanguageManager.Format("ServiceReceiptCustomer", lblCustomerNameValue.Text) + Environment.NewLine +
                 amountLine;
@@ -384,7 +325,7 @@ namespace Bank_ATM.Payments
                 $"Fee: {fee.FeeAmountUzs:N2} UZS" + Environment.NewLine +
                 $"Fee percent: {fee.PercentFee:N4}%" + Environment.NewLine +
                 (_chargeCurrentAccount
-                    ? $"Total debited: {fee.TotalDebitUzs:N2} UZS{Environment.NewLine}Cashback: {CalculateCashback(_pendingAmount, _pendingService.CashbackPercent):N2} UZS"
+                    ? $"Total debited: {fee.TotalDebitUzs:N2} UZS{Environment.NewLine}Cashback: {CalculateCashback(_pendingAmount, _service.CashbackPercent):N2} UZS"
                     : $"Net service amount: {netAmount:N2} UZS");
 
             if (_pendingNotes != null && _pendingNotes.Length > 0)
@@ -419,7 +360,7 @@ namespace Bank_ATM.Payments
             return ReceiptWorkflow.OfferPdfReceipt(
                 this,
                 () => ReceiptService.GenerateGuestServicePaymentReceipt(
-                    _pendingService,
+                    _service,
                     _verifiedServiceAccount,
                     _pendingReference,
                     _pendingAmount,
@@ -436,10 +377,10 @@ namespace Bank_ATM.Payments
 
             if (string.IsNullOrWhiteSpace(customer))
             {
-                return $"{_pendingService.ServiceName}: {_pendingReference}";
+                return $"{_service.ServiceName}: {_pendingReference}";
             }
 
-            return $"{_pendingService.ServiceName}: {_pendingReference} ({customer})";
+            return $"{_service.ServiceName}: {_pendingReference} ({customer})";
         }
 
         private static bool TryParseAmount(string input, out decimal amount)

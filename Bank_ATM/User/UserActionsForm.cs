@@ -192,13 +192,10 @@ namespace Bank_ATM.User
 
         private void btnServices_Click(object sender, EventArgs e)
         {
-            using (var form = new ServicePaymentForm(true))
+            using (var form = new ServiceCategoryForm(true))
             {
-                if (form.ShowDialog(this) == DialogResult.OK)
-                {
-                    RefreshAccountSummary();
-                    ShowStatus(StatusBannerKind.Success, LanguageManager.GetString("Payment"), LanguageManager.GetString("ServicePaymentCompleted"));
-                }
+                form.ShowDialog(this);
+                RefreshAccountSummary();
             }
         }
 

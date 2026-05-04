@@ -37,6 +37,8 @@ namespace Bank_ATM.Admin
             btnManageCurrencies.Values.Text = btnManageCurrencies.Text;
             btnManageFees.Text = "Fee Rules";
             btnManageFees.Values.Text = btnManageFees.Text;
+            btnManageCategories.Text = "Categories";
+            btnManageCategories.Values.Text = btnManageCategories.Text;
             btnRefillAtm.Text = LanguageManager.GetString("RefillAtmCash");
             btnRefillAtm.Values.Text = btnRefillAtm.Text;
             btnLogout.Text = LanguageManager.GetString("Logout");
@@ -85,6 +87,13 @@ namespace Bank_ATM.Admin
         {
             var rules = _adminService.GetAllFeeRules();
             AdminDataViewForm viewForm = new AdminDataViewForm("FEE RULES", rules, "FEES");
+            viewForm.ShowDialog();
+        }
+
+        private void btnManageCategories_Click(object sender, EventArgs e)
+        {
+            var categories = _adminService.GetAllServiceCategories();
+            AdminDataViewForm viewForm = new AdminDataViewForm("SERVICE CATEGORIES", categories, "CATEGORIES");
             viewForm.ShowDialog();
         }
 
