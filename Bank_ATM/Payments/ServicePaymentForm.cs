@@ -404,5 +404,10 @@ namespace Bank_ATM.Payments
 
             return decimal.Round(amount * cashbackPercent / 100m, 2);
         }
+
+        private void pnlSelectedService_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

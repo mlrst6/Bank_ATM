@@ -42,9 +42,9 @@ namespace Bank_ATM.Payments
             this.pnlSelectedService.SuspendLayout();
             this.pnlVerification.SuspendLayout();
             this.SuspendLayout();
-            //
+            // 
             // pnlHeader
-            //
+            // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(37)))), ((int)(((byte)(61)))));
             this.pnlHeader.Controls.Add(this.lblSubtitle);
             this.pnlHeader.Controls.Add(this.lblTitle);
@@ -52,30 +52,30 @@ namespace Bank_ATM.Payments
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(832, 96);
             this.pnlHeader.TabIndex = 0;
-            //
+            // 
             // lblSubtitle
-            //
+            // 
             this.lblSubtitle.AutoSize = true;
             this.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblSubtitle.Location = new System.Drawing.Point(22, 54);
             this.lblSubtitle.Name = "lblSubtitle";
-            this.lblSubtitle.Size = new System.Drawing.Size(277, 23);
+            this.lblSubtitle.Size = new System.Drawing.Size(307, 23);
             this.lblSubtitle.TabIndex = 1;
             this.lblSubtitle.Text = "Confirm details and complete payment";
-            //
+            // 
             // lblTitle
-            //
+            // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitle.ForeColor = System.Drawing.Color.White;
             this.lblTitle.Location = new System.Drawing.Point(22, 18);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(180, 41);
+            this.lblTitle.Size = new System.Drawing.Size(243, 41);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Service Payment";
-            //
+            // 
             // pnlSelectedService
-            //
+            // 
             this.pnlSelectedService.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(32)))), ((int)(((byte)(56)))));
             this.pnlSelectedService.Controls.Add(this.lblServiceIcon);
             this.pnlSelectedService.Controls.Add(this.lblServiceName);
@@ -87,31 +87,32 @@ namespace Bank_ATM.Payments
             this.pnlSelectedService.Name = "pnlSelectedService";
             this.pnlSelectedService.Size = new System.Drawing.Size(832, 100);
             this.pnlSelectedService.TabIndex = 1;
-            //
+            this.pnlSelectedService.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlSelectedService_Paint);
+            // 
             // lblServiceIcon
-            //
+            // 
             this.lblServiceIcon.AutoSize = true;
             this.lblServiceIcon.Font = new System.Drawing.Font("Segoe UI Emoji", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblServiceIcon.ForeColor = System.Drawing.Color.White;
             this.lblServiceIcon.Location = new System.Drawing.Point(20, 18);
             this.lblServiceIcon.Name = "lblServiceIcon";
-            this.lblServiceIcon.Size = new System.Drawing.Size(64, 64);
+            this.lblServiceIcon.Size = new System.Drawing.Size(49, 67);
             this.lblServiceIcon.TabIndex = 0;
             this.lblServiceIcon.Text = "•";
-            //
+            // 
             // lblServiceName
-            //
+            // 
             this.lblServiceName.AutoSize = true;
             this.lblServiceName.Font = new System.Drawing.Font("Segoe UI Semibold", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblServiceName.ForeColor = System.Drawing.Color.White;
             this.lblServiceName.Location = new System.Drawing.Point(110, 16);
             this.lblServiceName.Name = "lblServiceName";
-            this.lblServiceName.Size = new System.Drawing.Size(150, 37);
+            this.lblServiceName.Size = new System.Drawing.Size(105, 37);
             this.lblServiceName.TabIndex = 1;
             this.lblServiceName.Text = "Service";
-            //
+            // 
             // lblCategory
-            //
+            // 
             this.lblCategory.AutoSize = true;
             this.lblCategory.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblCategory.Location = new System.Drawing.Point(112, 58);
@@ -119,9 +120,9 @@ namespace Bank_ATM.Payments
             this.lblCategory.Size = new System.Drawing.Size(79, 23);
             this.lblCategory.TabIndex = 2;
             this.lblCategory.Text = "Category";
-            //
+            // 
             // lblCategoryValue
-            //
+            // 
             this.lblCategoryValue.AutoSize = true;
             this.lblCategoryValue.ForeColor = System.Drawing.Color.White;
             this.lblCategoryValue.Location = new System.Drawing.Point(195, 58);
@@ -129,30 +130,30 @@ namespace Bank_ATM.Payments
             this.lblCategoryValue.Size = new System.Drawing.Size(17, 23);
             this.lblCategoryValue.TabIndex = 3;
             this.lblCategoryValue.Text = "-";
-            //
+            // 
             // lblCashback
-            //
+            // 
             this.lblCashback.AutoSize = true;
             this.lblCashback.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblCashback.Location = new System.Drawing.Point(560, 58);
             this.lblCashback.Name = "lblCashback";
-            this.lblCashback.Size = new System.Drawing.Size(86, 23);
+            this.lblCashback.Size = new System.Drawing.Size(82, 23);
             this.lblCashback.TabIndex = 4;
             this.lblCashback.Text = "Cashback";
-            //
+            // 
             // lblCashbackValue
-            //
+            // 
             this.lblCashbackValue.AutoSize = true;
-            this.lblCashbackValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(239)))), ((int)(((byte)(172)))));
             this.lblCashbackValue.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCashbackValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(239)))), ((int)(((byte)(172)))));
             this.lblCashbackValue.Location = new System.Drawing.Point(652, 58);
             this.lblCashbackValue.Name = "lblCashbackValue";
-            this.lblCashbackValue.Size = new System.Drawing.Size(38, 23);
+            this.lblCashbackValue.Size = new System.Drawing.Size(40, 23);
             this.lblCashbackValue.TabIndex = 5;
             this.lblCashbackValue.Text = "0 %";
-            //
+            // 
             // lblReference
-            //
+            // 
             this.lblReference.AutoSize = true;
             this.lblReference.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblReference.Location = new System.Drawing.Point(158, 252);
@@ -160,29 +161,29 @@ namespace Bank_ATM.Payments
             this.lblReference.Size = new System.Drawing.Size(104, 23);
             this.lblReference.TabIndex = 2;
             this.lblReference.Text = "Account/Ref";
-            //
+            // 
             // txtReference
-            //
+            // 
             this.txtReference.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.txtReference.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtReference.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtReference.ForeColor = System.Drawing.Color.White;
             this.txtReference.Location = new System.Drawing.Point(158, 278);
             this.txtReference.Name = "txtReference";
-            this.txtReference.Size = new System.Drawing.Size(778, 32);
+            this.txtReference.Size = new System.Drawing.Size(778, 34);
             this.txtReference.TabIndex = 3;
-            //
+            // 
             // lblReferenceHint
-            //
+            // 
             this.lblReferenceHint.AutoSize = true;
             this.lblReferenceHint.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblReferenceHint.Location = new System.Drawing.Point(158, 314);
             this.lblReferenceHint.Name = "lblReferenceHint";
             this.lblReferenceHint.Size = new System.Drawing.Size(0, 23);
             this.lblReferenceHint.TabIndex = 4;
-            //
+            // 
             // pnlVerification
-            //
+            // 
             this.pnlVerification.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(32)))), ((int)(((byte)(56)))));
             this.pnlVerification.Controls.Add(this.lblReferenceStatusValue);
             this.pnlVerification.Controls.Add(this.lblReferenceStatusCaption);
@@ -192,9 +193,9 @@ namespace Bank_ATM.Payments
             this.pnlVerification.Name = "pnlVerification";
             this.pnlVerification.Size = new System.Drawing.Size(778, 68);
             this.pnlVerification.TabIndex = 5;
-            //
+            // 
             // lblReferenceStatusValue
-            //
+            // 
             this.lblReferenceStatusValue.AutoSize = true;
             this.lblReferenceStatusValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(211)))), ((int)(((byte)(252)))));
             this.lblReferenceStatusValue.Location = new System.Drawing.Point(462, 36);
@@ -202,9 +203,9 @@ namespace Bank_ATM.Payments
             this.lblReferenceStatusValue.Size = new System.Drawing.Size(142, 23);
             this.lblReferenceStatusValue.TabIndex = 3;
             this.lblReferenceStatusValue.Text = "Waiting for check";
-            //
+            // 
             // lblReferenceStatusCaption
-            //
+            // 
             this.lblReferenceStatusCaption.AutoSize = true;
             this.lblReferenceStatusCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblReferenceStatusCaption.Location = new System.Drawing.Point(462, 16);
@@ -212,9 +213,9 @@ namespace Bank_ATM.Payments
             this.lblReferenceStatusCaption.Size = new System.Drawing.Size(135, 23);
             this.lblReferenceStatusCaption.TabIndex = 2;
             this.lblReferenceStatusCaption.Text = "Reference status";
-            //
+            // 
             // lblCustomerNameValue
-            //
+            // 
             this.lblCustomerNameValue.AutoSize = true;
             this.lblCustomerNameValue.ForeColor = System.Drawing.Color.White;
             this.lblCustomerNameValue.Location = new System.Drawing.Point(20, 36);
@@ -222,9 +223,9 @@ namespace Bank_ATM.Payments
             this.lblCustomerNameValue.Size = new System.Drawing.Size(17, 23);
             this.lblCustomerNameValue.TabIndex = 1;
             this.lblCustomerNameValue.Text = "-";
-            //
+            // 
             // lblCustomerNameCaption
-            //
+            // 
             this.lblCustomerNameCaption.AutoSize = true;
             this.lblCustomerNameCaption.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblCustomerNameCaption.Location = new System.Drawing.Point(20, 16);
@@ -232,9 +233,9 @@ namespace Bank_ATM.Payments
             this.lblCustomerNameCaption.Size = new System.Drawing.Size(132, 23);
             this.lblCustomerNameCaption.TabIndex = 0;
             this.lblCustomerNameCaption.Text = "Customer name";
-            //
+            // 
             // lblAmount
-            //
+            // 
             this.lblAmount.AutoSize = true;
             this.lblAmount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblAmount.Location = new System.Drawing.Point(158, 426);
@@ -242,20 +243,20 @@ namespace Bank_ATM.Payments
             this.lblAmount.Size = new System.Drawing.Size(108, 23);
             this.lblAmount.TabIndex = 6;
             this.lblAmount.Text = "Amount UZS";
-            //
+            // 
             // txtAmount
-            //
+            // 
             this.txtAmount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.txtAmount.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAmount.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtAmount.ForeColor = System.Drawing.Color.White;
             this.txtAmount.Location = new System.Drawing.Point(158, 452);
             this.txtAmount.Name = "txtAmount";
-            this.txtAmount.Size = new System.Drawing.Size(778, 32);
+            this.txtAmount.Size = new System.Drawing.Size(778, 34);
             this.txtAmount.TabIndex = 7;
-            //
+            // 
             // btnPay
-            //
+            // 
             this.btnPay.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnPay.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnPay.Location = new System.Drawing.Point(556, 626);
@@ -289,9 +290,9 @@ namespace Bank_ATM.Payments
             this.btnPay.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnPay.Values.Text = "PAY";
             this.btnPay.Click += new System.EventHandler(this.btnPay_Click);
-            //
+            // 
             // btnCancel
-            //
+            // 
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.Custom1;
             this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCancel.Location = new System.Drawing.Point(756, 626);
@@ -325,10 +326,10 @@ namespace Bank_ATM.Payments
             this.btnCancel.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnCancel.Values.Text = "CANCEL";
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            //
+            // 
             // statusBanner
-            //
-            this.statusBanner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            // 
+            this.statusBanner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.statusBanner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.statusBanner.Location = new System.Drawing.Point(158, 514);
@@ -337,9 +338,9 @@ namespace Bank_ATM.Payments
             this.statusBanner.Size = new System.Drawing.Size(778, 96);
             this.statusBanner.TabIndex = 10;
             this.statusBanner.Visible = false;
-            //
+            // 
             // ServicePaymentForm
-            //
+            // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(23)))), ((int)(((byte)(38)))));
             this.ClientSize = new System.Drawing.Size(1100, 720);
